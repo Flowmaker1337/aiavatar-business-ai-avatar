@@ -1,0 +1,60 @@
+# Docker Compose version is now optional
+
+services:
+  # Main application
+  aiavatar:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=${PORT:-3000}
+      # MongoDB connection - EXTERNAL (from .env)
+      - MONGODB_URI=${MONGODB_URI}
+      - MONGODB_DB_NAME=${MONGODB_DB_NAME}
+      - MONGODB_USERS_COLLECTION=${MONGODB_USERS_COLLECTION}
+      - MONGODB_AVATARS_COLLECTION=${MONGODB_AVATARS_COLLECTION}
+      - MONGODB_SESSIONS_COLLECTION=${MONGODB_SESSIONS_COLLECTION}
+      - MONGODB_CHAT_HISTORY_COLLECTION=${MONGODB_CHAT_HISTORY_COLLECTION}
+      # Redis connection - EXTERNAL (from .env)
+      - REDIS_URL=${REDIS_URL}
+      # Vector Database Configuration
+      - VECTOR_DB_TYPE=${VECTOR_DB_TYPE:-qdrant}
+      # Pinecone (cloud service - needs to be configured externally)
+      - PINECONE_API_KEY=${PINECONE_API_KEY}
+      - PINECONE_ENVIRONMENT=${PINECONE_ENVIRONMENT}
+      - PINECONE_PROJECT_ID=${PINECONE_PROJECT_ID}
+      - PINECONE_INDEX_NAME=${PINECONE_INDEX_NAME}
+      # Qdrant (can be external or local)
+      - QDRANT_URL=${QDRANT_URL}
+      - QDRANT_COLLECTION_NAME=${QDRANT_COLLECTION_NAME}
+      - QDRANT_API_KEY=${QDRANT_API_KEY}
+      # OpenAI (cloud service - needs to be configured externally)
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      # Eleven Labs (cloud service - needs to be configured externally)
+      - ELEVEN_LABS_API_KEY=${ELEVEN_LABS_API_KEY}
+      # Other settings
+      - MAX_TOKENS=${MAX_TOKENS:-1000}
+    restart: unless-stopped
+    networks:
+      - aiavatar-network
+
+  # Qdrant Vector Database (optional - only if QDRANT_URL is not set externally)
+  qdrant:
+    image: qdrant/qdrant:latest
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    restart: unless-stopped
+    networks:
+      - aiavatar-network
+    profiles:
+      - local-qdrant
+
+volumes:
+  qdrant_data:
+
+networks:
+  aiavatar-network:
+    driver: bridge 

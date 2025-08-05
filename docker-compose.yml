@@ -1,0 +1,90 @@
+# Docker Compose version is now optional
+
+services:
+  # Main application
+  aiavatar:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=${PORT:-3000}
+      # MongoDB connection
+      - MONGODB_URI=${MONGODB_URI:-mongodb://mongodb:27017/npc_agent}
+      - MONGODB_DB_NAME=${MONGODB_DB_NAME:-npc_agent}
+      - MONGODB_USERS_COLLECTION=${MONGODB_USERS_COLLECTION:-users}
+      - MONGODB_AVATARS_COLLECTION=${MONGODB_AVATARS_COLLECTION:-avatars}
+      - MONGODB_SESSIONS_COLLECTION=${MONGODB_SESSIONS_COLLECTION:-sessions}
+      - MONGODB_CHAT_HISTORY_COLLECTION=${MONGODB_CHAT_HISTORY_COLLECTION:-chatHistory}
+      # Redis connection
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+      # Vector Database Configuration
+      - VECTOR_DB_TYPE=${VECTOR_DB_TYPE:-qdrant}
+      # Pinecone (cloud service - needs to be configured externally)
+      - PINECONE_API_KEY=${PINECONE_API_KEY}
+      - PINECONE_ENVIRONMENT=${PINECONE_ENVIRONMENT}
+      - PINECONE_PROJECT_ID=${PINECONE_PROJECT_ID}
+      - PINECONE_INDEX_NAME=${PINECONE_INDEX_NAME}
+      # Qdrant (local vector database)
+      - QDRANT_URL=${QDRANT_URL:-http://qdrant:6333}
+      - QDRANT_COLLECTION_NAME=${QDRANT_COLLECTION_NAME:-knowledge_base}
+      - QDRANT_API_KEY=${QDRANT_API_KEY}
+      # OpenAI (cloud service - needs to be configured externally)
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      # Eleven Labs (cloud service - needs to be configured externally)
+      - ELEVEN_LABS_API_KEY=${ELEVEN_LABS_API_KEY}
+      # Other settings
+      - MAX_TOKENS=${MAX_TOKENS:-1000}
+    volumes:
+      - ./logs:/app/logs
+    depends_on:
+      - mongodb
+      - redis
+      - qdrant
+    restart: unless-stopped
+    networks:
+      - aiavatar-network
+
+  # MongoDB database
+  mongodb:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=npc_agent
+    volumes:
+      - mongodb_data:/data/db
+    restart: unless-stopped
+    networks:
+      - aiavatar-network
+
+  # Redis cache
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - aiavatar-network
+
+  # Qdrant Vector Database
+  qdrant:
+    image: qdrant/qdrant:latest
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    restart: unless-stopped
+    networks:
+      - aiavatar-network
+
+volumes:
+  mongodb_data:
+  redis_data:
+  qdrant_data:
+
+networks:
+  aiavatar-network:
+    driver: bridge 

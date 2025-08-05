@@ -1,0 +1,58 @@
+{
+  "name": "aiavatar",
+  "version": "1.0.0",
+  "description": "System Doradcy Leasingowego - NPC Agent",
+  "main": "dist/index.js",
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
+  },
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "nodemon --exec ts-node src/index.ts",
+    "build": "tsc && npm run copy-files",
+    "copy-files": "node scripts/copy-config-files.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "upload-vectors": "node dist/config/uploadVectorData.js",
+    "clear-vectors": "node dist/config/clearVectorData.js clear-all",
+    "clear-vectors-preview": "node dist/config/clearVectorData.js preview",
+    "clear-vectors-duplicates": "node dist/config/clearVectorData.js duplicates",
+    "upload-pinecone": "node dist/config/uploadToPinecone.js",
+    "clear-pinecone": "node dist/config/clearPineconeIndex.js clear-all",
+    "clear-pinecone-preview": "node dist/config/clearPineconeIndex.js preview",
+    "clear-pinecone-duplicates": "node dist/config/clearPineconeIndex.js duplicates",
+    "upload-qdrant": "node dist/config/uploadToQdrant.js",
+    "clear-qdrant": "node dist/config/clearQdrantIndex.js clear-all",
+    "clear-qdrant-preview": "node dist/config/clearQdrantIndex.js preview",
+    "clear-qdrant-duplicates": "node dist/config/clearQdrantIndex.js duplicates",
+    "upload-business-avatars": "node dist/config/uploadBusinessAvatarsToQdrant.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@pinecone-database/pinecone": "^1.1.2",
+    "@qdrant/js-client-rest": "^1.14.1",
+    "@types/mongodb": "^4.0.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "lodash": "^4.17.21",
+    "mongodb": "^6.16.0",
+    "openai": "^4.96.0",
+    "pinecone-client": "^2.0.0",
+    "redis": "^4.7.0",
+    "tiktoken": "^1.0.13",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.1",
+    "@types/lodash": "^4.14.202",
+    "@types/node": "^22.15.3",
+    "@types/uuid": "^10.0.0",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}

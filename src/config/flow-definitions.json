@@ -1,0 +1,364 @@
+{
+  "flows": [
+    {
+      "id": "greeting_flow",
+      "name": "Powitanie i nawiązanie kontaktu",
+      "description": "Proces powitania i zbudowania pierwszego kontaktu z użytkownikiem",
+      "entry_intents": ["greeting"],
+      "priority": 10,
+      "steps": [
+        {
+          "id": "initial_greeting",
+          "name": "Powitanie",
+          "description": "Ciepłe powitanie użytkownika",
+          "required": true,
+          "next_steps": ["company_introduction"]
+        },
+        {
+          "id": "company_introduction",
+          "name": "Przedstawienie firmy",
+          "description": "Krótkie przedstawienie swojej firmy",
+          "required": true,
+          "next_steps": ["conversation_opener"]
+        },
+        {
+          "id": "conversation_opener",
+          "name": "Otwarcie rozmowy",
+          "description": "Zaproszenie do rozmowy o potrzebach",
+          "required": true,
+          "next_steps": ["completed"]
+        }
+      ],
+      "success_criteria": ["initial_greeting", "company_introduction", "conversation_opener"],
+      "max_duration": 300,
+      "repeatable": true
+    },
+    {
+      "id": "company_presentation_flow",
+      "name": "Prezentacja firmy NPC",
+      "description": "Szczegółowe przedstawienie firmy, usług i możliwości",
+      "entry_intents": ["ask_about_npc_firm"],
+      "priority": 8,
+      "steps": [
+        {
+          "id": "company_overview",
+          "name": "Przegląd firmy",
+          "description": "Ogólny opis firmy i branży",
+          "required": true,
+          "next_steps": ["services_presentation"]
+        },
+        {
+          "id": "services_presentation",
+          "name": "Prezentacja usług",
+          "description": "Szczegółowy opis usług i produktów",
+          "required": true,
+          "next_steps": ["value_proposition"]
+        },
+        {
+          "id": "value_proposition",
+          "name": "Propozycja wartości",
+          "description": "Wyjaśnienie korzyści i wartości dodanej",
+          "required": true,
+          "next_steps": ["examples_cases"]
+        },
+        {
+          "id": "examples_cases",
+          "name": "Przykłady zastosowań",
+          "description": "Konkretne przykłady i case studies",
+          "required": false,
+          "next_steps": ["completed"]
+        }
+      ],
+      "success_criteria": ["company_overview", "services_presentation", "value_proposition"],
+      "max_duration": 600,
+      "repeatable": true
+    },
+    {
+      "id": "user_discovery_flow",
+      "name": "Poznanie firmy użytkownika",
+      "description": "Zbieranie informacji o firmie i kontekście biznesowym użytkownika",
+      "entry_intents": ["user_firm_info"],
+      "priority": 9,
+      "steps": [
+        {
+          "id": "basic_company_info",
+          "name": "Podstawowe informacje",
+          "description": "Nazwa, branża, rozmiar firmy",
+          "required": true,
+          "next_steps": ["business_model"]
+        },
+        {
+          "id": "business_model",
+          "name": "Model biznesowy",
+          "description": "Sposób działania i oferowane usługi",
+          "required": true,
+          "next_steps": ["target_market"]
+        },
+        {
+          "id": "target_market",
+          "name": "Rynek docelowy",
+          "description": "Klienci i segmenty rynkowe",
+          "required": true,
+          "next_steps": ["current_challenges"]
+        },
+        {
+          "id": "current_challenges",
+          "name": "Aktualne wyzwania",
+          "description": "Problemy i trudności w biznesie",
+          "required": false,
+          "next_steps": ["completed"]
+        }
+      ],
+      "success_criteria": ["basic_company_info", "business_model", "target_market"],
+      "max_duration": 900,
+      "repeatable": true
+    },
+    {
+      "id": "needs_analysis_flow",
+      "name": "Analiza potrzeb użytkownika",
+      "description": "Dogłębna analiza potrzeb, wyzwań i oczekiwań",
+      "entry_intents": ["user_needs"],
+      "priority": 9,
+      "steps": [
+        {
+          "id": "pain_points",
+          "name": "Punkty bólowe",
+          "description": "Identyfikacja głównych problemów",
+          "required": true,
+          "next_steps": ["impact_assessment"]
+        },
+        {
+          "id": "impact_assessment",
+          "name": "Ocena wpływu",
+          "description": "Jak problemy wpływają na biznes",
+          "required": true,
+          "next_steps": ["solution_attempts"]
+        },
+        {
+          "id": "solution_attempts",
+          "name": "Próby rozwiązania",
+          "description": "Co już próbowano, co działało/nie działało",
+          "required": true,
+          "next_steps": ["success_metrics"]
+        },
+        {
+          "id": "success_metrics",
+          "name": "Metryki sukcesu",
+          "description": "Jak zmierzyć sukces rozwiązania",
+          "required": false,
+          "next_steps": ["completed"]
+        }
+      ],
+      "success_criteria": ["pain_points", "impact_assessment", "solution_attempts"],
+      "max_duration": 1200,
+      "repeatable": true
+    },
+    {
+      "id": "expectations_flow",
+      "name": "Oczekiwania wobec współpracy",
+      "description": "Zrozumienie oczekiwań użytkownika wobec partnerstwa",
+      "entry_intents": ["user_expectations"],
+      "priority": 7,
+      "steps": [
+        {
+          "id": "cooperation_style",
+          "name": "Styl współpracy",
+          "description": "Preferowany sposób współpracy",
+          "required": true,
+          "next_steps": ["timeline_expectations"]
+        },
+        {
+          "id": "timeline_expectations",
+          "name": "Oczekiwania czasowe",
+          "description": "Harmonogram i tempo pracy",
+          "required": true,
+          "next_steps": ["communication_preferences"]
+        },
+        {
+          "id": "communication_preferences",
+          "name": "Preferencje komunikacyjne",
+          "description": "Sposób i częstotliwość komunikacji",
+          "required": true,
+          "next_steps": ["success_criteria"]
+        },
+        {
+          "id": "success_criteria",
+          "name": "Kryteria sukcesu",
+          "description": "Jak definiować sukces współpracy",
+          "required": false,
+          "next_steps": ["completed"]
+        }
+      ],
+      "success_criteria": ["cooperation_style", "timeline_expectations", "communication_preferences"],
+      "max_duration": 800,
+      "repeatable": true
+    },
+    {
+      "id": "deep_questions_flow",
+      "name": "Pytania pogłębiające",
+      "description": "Zadawanie celnych pytań dla lepszego zrozumienia kontekstu",
+      "entry_intents": ["user_questions"],
+      "priority": 6,
+      "steps": [
+        {
+          "id": "context_clarification",
+          "name": "Wyjaśnienie kontekstu",
+          "description": "Doprecyzowanie sytuacji i tła",
+          "required": true,
+          "next_steps": ["deep_dive"]
+        },
+        {
+          "id": "deep_dive",
+          "name": "Pogłębienie tematu",
+          "description": "Szczegółowe omówienie kluczowych aspektów",
+          "required": true,
+          "next_steps": ["implications"]
+        },
+        {
+          "id": "implications",
+          "name": "Konsekwencje i implikacje",
+          "description": "Analiza skutków i powiązań",
+          "required": true,
+          "next_steps": ["action_items"]
+        },
+        {
+          "id": "action_items",
+          "name": "Punkty działania",
+          "description": "Konkretne kroki do podjęcia",
+          "required": false,
+          "next_steps": ["completed"]
+        }
+      ],
+      "success_criteria": ["context_clarification", "deep_dive", "implications"],
+      "max_duration": 1000,
+      "repeatable": true
+    },
+    {
+      "id": "solution_flow",
+      "name": "Prezentacja rozwiązań",
+      "description": "Przedstawienie dopasowanych rozwiązań i propozycji współpracy",
+      "entry_intents": ["solution_presentation"],
+      "priority": 8,
+      "steps": [
+        {
+          "id": "solution_overview",
+          "name": "Przegląd rozwiązań",
+          "description": "Ogólne przedstawienie możliwych rozwiązań",
+          "required": true,
+          "next_steps": ["detailed_proposal"]
+        },
+        {
+          "id": "detailed_proposal",
+          "name": "Szczegółowa propozycja",
+          "description": "Konkretne rozwiązanie dopasowane do potrzeb",
+          "required": true,
+          "next_steps": ["benefits_analysis"]
+        },
+        {
+          "id": "benefits_analysis",
+          "name": "Analiza korzyści",
+          "description": "Wyjaśnienie korzyści i wartości dodanej",
+          "required": true,
+          "next_steps": ["implementation_plan"]
+        },
+        {
+          "id": "implementation_plan",
+          "name": "Plan wdrożenia",
+          "description": "Kroki i harmonogram implementacji",
+          "required": false,
+          "next_steps": ["completed"]
+        }
+      ],
+      "success_criteria": ["solution_overview", "detailed_proposal", "benefits_analysis"],
+      "max_duration": 1500,
+      "repeatable": true
+    },
+    {
+      "id": "conversation_redirect_flow",
+      "name": "Przekierowanie rozmowy",
+      "description": "Obsługa sygnałów przekierowania rozmowy lub zakończenia tematu",
+      "entry_intents": ["conversation_redirect"],
+      "priority": 8,
+      "steps": [
+        {
+          "id": "acknowledge_redirect",
+          "name": "Potwierdzenie przekierowania",
+          "description": "Potwierdzenie chęci przekierowania rozmowy",
+          "required": true,
+          "next_steps": ["next_steps_proposal"]
+        },
+        {
+          "id": "next_steps_proposal",
+          "name": "Propozycja kolejnych kroków",
+          "description": "Zaproponowanie konkretnych kolejnych kroków",
+          "required": true,
+          "next_steps": ["meeting_arrangement"]
+        },
+        {
+          "id": "meeting_arrangement",
+          "name": "Umówienie spotkania",
+          "description": "Prośba o podanie adresu email do umówienia spotkania",
+          "required": true,
+          "next_steps": ["meeting_confirmation"]
+        },
+        {
+          "id": "meeting_confirmation",
+          "name": "Potwierdzenie umówienia spotkania",
+          "description": "Potwierdzenie otrzymania emaila i informacja o wysłaniu maila",
+          "required": true,
+          "next_steps": ["completed"]
+        }
+      ],
+      "success_criteria": ["acknowledge_redirect", "next_steps_proposal", "meeting_arrangement", "meeting_confirmation"],
+      "max_duration": 600,
+      "repeatable": true
+    },
+    {
+      "id": "npc_buyer_flow",
+      "name": "NPC jako potencjalny klient",
+      "description": "Flow w którym NPC wyraża zainteresowanie ofertą użytkownika i zadaje pytania jako potencjalny kupiec",
+      "entry_intents": ["npc_interest_in_user_offer"],
+      "priority": 8,
+      "steps": [
+        {
+          "id": "express_interest",
+          "name": "Wyrażenie zainteresowania",
+          "description": "NPC wyraża zainteresowanie ofertą użytkownika",
+          "required": true,
+          "next_steps": ["ask_about_offer"]
+        },
+        {
+          "id": "ask_about_offer",
+          "name": "Pytania o ofertę",
+          "description": "NPC zadaje konkretne pytania o ofertę użytkownika",
+          "required": true,
+          "next_steps": ["evaluate_fit"]
+        },
+        {
+          "id": "evaluate_fit",
+          "name": "Ocena dopasowania",
+          "description": "NPC ocenia czy oferta pasuje do jego potrzeb",
+          "required": true,
+          "next_steps": ["discuss_terms"]
+        },
+        {
+          "id": "discuss_terms",
+          "name": "Omówienie warunków",
+          "description": "NPC omawia warunki potencjalnej współpracy",
+          "required": true,
+          "next_steps": ["purchase_decision"]
+        },
+        {
+          "id": "purchase_decision",
+          "name": "Decyzja o zakupie",
+          "description": "NPC podejmuje decyzję o potencjalnym zakupie lub współpracy",
+          "required": true,
+          "next_steps": ["completed"]
+        }
+      ],
+      "success_criteria": ["express_interest", "ask_about_offer", "evaluate_fit", "discuss_terms", "purchase_decision"],
+      "max_duration": 800,
+      "repeatable": true
+    }
+  ]
+} 

@@ -1,0 +1,15 @@
+{
+  "goals": [
+    {
+      "name": "end_conversation",
+      "repeatable": false,
+      "enabled_by_default": true,
+      "activation": {
+        "intent": "end_conversation"
+      },
+      "actions": {
+        "say_verbatim": "Dziękuję za rozmowę! Jeśli będziesz mieć więcej pytań, jestem do dyspozycji."
+      }
+    }
+  ]
+}

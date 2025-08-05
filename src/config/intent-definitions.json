@@ -1,0 +1,217 @@
+{
+  "intents": [
+    {
+      "name": "greeting",
+      "description": "Rozpoczęcie rozmowy z użytkownikiem w uprzejmy, profesjonalny sposób",
+      "keywords": ["cześć", "dzień dobry", "witaj", "hello", "hej", "miło poznać"],
+      "examples": [
+        "Dzień dobry, miło mi poznać",
+        "Cześć, jak się masz?",
+        "Witam, jestem...",
+        "Hello, nice to meet you"
+      ],
+      "requires_flow": true,
+      "flow_name": "greeting_flow",
+      "repeatable": true,
+      "priority": 10
+    },
+    {
+      "name": "ask_about_npc_firm",
+      "description": "Pytania o firmę NPC, jej działalność, misję, usługi",
+      "keywords": ["firma", "działalność", "zajmujecie", "usługi", "produkty", "specjalizacja"],
+      "examples": [
+        "Czym się zajmujecie?",
+        "Opowiedz o swojej firmie",
+        "Jakie macie usługi?",
+        "Co oferujecie?"
+      ],
+      "requires_flow": true,
+      "flow_name": "company_presentation_flow",
+      "repeatable": true,
+      "priority": 8
+    },
+    {
+      "name": "user_firm_info",
+      "description": "Zbieranie danych o firmie użytkownika",
+      "keywords": ["moja firma", "pracujemy", "zajmujemy się", "nasza działalność"],
+      "examples": [
+        "Nasza firma zajmuje się...",
+        "Mamy problem z...",
+        "Pracujemy nad...",
+        "Jesteśmy w branży..."
+      ],
+      "requires_flow": true,
+      "flow_name": "user_discovery_flow",
+      "repeatable": true,
+      "priority": 9
+    },
+    {
+      "name": "user_needs",
+      "description": "Identyfikacja potrzeb i wyzwań użytkownika",
+      "keywords": ["potrzebujemy", "szukamy", "problem", "wyzwanie", "chcemy"],
+      "examples": [
+        "Potrzebujemy rozwiązania...",
+        "Mamy problem z...",
+        "Szukamy sposobu na...",
+        "Chcemy poprawić..."
+      ],
+      "requires_flow": true,
+      "flow_name": "needs_analysis_flow",
+      "repeatable": true,
+      "priority": 9
+    },
+    {
+      "name": "user_expectations",
+      "description": "Zbieranie oczekiwań użytkownika względem współpracy",
+      "keywords": ["oczekujemy", "zależy nam", "warunki", "współpraca", "partnerstwo"],
+      "examples": [
+        "Zależy nam na...",
+        "Oczekujemy...",
+        "Warunki współpracy...",
+        "Dla nas kluczowe jest..."
+      ],
+      "requires_flow": true,
+      "flow_name": "expectations_flow",
+      "repeatable": true,
+      "priority": 7
+    },
+    {
+      "name": "user_questions",
+      "description": "Pytania pogłębiające od użytkownika",
+      "keywords": ["dlaczego", "jak", "kiedy", "gdzie", "czy można", "jakie"],
+      "examples": [
+        "Jak to działa?",
+        "Dlaczego tak?",
+        "Czy można...?",
+        "Jakie są możliwości?"
+      ],
+      "requires_flow": true,
+      "flow_name": "deep_questions_flow",
+      "repeatable": true,
+      "priority": 6
+    },
+    {
+      "name": "solution_presentation",
+      "description": "Prezentacja rozwiązań i propozycji współpracy",
+      "keywords": ["rozwiązanie", "propozycja", "oferujemy", "możemy pomóc"],
+      "examples": [
+        "Jakie macie rozwiązania?",
+        "Co możecie zaproponować?",
+        "Jak możecie pomóc?",
+        "Pokażcie swoją ofertę"
+      ],
+      "requires_flow": true,
+      "flow_name": "solution_flow",
+      "repeatable": true,
+      "priority": 8
+    },
+    {
+      "name": "user_comments",
+      "description": "Komentarze i luźne wypowiedzi użytkownika",
+      "keywords": ["eh", "ale", "hmm", "ciekawe", "fajnie", "super"],
+      "examples": [
+        "Ale dziś mam ciężki dzień...",
+        "Hmm, ciekawe podejście",
+        "Fajnie, że tak myślicie",
+        "Super, bardzo mi się podoba"
+      ],
+      "requires_flow": false,
+      "repeatable": true,
+      "priority": 3
+    },
+    {
+      "name": "general_questions",
+      "description": "Pytania ogólne o branżę, trendy, rynek",
+      "keywords": ["rynek", "branża", "trendy", "AI", "przyszłość", "rozwój"],
+      "examples": [
+        "Jak AI wpływa na rynek?",
+        "Jakie są trendy w branży?",
+        "Co myślisz o przyszłości?",
+        "Jak wygląda rynek?"
+      ],
+      "requires_flow": false,
+      "repeatable": true,
+      "priority": 5
+    },
+    {
+      "name": "conversation_redirect",
+      "description": "Przekierowanie rozmowy lub sygnał zakończenia tematu",
+      "keywords": ["zespół", "zespołem", "porozmawiaj", "skontaktuj", "przekaż", "szczegóły", "dalej", "następny krok"],
+      "examples": [
+        "O szczegółach najlepiej gdybyś porozmawiał z moim zespołem",
+        "Skontaktuj się z naszym zespołem",
+        "Przekaż to dalej",
+        "Przejdźmy do następnego kroku",
+        "Chcę rozmawiać z kimś z zespołu"
+      ],
+      "requires_flow": true,
+      "flow_name": "conversation_redirect_flow",
+      "repeatable": true,
+      "priority": 8
+    },
+    {
+      "name": "email_promise",
+      "description": "Użytkownik obiecuje podać adres email ale jeszcze go nie podał",
+      "keywords": ["podam", "dam", "wyślę", "prześlę", "podać", "wysłać", "przesłać"],
+      "examples": [
+        "Podam Ci mail do kierownika",
+        "Dam Ci jego email",
+        "Wyślę Ci adres email",
+        "Mogę podać adres do kontaktu",
+        "Prześlę Ci kontakt do zespołu"
+      ],
+      "requires_flow": false,
+      "repeatable": true,
+      "priority": 8
+    },
+    {
+      "name": "email_provided",
+      "description": "Użytkownik faktycznie podaje konkretny adres email osoby do kontaktu",
+      "keywords": ["@", "gmail", "outlook", "yahoo", ".com", ".pl", ".org"],
+      "examples": [
+        "jan.kowalski@firma.pl",
+        "Mój email to kowalski@example.com",
+        "Proszę pisać na adres: biuro@firma.pl",
+        "Kontakt: anna.nowak@company.com",
+        "kowalski@gmail.com to jego email"
+      ],
+      "requires_flow": false,
+      "repeatable": true,
+      "priority": 9
+    },
+    {
+      "name": "npc_interest_in_user_offer",
+      "description": "NPC wyrażające zainteresowanie ofertą lub rozwiązaniami użytkownika",
+      "keywords": ["zainteresowany", "kupić", "potrzebujemy", "mogłoby nam się przydać", "chcielibyśmy", "szukamy", "kupno", "współpraca"],
+      "examples": [
+        "To brzmi interesująco, mogłoby nam się przydać",
+        "Jesteśmy zainteresowani Twoim rozwiązaniem",
+        "Chcielibyśmy dowiedzieć się więcej o Twojej ofercie",
+        "Szukamy właśnie czegoś takiego",
+        "Nasza firma potrzebuje podobnego rozwiązania",
+        "Moglibyśmy być zainteresowani kupnem"
+      ],
+      "requires_flow": true,
+      "flow_name": "npc_buyer_flow",
+      "repeatable": true,
+      "priority": 8
+    },
+    {
+      "name": "user_presenting_offer",
+      "description": "Użytkownik przedstawia swoją ofertę, produkty lub usługi",
+      "keywords": ["oferujemy", "mamy do zaoferowania", "nasze produkty", "nasze usługi", "specjalizujemy się", "możemy Wam pomóc", "nasze rozwiązania"],
+      "examples": [
+        "Oferujemy rozwiązania z zakresu...",
+        "Mamy do zaoferowania system...",
+        "Specjalizujemy się w...",
+        "Nasze produkty to...",
+        "Możemy Wam pomóc w...",
+        "Nasze rozwiązania pomagają...",
+        "Świadczymy usługi..."
+      ],
+      "requires_flow": false,
+      "repeatable": true,
+      "priority": 7
+    }
+  ]
+} 

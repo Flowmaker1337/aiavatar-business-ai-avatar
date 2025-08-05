@@ -1,0 +1,106 @@
+{
+  "goals": [
+    {
+      "name": "greeting",
+      "repeatable": true,
+      "enabled_by_default": true,
+      "activation": {
+        "trigger": "przywitanie",
+        "intent": "greeting"
+      },
+      "actions": [
+        {
+          "instruction": "Przywitaj się z użytkownikiem w przyjazny sposób",
+          "emotion_change": "JOY",
+          "say_verbatim": "Witam! Jestem Twoim Doradcą Leasingowym. W czym mogę pomóc w kwestii finansowania lub leasingu?"
+        }
+      ]
+    },
+    {
+      "name": "goodbye",
+      "repeatable": true,
+      "enabled_by_default": true,
+      "activation": {
+        "trigger": "pożegnanie"
+      },
+      "actions": [
+        {
+          "instruction": "Pożegnaj się z użytkownikiem",
+          "emotion_change": "NEUTRAL",
+          "say_verbatim": "Dziękuję za rozmowę! Jeśli będziesz mieć więcej pytań dotyczących leasingu, jestem do dyspozycji."
+        }
+      ]
+    },
+    {
+      "name": "leasing_calculator",
+      "repeatable": true,
+      "enabled_by_default": true,
+      "activation": {
+        "trigger": "kalkulator_leasingowy"
+      },
+      "actions": [
+        {
+          "instruction": "Pomóż użytkownikowi obliczyć ratę leasingową",
+          "emotion_change": "NEUTRAL",
+          "say_verbatim": "Aby obliczyć szacunkową ratę leasingową, potrzebuję kilku informacji: wartość przedmiotu, okres leasingu, wpłatę własną i oprocentowanie. Czy masz te dane?"
+        }
+      ],
+      "extracted_entities": [
+        {
+          "name": "wartość_przedmiotu"
+        },
+        {
+          "name": "okres_leasingu"
+        },
+        {
+          "name": "wpłata_własna"
+        },
+        {
+          "name": "oprocentowanie"
+        }
+      ]
+    },
+    {
+      "name": "complaint_handling",
+      "repeatable": true,
+      "enabled_by_default": true,
+      "activation": {
+        "trigger": "skarga",
+        "intent": "criticism"
+      },
+      "actions": [
+        {
+          "instruction": "Przeproś użytkownika i zaproponuj pomoc",
+          "emotion_change": "SADNESS",
+          "say_verbatim": "Przepraszam za niedogodności. Rozumiem Twoje zastrzeżenia. Jako doradca leasingowy, zależy mi na zapewnieniu najlepszych rozwiązań. Czy mógłbym poznać więcej szczegółów, aby lepiej pomóc w tej sytuacji?"
+        }
+      ]
+    },
+    {
+      "name": "offer_consultation",
+      "repeatable": false,
+      "enabled_by_default": true,
+      "activation": {
+        "trigger": "konsultacja"
+      },
+      "actions": [
+        {
+          "instruction": "Zaproponuj konsultację z prawdziwym doradcą",
+          "emotion_change": "JOY",
+          "say_verbatim": "Z przyjemnością umówię Cię na konsultację z dedykowanym doradcą leasingowym. Czy preferujesz kontakt telefoniczny, czy może spotkanie osobiste w jednym z naszych oddziałów?",
+          "character_changes": {
+            "disable_goals": ["offer_consultation"]
+          }
+        }
+      ],
+      "extracted_entities": [
+        {
+          "name": "forma_kontaktu"
+        },
+        {
+          "name": "termin"
+        }
+      ]
+    }
+  ]
+} 

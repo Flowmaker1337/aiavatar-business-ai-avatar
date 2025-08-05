@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Avatar Business Dashboard</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/d3@7/dist/d3.min.js"></script>
+    <script src="https://unpkg.com/dagre-d3@0.6.4/dist/dagre-d3.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            line-height: 1.6;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 350px 1fr 300px;
+            grid-template-rows: 1fr 200px;
+            height: 100vh;
+            gap: 12px;
+            padding: 12px;
+        }
+        
+        .panel {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #30363d;
+        }
+        
+        .panel-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #f0f6fc;
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-online {
+            background: #238636;
+            color: #fff;
+        }
+        
+        .status-offline {
+            background: #da3633;
+            color: #fff;
+        }
+        
+        .chat-panel {
+            grid-row: 1 / 2;
+        }
+        
+        .flow-panel {
+            grid-row: 1 / 2;
+        }
+        
+        .mindstate-panel {
+            grid-row: 1 / 2;
+        }
+        
+        .debug-panel {
+            grid-column: 1 / -1;
+            grid-row: 2 / 3;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 16px;
+            padding: 8px;
+            background: #0d1117;
+            border-radius: 6px;
+            border: 1px solid #30363d;
+        }
+        
+        .message {
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            max-width: 90%;
+        }
+        
+        .message-user {
+            background: #1f6feb;
+            color: #fff;
+            margin-left: auto;
+        }
+        
+        .message-avatar {
+            background: #262c36;
+            color: #c9d1d9;
+        }
+        
+        .message-time {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-bottom: 4px;
+        }
+        
+        .chat-input {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 12px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            font-size: 14px;
+        }
+        
+        .chat-input input:focus {
+            outline: none;
+            border-color: #1f6feb;
+        }
+        
+        .btn {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #238636;
+            color: #fff;
+        }
+        
+        .btn-primary:hover {
+            background: #2ea043;
+        }
+        
+        .btn-secondary {
+            background: #30363d;
+            color: #c9d1d9;
+        }
+        
+        .btn-secondary:hover {
+            background: #484f58;
+        }
+        
+        .flow-graph {
+            flex: 1;
+            overflow: auto;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            min-height: 600px;
+            padding: 10px;
+        }
+        
+        .flow-graph svg {
+            background: #0d1117;
+            border-radius: 6px;
+        }
+        
+        /* Flow Graph Node Styles */
+        .flow-graph .node rect {
+            rx: 8px;
+            ry: 8px;
+            stroke-width: 2px;
+        }
+        
+        .flow-graph .type-normal rect {
+            fill: #21262d;
+            stroke: #30363d;
+        }
+        
+        .flow-graph .type-active rect {
+            fill: #1f6feb;
+            stroke: #58a6ff;
+            stroke-width: 3px;
+        }
+        
+        .flow-graph .type-completed rect {
+            fill: #238636;
+            stroke: #56d364;
+        }
+        
+        /* Flow Overview Styles */
+        .flow-graph .type-flow-normal rect {
+            fill: #21262d;
+            stroke: #30363d;
+            stroke-width: 2px;
+        }
+        
+        .flow-graph .type-flow-active rect {
+            fill: #1f6feb;
+            stroke: #58a6ff;
+            stroke-width: 3px;
+        }
+        
+        .flow-graph .type-flow-completed rect {
+            fill: #238636;
+            stroke: #56d364;
+            stroke-width: 2px;
+        }
+        
+        .flow-graph .node text {
+            fill: #f0f6fc;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        
+        .flow-graph .type-active text,
+        .flow-graph .type-flow-active text {
+            fill: #ffffff;
+            font-weight: 600;
+        }
+        
+        .flow-graph .edgePath path {
+            stroke: #30363d;
+            stroke-width: 2px;
+            fill: none;
+        }
+        
+        .flow-graph .edgePath .arrowhead {
+            fill: #30363d;
+        }
+        
+        /* Step Indicator Styles */
+        .flow-graph .step-indicator rect {
+            cursor: pointer;
+        }
+        
+        .flow-graph .step-indicator text {
+            pointer-events: none;
+        }
+        
+        .mindstate-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .mindstate-item {
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            background: #262c36;
+            border-radius: 6px;
+            border-left: 3px solid #1f6feb;
+        }
+        
+        .mindstate-item.fulfilled {
+            border-left-color: #238636;
+            opacity: 0.7;
+        }
+        
+        .mindstate-intent {
+            font-weight: 500;
+            color: #f0f6fc;
+        }
+        
+        .mindstate-meta {
+            font-size: 12px;
+            color: #8b949e;
+            margin-top: 4px;
+        }
+        
+        .debug-logs {
+            flex: 1;
+            overflow-y: auto;
+            background: #0d1117;
+            border-radius: 6px;
+            border: 1px solid #30363d;
+            padding: 8px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 12px;
+        }
+        
+        .log-entry {
+            margin-bottom: 4px;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
+        .log-info {
+            color: #79c0ff;
+        }
+        
+        .log-success {
+            color: #56d364;
+        }
+        
+        .log-error {
+            color: #ff7b72;
+        }
+        
+        .log-warning {
+            color: #f0883e;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #8b949e;
+        }
+        
+        .spinner {
+            border: 2px solid #30363d;
+            border-top: 2px solid #1f6feb;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            color: #ff7b72;
+            text-align: center;
+            padding: 20px;
+            background: #261c22;
+            border-radius: 6px;
+            margin: 16px 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect, useCallback } = React;
+        
+        // API Service
+        const apiService = {
+            async health() {
+                const response = await fetch('/api/health');
+                return response.json();
+            },
+            
+            async query(message, sessionId) {
+                const response = await fetch('/api/query', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_message: message,
+                        session_id: sessionId
+                    })
+                });
+                return response.json();
+            },
+            
+            async getChatHistory(sessionId) {
+                const response = await fetch(`/api/chat/${sessionId}`);
+                return response.json();
+            },
+            
+            async getSessionState(sessionId) {
+                if (!sessionId) return null;
+                const response = await fetch(`/api/state/${sessionId}`);
+                return response.json();
+            },
+            
+            async getFlowDefinitions() {
+                const response = await fetch('/api/flows');
+                return response.json();
+            }
+        };
+        
+        // Chat Panel Component
+        const ChatPanel = ({ sessionId, onSessionChange }) => {
+            const [messages, setMessages] = useState([]);
+            const [inputMessage, setInputMessage] = useState('');
+            const [isLoading, setIsLoading] = useState(false);
+            const [error, setError] = useState(null);
+            
+            const sendMessage = async (e) => {
+                e.preventDefault();
+                if (!inputMessage.trim() || isLoading) return;
+                
+                const userMessage = inputMessage.trim();
+                setInputMessage('');
+                setIsLoading(true);
+                setError(null);
+                
+                // Add user message immediately
+                const userMsg = {
+                    id: Date.now(),
+                    content: userMessage,
+                    isUser: true,
+                    timestamp: new Date().toISOString()
+                };
+                setMessages(prev => [...prev, userMsg]);
+                
+                try {
+                    const response = await apiService.query(userMessage, sessionId);
+                    
+                    if (response.status === 'success') {
+                        const avatarMsg = {
+                            id: Date.now() + 1,
+                            content: response.message,
+                            isUser: false,
+                            timestamp: new Date().toISOString(),
+                            analysis: response.analysis
+                        };
+                        setMessages(prev => [...prev, avatarMsg]);
+                        
+                        // Update session if needed
+                        if (response.session_id && response.session_id !== sessionId) {
+                            onSessionChange(response.session_id);
+                        }
+                    } else {
+                        setError(response.message || 'Wystąpił błąd podczas przetwarzania wiadomości');
+                    }
+                } catch (err) {
+                    setError('Błąd połączenia z serwerem');
+                    console.error('Chat error:', err);
+                } finally {
+                    setIsLoading(false);
+                }
+            };
+            
+            useEffect(() => {
+                if (sessionId) {
+                    const fetchHistory = async () => {
+                        try {
+                            const response = await apiService.getChatHistory(sessionId);
+                            if (response.status === 'success') {
+                                const formattedMessages = response.history.map(item => ({
+                                    id: item._id,
+                                    content: item.content,
+                                    isUser: item.isUser,
+                                    timestamp: item.timestamp,
+                                    analysis: item.analysis
+                                }));
+                                setMessages(formattedMessages);
+                            }
+                        } catch (err) {
+                            console.error('Failed to fetch chat history:', err);
+                            setError('Nie można załadować historii czatu.');
+                        }
+                    };
+                    fetchHistory();
+                }
+            }, [sessionId]);
+            
+            return (
+                <div className="panel chat-panel">
+                    <div className="panel-header">
+                        <h3 className="panel-title">Chat z AI Avatar</h3>
+                        <div className="status-badge status-online">Online</div>
+                    </div>
+                    
+                    <div className="chat-messages">
+                        {messages.map((msg) => (
+                            <div key={msg.id} className={`message ${msg.isUser ? 'message-user' : 'message-avatar'}`}>
+                                <div className="message-time">
+                                    {new Date(msg.timestamp).toLocaleTimeString()}
+                                </div>
+                                <div>{msg.content}</div>
+                                {msg.analysis && (
+                                    <div className="message-meta">
+                                        Intent: {msg.analysis.intent} | Relevant: {msg.analysis.topic_relevant ? 'Yes' : 'No'}
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                        {isLoading && (
+                            <div className="loading">
+                                <div className="spinner"></div>
+                                Avatar myśli...
+                            </div>
+                        )}
+                        {error && (
+                            <div className="error-message">
+                                {error}
+                            </div>
+                        )}
+                    </div>
+                    
+                    <form onSubmit={sendMessage} className="chat-input">
+                        <input
+                            type="text"
+                            value={inputMessage}
+                            onChange={(e) => setInputMessage(e.target.value)}
+                            placeholder="Napisz wiadomość..."
+                            disabled={isLoading}
+                        />
+                        <button type="submit" className="btn btn-primary" disabled={isLoading}>
+                            Wyślij
+                        </button>
+                    </form>
+                </div>
+            );
+        };
+        
+        // Flow Graph Component
+        const FlowGraph = ({ sessionId, flows, activeFlow }) => {
+            const graphRef = React.useRef(null);
+            
+            useEffect(() => {
+                if (!graphRef.current || !flows.length) return;
+                
+                // Clear previous graph
+                d3.select(graphRef.current).selectAll("*").remove();
+                
+                const svg = d3.select(graphRef.current);
+                const margin = { top: 20, right: 20, bottom: 20, left: 200 };
+                const flowHeight = 80;
+                const stepWidth = 120;
+                const stepHeight = 40;
+                const stepSpacing = 10;
+                const flowSpacing = 20;
+                
+                // Calculate dimensions
+                const maxSteps = Math.max(...flows.map(f => f.steps.length));
+                const svgWidth = margin.left + margin.right + (maxSteps * (stepWidth + stepSpacing));
+                const svgHeight = margin.top + margin.bottom + (flows.length * (flowHeight + flowSpacing));
+                
+                svg.attr("width", svgWidth);
+                svg.attr("height", svgHeight);
+                
+                const g = svg.append("g")
+                    .attr("transform", `translate(${margin.left}, ${margin.top})`);
+                
+                // Sort flows by priority
+                const sortedFlows = [...flows].sort((a, b) => b.priority - a.priority);
+                
+                // Render each flow as a row
+                sortedFlows.forEach((flow, flowIndex) => {
+                    const isActive = flow.id === activeFlow?.flow_id;
+                    const isCompleted = activeFlow?.status === 'completed' && flow.id === activeFlow?.flow_id;
+                    
+                    const flowY = flowIndex * (flowHeight + flowSpacing);
+                    
+                    // Flow background and border
+                    let flowColor = '#21262d';
+                    let strokeColor = '#30363d';
+                    let strokeWidth = 2;
+                    
+                    if (isActive) {
+                        flowColor = '#1f6feb';
+                        strokeColor = '#58a6ff';
+                        strokeWidth = 3;
+                    } else if (isCompleted) {
+                        flowColor = '#238636';
+                        strokeColor = '#56d364';
+                    }
+                    
+                    // Flow label background
+                    g.append("rect")
+                        .attr("x", -180)
+                        .attr("y", flowY)
+                        .attr("width", 170)
+                        .attr("height", flowHeight)
+                        .attr("rx", 6)
+                        .attr("ry", 6)
+                        .style("fill", flowColor)
+                        .style("stroke", strokeColor)
+                        .style("stroke-width", strokeWidth + "px");
+                    
+                    // Flow name
+                    g.append("text")
+                        .attr("x", -95)
+                        .attr("y", flowY + 20)
+                        .attr("text-anchor", "middle")
+                        .style("fill", "#f0f6fc")
+                        .style("font-size", "12px")
+                        .style("font-weight", isActive ? "600" : "500")
+                        .text(flow.name);
+                    
+                    // Flow entry intents
+                    const entryIntents = flow.entry_intents.join(', ');
+                    g.append("text")
+                        .attr("x", -95)
+                        .attr("y", flowY + 35)
+                        .attr("text-anchor", "middle")
+                        .style("fill", "#8b949e")
+                        .style("font-size", "10px")
+                        .text(`(${entryIntents})`);
+                    
+                    // Flow priority
+                    g.append("text")
+                        .attr("x", -95)
+                        .attr("y", flowY + 50)
+                        .attr("text-anchor", "middle")
+                        .style("fill", "#8b949e")
+                        .style("font-size", "10px")
+                        .text(`Priority: ${flow.priority}`);
+                    
+                    // Render all steps for this flow
+                    flow.steps.forEach((step, stepIndex) => {
+                        const isCurrentStep = isActive && activeFlow.current_step === step.id;
+                        const isCompletedStep = isActive && activeFlow.completed_steps?.includes(step.id);
+                        
+                        let stepColor = '#21262d';
+                        let stepStroke = '#30363d';
+                        let stepStrokeWidth = 1;
+                        
+                        if (isCurrentStep) {
+                            stepColor = '#1f6feb';
+                            stepStroke = '#58a6ff';
+                            stepStrokeWidth = 3;
+                        } else if (isCompletedStep) {
+                            stepColor = '#238636';
+                            stepStroke = '#56d364';
+                            stepStrokeWidth = 2;
+                        }
+                        
+                        const stepX = stepIndex * (stepWidth + stepSpacing);
+                        const stepY = flowY + (flowHeight - stepHeight) / 2;
+                        
+                        // Step background
+                        g.append("rect")
+                            .attr("x", stepX)
+                            .attr("y", stepY)
+                            .attr("width", stepWidth)
+                            .attr("height", stepHeight)
+                            .attr("rx", 4)
+                            .attr("ry", 4)
+                            .style("fill", stepColor)
+                            .style("stroke", stepStroke)
+                            .style("stroke-width", stepStrokeWidth + "px")
+                            .style("cursor", "pointer");
+                        
+                        // Step name
+                        g.append("text")
+                            .attr("x", stepX + stepWidth / 2)
+                            .attr("y", stepY + stepHeight / 2 + 4)
+                            .attr("text-anchor", "middle")
+                            .style("fill", "#f0f6fc")
+                            .style("font-size", "11px")
+                            .style("font-weight", isCurrentStep ? "600" : "400")
+                            .text(step.name);
+                        
+                        // Add arrow between steps
+                        if (stepIndex < flow.steps.length - 1) {
+                            const arrowX = stepX + stepWidth + stepSpacing / 2;
+                            const arrowY = stepY + stepHeight / 2;
+                            
+                            g.append("path")
+                                .attr("d", `M ${arrowX - 5} ${arrowY} L ${arrowX + 5} ${arrowY}`)
+                                .style("stroke", "#30363d")
+                                .style("stroke-width", "2px")
+                                .style("marker-end", "url(#arrowhead)");
+                        }
+                    });
+                });
+                
+                // Add arrow marker definition
+                const defs = svg.append("defs");
+                defs.append("marker")
+                    .attr("id", "arrowhead")
+                    .attr("viewBox", "0 -5 10 10")
+                    .attr("refX", 5)
+                    .attr("refY", 0)
+                    .attr("markerWidth", 4)
+                    .attr("markerHeight", 4)
+                    .attr("orient", "auto")
+                    .append("path")
+                    .attr("d", "M0,-5L10,0L0,5")
+                    .style("fill", "#30363d");
+
+            }, [flows, activeFlow]);
+
+            const currentFlow = flows.find(f => f.id === activeFlow?.flow_id);
+
+            return (
+                <div className="panel flow-panel">
+                    <div className="panel-header">
+                        <h3 className="panel-title">Flow Overview</h3>
+                        <div className="status-badge status-online">
+                            {flows.length} Flows
+                        </div>
+                    </div>
+                    
+                    <div className="flow-graph">
+                        <svg ref={graphRef}></svg>
+                    </div>
+                    
+                    <div style={{ padding: '16px', fontSize: '12px', color: '#8b949e' }}>
+                        <div><strong>Active Flow:</strong> {currentFlow?.name || 'Brak aktywnego flow'}</div>
+                        <div><strong>Current Step:</strong> {activeFlow?.current_step || 'Brak aktywnego kroku'}</div>
+                        <div><strong>Flow Progress:</strong> {activeFlow?.completed_steps?.length || 0}/{currentFlow?.steps?.length || 0} kroków</div>
+                        <div><strong>Flow Status:</strong> {activeFlow?.status || 'Nieaktywny'}</div>
+                    </div>
+                </div>
+            );
+        };
+        
+        // MindState Panel Component
+        const MindStatePanel = ({ sessionId, mindState }) => {
+            return (
+                <div className="panel mindstate-panel">
+                    <div className="panel-header">
+                        <h3 className="panel-title">MindState Monitor</h3>
+                        <div className="status-badge status-online">Tracking</div>
+                    </div>
+                    
+                    <div className="mindstate-list">
+                        {!mindState || !mindState.stack ? (
+                            <div className="loading">
+                                <div className="spinner"></div>
+                                Oczekiwanie na sesję...
+                            </div>
+                        ) : (
+                            mindState.stack.map((item, index) => (
+                                <div key={index} className={`mindstate-item ${mindState.fulfilled_intents[item.intent]?.fulfilled ? 'fulfilled' : ''}`}>
+                                    <div className="mindstate-intent">{item.intent}</div>
+                                    <div className="mindstate-meta">
+                                        Confidence: {(item.confidence * 100).toFixed(1)}% | 
+                                        {mindState.fulfilled_intents[item.intent]?.fulfilled ? ' Fulfilled' : ' Active'} | 
+                                        {new Date(item.timestamp).toLocaleTimeString()}
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            );
+        };
+        
+        // Debug Panel Component
+        const DebugPanel = () => {
+            const [logs, setLogs] = useState([]);
+            const [isVisible, setIsVisible] = useState(true);
+            
+            useEffect(() => {
+                // Mock debug logs
+                const mockLogs = [
+                    { type: 'info', message: 'Dashboard initialized', timestamp: Date.now() - 5000 },
+                    { type: 'success', message: 'API connection established', timestamp: Date.now() - 4000 },
+                    { type: 'info', message: 'Chat session started', timestamp: Date.now() - 3000 },
+                    { type: 'warning', message: 'TTS service unavailable', timestamp: Date.now() - 2000 },
+                    { type: 'success', message: 'Query processed successfully', timestamp: Date.now() - 1000 }
+                ];
+                setLogs(mockLogs);
+            }, []);
+            
+            return (
+                <div className="panel debug-panel">
+                    <div className="panel-header">
+                        <h3 className="panel-title">Debug Console</h3>
+                        <button 
+                            className="btn btn-secondary"
+                            onClick={() => setIsVisible(!isVisible)}
+                        >
+                            {isVisible ? 'Hide' : 'Show'}
+                        </button>
+                    </div>
+                    
+                    {isVisible && (
+                        <div className="debug-logs">
+                            {logs.map((log, index) => (
+                                <div key={index} className={`log-entry log-${log.type}`}>
+                                    [{new Date(log.timestamp).toLocaleTimeString()}] {log.message}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+        
+        // Main Dashboard Component
+        const Dashboard = () => {
+            const [sessionId, setSessionId] = useState(null);
+            const [isHealthy, setIsHealthy] = useState(false);
+            const [sessionState, setSessionState] = useState(null);
+            const [flowDefinitions, setFlowDefinitions] = useState([]);
+            
+            const fetchSessionState = useCallback(async () => {
+                if (!sessionId) return;
+                try {
+                    const state = await apiService.getSessionState(sessionId);
+                    if (state.status === 'success') {
+                        setSessionState(state);
+                    }
+                } catch (err) {
+                    console.error('Failed to fetch session state:', err);
+                }
+            }, [sessionId]);
+            
+            useEffect(() => {
+                const checkHealth = async () => {
+                    try {
+                        const health = await apiService.health();
+                        setIsHealthy(health.status === 'ok');
+                    } catch (err) {
+                        console.error('Health check failed:', err);
+                        setIsHealthy(false);
+                    }
+                };
+                
+                const fetchFlows = async () => {
+                    try {
+                        const response = await apiService.getFlowDefinitions();
+                        if (response.status === 'success') {
+                            setFlowDefinitions(response.flows);
+                        }
+                    } catch (err) {
+                        console.error('Failed to fetch flow definitions:', err);
+                    }
+                };
+                
+                checkHealth();
+                fetchFlows();
+                const interval = setInterval(checkHealth, 30000);
+                
+                return () => clearInterval(interval);
+            }, []);
+            
+            useEffect(() => {
+                fetchSessionState();
+                const stateInterval = setInterval(fetchSessionState, 5000); // Poll every 5 seconds
+                return () => clearInterval(stateInterval);
+            }, [fetchSessionState]);
+            
+            const handleSessionChange = (newSessionId) => {
+                setSessionId(newSessionId);
+                // Fetch initial history for new session
+                // The ChatPanel will do this itself via its useEffect
+            };
+            
+            return (
+                <div className="dashboard">
+                    <ChatPanel 
+                        sessionId={sessionId} 
+                        onSessionChange={handleSessionChange}
+                    />
+                    <FlowGraph 
+                        sessionId={sessionId}
+                        flows={flowDefinitions}
+                        activeFlow={sessionState?.activeFlow}
+                    />
+                    <MindStatePanel 
+                        sessionId={sessionId} 
+                        mindState={sessionState?.mindState}
+                    />
+                    <DebugPanel />
+                </div>
+            );
+        };
+        
+        // Render the app
+        ReactDOM.render(<Dashboard />, document.getElementById('root'));
+    </script>
+</body>
+</html> 
