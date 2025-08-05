@@ -5,6 +5,7 @@ import avatarController from '../controllers/avatar.controller';
 import sessionController from '../controllers/session.controller';
 import healthController from '../controllers/health.controller';
 import flowController from '../controllers/flow.controller';
+import knowledgePrepareController from '../controllers/knowledge-prepare.controller';
 
 const router = Router();
 
@@ -51,5 +52,19 @@ router.get('/health/vector-database', healthController.getVectorDatabaseHealth.b
 
 // Endpoint for detailed health check of all system components
 router.get('/health/detailed', healthController.getDetailedHealth.bind(healthController));
+
+// ============ KNOWLEDGE PREPARATION ENGINE ENDPOINTS ============
+
+// Endpoint for processing training materials
+router.post('/knowledge/process', knowledgePrepareController.processTrainingFile.bind(knowledgePrepareController));
+
+// Endpoint for getting processed flows
+router.get('/knowledge/flows/:courseId', knowledgePrepareController.getProcessedFlows.bind(knowledgePrepareController));
+
+// Test endpoint for 12 Archetypes processing
+router.post('/knowledge/test-12archetypes', knowledgePrepareController.test12Archetypes.bind(knowledgePrepareController));
+
+// Health check for Knowledge Preparation Engine
+router.get('/knowledge/health', knowledgePrepareController.healthCheck.bind(knowledgePrepareController));
 
 export default router; 

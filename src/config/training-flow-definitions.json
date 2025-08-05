@@ -1,0 +1,244 @@
+{
+  "flows": [
+    {
+      "id": "theory_introduction_flow",
+      "name": "Wprowadzenie teoretyczne",
+      "description": "Przedstawienie teorii, konceptów i fundamentalnych zasad",
+      "entry_intents": ["theory_request", "concept_explanation"],
+      "priority": 10,
+      "steps": [
+        {
+          "id": "concept_overview",
+          "name": "Przegląd głównych konceptów",
+          "description": "Wprowadzenie do tematu i kluczowych pojęć",
+          "required": true,
+          "next_steps": ["theory_explanation"]
+        },
+        {
+          "id": "theory_explanation",
+          "name": "Wyjaśnienie teorii",
+          "description": "Szczegółowe omówienie teoretycznych podstaw",
+          "required": true,
+          "next_steps": ["examples_presentation"]
+        },
+        {
+          "id": "examples_presentation",
+          "name": "Przykłady praktyczne",
+          "description": "Konkretne przykłady ilustrujące teorię",
+          "required": true,
+          "next_steps": ["key_takeaways"]
+        },
+        {
+          "id": "key_takeaways",
+          "name": "Kluczowe wnioski",
+          "description": "Podsumowanie najważniejszych punktów",
+          "required": true,
+          "next_steps": ["completed"]
+        }
+      ],
+      "success_criteria": ["concept_overview", "theory_explanation", "examples_presentation", "key_takeaways"],
+      "max_duration": 900,
+      "repeatable": true
+    },
+    {
+      "id": "guided_practice_flow",
+      "name": "Ćwiczenia z przewodnikiem",
+      "description": "Wspólne wykonywanie ćwiczeń krok po kroku",
+      "entry_intents": ["practice_ready", "show_example"],
+      "priority": 9,
+      "steps": [
+        {
+          "id": "exercise_setup",
+          "name": "Przygotowanie ćwiczenia",
+          "description": "Przedstawienie zadania i celów ćwiczenia",
+          "required": true,
+          "next_steps": ["step_by_step_demo"]
+        },
+        {
+          "id": "step_by_step_demo",
+          "name": "Demonstracja krok po kroku",
+          "description": "Pokazanie wykonania ćwiczenia z wyjaśnieniami",
+          "required": true,
+          "next_steps": ["participant_attempt"]
+        },
+        {
+          "id": "participant_attempt",
+          "name": "Próba uczestnika",
+          "description": "Uczestnik wykonuje ćwiczenie z przewodnikiem",
+          "required": true,
+          "next_steps": ["feedback_correction"]
+        },
+        {
+          "id": "feedback_correction",
+          "name": "Feedback i korekty",
+          "description": "Ocena wykonania i ewentualne poprawki",
+          "required": true,
+          "next_steps": ["completed"]
+        }
+      ],
+      "success_criteria": ["exercise_setup", "step_by_step_demo", "participant_attempt", "feedback_correction"],
+      "max_duration": 1200,
+      "repeatable": true
+    },
+    {
+      "id": "question_answer_flow",
+      "name": "Sesja pytań i odpowiedzi",
+      "description": "Weryfikacja zrozumienia przez pytania i odpowiedzi",
+      "entry_intents": ["question_ask", "understanding_check", "clarification"],
+      "priority": 8,
+      "steps": [
+        {
+          "id": "comprehension_check",
+          "name": "Sprawdzenie zrozumienia",
+          "description": "Zadanie pytań sprawdzających wiedzę",
+          "required": true,
+          "next_steps": ["clarification_request"]
+        },
+        {
+          "id": "clarification_request",
+          "name": "Prośba o wyjaśnienie",
+          "description": "Doprecyzowanie niejasnych punktów",
+          "required": true,
+          "next_steps": ["detailed_explanation"]
+        },
+        {
+          "id": "detailed_explanation",
+          "name": "Szczegółowe wyjaśnienie",
+          "description": "Dogłębne wyjaśnienie trudnych zagadnień",
+          "required": true,
+          "next_steps": ["understanding_confirm"]
+        },
+        {
+          "id": "understanding_confirm",
+          "name": "Potwierdzenie zrozumienia",
+          "description": "Upewnienie się że materiał został zrozumiany",
+          "required": true,
+          "next_steps": ["completed"]
+        }
+      ],
+      "success_criteria": ["comprehension_check", "clarification_request", "detailed_explanation", "understanding_confirm"],
+      "max_duration": 800,
+      "repeatable": true
+    },
+    {
+      "id": "independent_practice_flow",
+      "name": "Samodzielna praktyka",
+      "description": "Uczestnik wykonuje zadania samodzielnie z monitorowaniem postępów",
+      "entry_intents": ["practice_more", "independent_task"],
+      "priority": 8,
+      "steps": [
+        {
+          "id": "task_assignment",
+          "name": "Przydzielenie zadania",
+          "description": "Przedstawienie zadania do samodzielnego wykonania",
+          "required": true,
+          "next_steps": ["progress_monitoring"]
+        },
+        {
+          "id": "progress_monitoring",
+          "name": "Monitorowanie postępów",
+          "description": "Obserwacja i wspieranie podczas wykonywania",
+          "required": true,
+          "next_steps": ["hint_provision"]
+        },
+        {
+          "id": "hint_provision",
+          "name": "Udzielanie wskazówek",
+          "description": "Pomoc gdy uczestnik napotyka trudności",
+          "required": false,
+          "next_steps": ["completion_validation"]
+        },
+        {
+          "id": "completion_validation",
+          "name": "Walidacja wykonania",
+          "description": "Sprawdzenie poprawności wykonanego zadania",
+          "required": true,
+          "next_steps": ["completed"]
+        }
+      ],
+      "success_criteria": ["task_assignment", "progress_monitoring", "completion_validation"],
+      "max_duration": 1500,
+      "repeatable": true
+    },
+    {
+      "id": "assessment_flow",
+      "name": "Ocena postępów",
+      "description": "Ewaluacja zrozumienia i umiejętności uczestnika",
+      "entry_intents": ["assessment_request", "check_progress"],
+      "priority": 7,
+      "steps": [
+        {
+          "id": "skill_evaluation",
+          "name": "Ocena umiejętności",
+          "description": "Sprawdzenie praktycznych umiejętności",
+          "required": true,
+          "next_steps": ["knowledge_test"]
+        },
+        {
+          "id": "knowledge_test",
+          "name": "Test wiedzy",
+          "description": "Weryfikacja teoretycznej wiedzy",
+          "required": true,
+          "next_steps": ["performance_analysis"]
+        },
+        {
+          "id": "performance_analysis",
+          "name": "Analiza wyników",
+          "description": "Ocena ogólnych postępów w nauce",
+          "required": true,
+          "next_steps": ["improvement_suggestions"]
+        },
+        {
+          "id": "improvement_suggestions",
+          "name": "Sugestie poprawy",
+          "description": "Wskazówki do dalszego rozwoju",
+          "required": true,
+          "next_steps": ["completed"]
+        }
+      ],
+      "success_criteria": ["skill_evaluation", "knowledge_test", "performance_analysis", "improvement_suggestions"],
+      "max_duration": 1000,
+      "repeatable": false
+    },
+    {
+      "id": "summary_reflection_flow",
+      "name": "Podsumowanie i refleksja",
+      "description": "Synteza wiedzy i refleksja nad procesem uczenia się",
+      "entry_intents": ["summary_request", "reflection_time"],
+      "priority": 6,
+      "steps": [
+        {
+          "id": "key_points_recap",
+          "name": "Przypomnienie kluczowych punktów",
+          "description": "Przegląd najważniejszych zagadnień z lekcji",
+          "required": true,
+          "next_steps": ["learning_reflection"]
+        },
+        {
+          "id": "learning_reflection",
+          "name": "Refleksja nad uczeniem się",
+          "description": "Zastanowienie się nad procesem nauki",
+          "required": true,
+          "next_steps": ["application_planning"]
+        },
+        {
+          "id": "application_planning",
+          "name": "Planowanie zastosowania",
+          "description": "Określenie jak wykorzystać zdobytą wiedzę",
+          "required": true,
+          "next_steps": ["knowledge_integration"]
+        },
+        {
+          "id": "knowledge_integration",
+          "name": "Integracja wiedzy",
+          "description": "Połączenie nowej wiedzy z wcześniejszą",
+          "required": true,
+          "next_steps": ["completed"]
+        }
+      ],
+      "success_criteria": ["key_points_recap", "learning_reflection", "application_planning", "knowledge_integration"],
+      "max_duration": 600,
+      "repeatable": true
+    }
+  ]
+}

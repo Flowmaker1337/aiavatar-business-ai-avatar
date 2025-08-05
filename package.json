@@ -25,7 +25,8 @@
     "clear-qdrant": "node dist/config/clearQdrantIndex.js clear-all",
     "clear-qdrant-preview": "node dist/config/clearQdrantIndex.js preview",
     "clear-qdrant-duplicates": "node dist/config/clearQdrantIndex.js duplicates",
-    "upload-business-avatars": "node dist/config/uploadBusinessAvatarsToQdrant.js"
+    "upload-business-avatars": "node dist/config/uploadBusinessAvatarsToQdrant.js",
+    "test-knowledge-engine": "ts-node src/scripts/test-knowledge-engine.ts"
   },
   "keywords": [],
   "author": "",
