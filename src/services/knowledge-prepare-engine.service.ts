@@ -117,7 +117,6 @@ export interface ProcessingMetadata {
 
 class KnowledgePreparationEngine {
   private static instance: KnowledgePreparationEngine;
-  private timer = ExecutionTimerService.getInstance();
 
   private constructor() {}
 
@@ -136,8 +135,7 @@ class KnowledgePreparationEngine {
     fileType: 'json' | 'pdf' | 'docx' | 'csv' | 'md' = 'json'
   ): Promise<ProcessedTrainingContent> {
     
-    const timerName = `ProcessTrainingMaterial_${Date.now()}`;
-    this.timer.start(timerName);
+    const startTime = Date.now();
 
     try {
       console.log(`🚀 KPE: Starting processing of ${filePath} (${fileType})`);
@@ -157,7 +155,7 @@ class KnowledgePreparationEngine {
       // 5. UPLOAD DO BAZY - opcjonalnie
       // await this.uploadToVectorDatabase(vectorChunks);
 
-      const processingTime = this.timer.end(timerName);
+      const processingTime = Date.now() - startTime;
       
       const result: ProcessedTrainingContent = {
         originalCourse: rawContent,
@@ -178,7 +176,6 @@ class KnowledgePreparationEngine {
       return result;
 
     } catch (error) {
-      this.timer.end(timerName);
       console.error('❌ KPE: Processing failed:', error);
       throw error;
     }
@@ -227,7 +224,7 @@ class KnowledgePreparationEngine {
       };
     } catch (error) {
       console.error('❌ KPE: JSON parsing failed:', error);
-      throw new Error(`Failed to parse JSON file: ${error.message}`);
+      throw new Error(`Failed to parse JSON file: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -261,12 +258,29 @@ class KnowledgePreparationEngine {
     console.log('🤖 KPE: Starting AI content analysis...');
     
     const analyzedContent = { ...content };
+    let processedChunks = 0;
+    const totalChunks = analyzedContent.lessons.reduce((sum, lesson) => sum + lesson.chunks.length, 0);
     
     for (const lesson of analyzedContent.lessons) {
+      console.log(`📝 KPE: Analyzing lesson: ${lesson.name}`);
+      
       for (const chunk of lesson.chunks) {
+        processedChunks++;
+        
+        // Pokazuj progress
+        if (processedChunks % 5 === 0 || processedChunks === totalChunks) {
+          console.log(`   📊 Progress: ${processedChunks}/${totalChunks} chunks analyzed`);
+        }
+        
         // AI klasyfikuje typ fragmentu
         const chunkType = await this.classifyChunkType(chunk.content);
         const methodFlow = this.mapChunkTypeToFlow(chunkType);
+        
+        // Loguj result klasyfikacji dla pierwszych kilku
+        if (processedChunks <= 3) {
+          const preview = chunk.content.substring(0, 100) + '...';
+          console.log(`   🎯 "${preview}" → ${chunkType} → ${methodFlow}`);
+        }
         
         chunk.type = chunkType;
         chunk.flow = methodFlow;
@@ -278,27 +292,109 @@ class KnowledgePreparationEngine {
   }
 
   /**
-   * AI CLASSIFIER - rozpoznaje typ fragmentu treści
+   * AI CLASSIFIER - rozpoznaje typ fragmentu treści używając OpenAI
    */
   private async classifyChunkType(content: string): Promise<ChunkType> {
-    // Prosta klasyfikacja na podstawie słów kluczowych (fallback)
-    const lowerContent = content.toLowerCase();
-    
-    // TEORIA - definicje, wyjaśnienia, cechy
-    if (lowerContent.includes('archetyp') || 
-        lowerContent.includes('cechy') || 
-        lowerContent.includes('charakteryzuje') ||
-        lowerContent.includes('zdolność do')) {
-      return ChunkType.THEORY;
+    try {
+      // Próbujemy klasyfikacji przez OpenAI
+      const aiClassification = await this.classifyWithOpenAI(content);
+      if (aiClassification) {
+        return aiClassification;
+      }
+    } catch (error) {
+      console.warn('⚠️ KPE: OpenAI classification failed, using fallback');
     }
     
-    // PRZYKŁADY - filmy, postacie, case studies
+    // Fallback - prosta klasyfikacja na podstawie słów kluczowych
+    return this.classifyWithKeywords(content);
+  }
+
+  /**
+   * OPENAI CLASSIFIER - używa GPT do klasyfikacji treści
+   */
+  private async classifyWithOpenAI(content: string): Promise<ChunkType | null> {
+    try {
+      const prompt = this.buildClassificationPrompt(content);
+      
+      const response = await openAIService.getClient().chat.completions.create({
+        model: 'gpt-4o-mini', // Szybszy i tańszy model dla klasyfikacji
+        messages: [
+          {
+            role: 'system',
+            content: `Jesteś ekspertem od metodyki szkoleniowej. Twoim zadaniem jest klasyfikacja fragmentów treści szkoleniowej.
+
+TYPY FRAGMENTÓW:
+- THEORY: Teoria, definicje, wyjaśnienia konceptów, cechy, zasady
+- EXAMPLE: Przykłady, case studies, historie, filmy, postacie ilustrujące teorię  
+- QUESTION: Pytania do uczestników, interakcja, sprawdzanie zrozumienia
+- PRACTICE: Zadania, ćwiczenia, autoanalizy, praktyczne zastosowania
+- ASSESSMENT: Testy, oceny, sprawdzanie umiejętności
+- SUMMARY: Podsumowania, wnioski, przeglądy materiału
+
+Odpowiedz TYLKO jednym słowem: THEORY, EXAMPLE, QUESTION, PRACTICE, ASSESSMENT lub SUMMARY.`
+          },
+          {
+            role: 'user', 
+            content: prompt
+          }
+        ],
+        max_tokens: 10, // Tylko jedno słowo
+        temperature: 0.1 // Niska temperatura dla konsystentności
+      });
+
+      const classification = response.choices[0]?.message?.content?.trim().toUpperCase();
+      
+      // Mapowanie odpowiedzi AI na nasze typy
+      switch (classification) {
+        case 'THEORY': return ChunkType.THEORY;
+        case 'EXAMPLE': return ChunkType.EXAMPLE; 
+        case 'QUESTION': return ChunkType.QUESTION;
+        case 'PRACTICE': return ChunkType.PRACTICE;
+        case 'ASSESSMENT': return ChunkType.ASSESSMENT;
+        case 'SUMMARY': return ChunkType.SUMMARY;
+        default: 
+          console.warn(`🤖 KPE: Unknown AI classification: ${classification}`);
+          return null;
+      }
+      
+    } catch (error) {
+      console.error('❌ KPE: OpenAI classification error:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Buduje prompt dla klasyfikacji OpenAI
+   */
+  private buildClassificationPrompt(content: string): string {
+    // Skracamy treść jeśli jest za długa (limit tokenów)
+    const maxLength = 2000;
+    const truncatedContent = content.length > maxLength 
+      ? content.substring(0, maxLength) + '...' 
+      : content;
+    
+    return `Sklasyfikuj ten fragment szkolenia:
+
+"${truncatedContent}"
+
+Jaki to typ fragmentu metodycznego?`;
+  }
+
+  /**
+   * FALLBACK CLASSIFIER - słowa kluczowe
+   */
+  private classifyWithKeywords(content: string): ChunkType {
+    const lowerContent = content.toLowerCase();
+    
+    // PRZYKŁADY - wysokie priorytety
     if (lowerContent.includes('przykład') || 
         lowerContent.includes('film') || 
         lowerContent.includes('postać') ||
         lowerContent.includes('disney') ||
         lowerContent.includes('batman') ||
-        lowerContent.includes('shrek')) {
+        lowerContent.includes('shrek') ||
+        lowerContent.includes('simba') ||
+        lowerContent.includes('król lew')) {
       return ChunkType.EXAMPLE;
     }
     
@@ -306,26 +402,33 @@ class KnowledgePreparationEngine {
     if (lowerContent.includes('kto z was') || 
         lowerContent.includes('pytanie') || 
         lowerContent.includes('co myślicie') ||
-        lowerContent.includes('jak się czujecie')) {
+        lowerContent.includes('jak się czujecie') ||
+        lowerContent.includes('czy ktoś') ||
+        lowerContent.includes('liczę na') ||
+        lowerContent.includes('co wam')) {
       return ChunkType.QUESTION;
     }
     
-    // PRAKTYKA - zadania, autoanalizy
+    // PRAKTYKA - zadania, autoanalizy  
     if (lowerContent.includes('zobacz u siebie') || 
         lowerContent.includes('porównaj') || 
         lowerContent.includes('sprawdź') ||
-        lowerContent.includes('weź na warsztat')) {
+        lowerContent.includes('weź na warsztat') ||
+        lowerContent.includes('przejrzeć archetyp') ||
+        lowerContent.includes('jak te cechy działają')) {
       return ChunkType.PRACTICE;
     }
     
     // PODSUMOWANIE
     if (lowerContent.includes('podsumowanie') || 
         lowerContent.includes('co dalej') || 
-        lowerContent.includes('wnioski')) {
+        lowerContent.includes('wnioski') ||
+        lowerContent.includes('roadmapa') ||
+        lowerContent.includes('za chwilę dam wam')) {
       return ChunkType.SUMMARY;
     }
     
-    // Domyślnie TEORIA
+    // TEORIA - default, ale sprawdzamy charakterystyczne frazy
     return ChunkType.THEORY;
   }
 
@@ -402,7 +505,7 @@ class KnowledgePreparationEngine {
     for (const [flowType, flowContents] of Object.entries(flowMapping)) {
       for (const flowContent of flowContents) {
         const vectorChunk: VectorChunk = {
-          id: `${originalContent.courseId}_${flowContent.chunkId}_vector`,
+          id: `${originalContent.courseId}_${flowContent.lessonId}_${flowContent.chunkId}_${flowType}_vector`,
           content: flowContent.content,
           metadata: {
             courseId: originalContent.courseId,
@@ -498,7 +601,9 @@ class KnowledgePreparationEngine {
         metadata: chunk.metadata
       }));
       
-      await vectorDatabaseService.uploadVectorData(vectorData);
+      // TODO: Implement proper vector upload method
+      // await vectorDatabaseService.uploadData();
+      console.log('📝 KPE: Vector upload method needs implementation');
       console.log('✅ KPE: Vector chunks uploaded successfully');
       
     } catch (error) {

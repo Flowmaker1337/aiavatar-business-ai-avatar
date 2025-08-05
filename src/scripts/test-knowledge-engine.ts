@@ -45,10 +45,10 @@ async function testKnowledgeEngine() {
       return {
         flow: flowType.replace('_flow', '').toUpperCase(),
         contentPieces: contents.length,
-        totalCharacters: contents.reduce((sum, content) => sum + content.content.length, 0),
+        totalCharacters: contents.reduce((sum: number, content: any) => sum + content.content.length, 0),
         avgTimePerPiece: contents.length > 0 ? 
-          Math.round(contents.reduce((sum, content) => sum + content.estimatedTime, 0) / contents.length) : 0,
-        lessonsCovered: [...new Set(contents.map(c => c.lessonId))].length
+          Math.round(contents.reduce((sum: number, content: any) => sum + content.estimatedTime, 0) / contents.length) : 0,
+        lessonsCovered: [...new Set(contents.map((c: any) => c.lessonId))].length
       };
     });
     
@@ -117,7 +117,7 @@ async function testKnowledgeEngine() {
     
   } catch (error) {
     console.error('❌ TEST FAILED:', error);
-    console.error('\nError details:', error.message);
+    console.error('\nError details:', error instanceof Error ? error.message : String(error));
     process.exit(1);
   }
 }
