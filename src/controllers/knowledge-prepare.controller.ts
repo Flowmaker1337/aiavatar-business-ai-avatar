@@ -73,7 +73,7 @@ class KnowledgePreparationController {
       console.error('❌ KPE Controller: Processing failed:', error);
       res.status(500).json({ 
         error: 'Training file processing failed',
-        details: error.message 
+        details: (error as Error).message 
       });
     }
   }
@@ -113,11 +113,11 @@ class KnowledgePreparationController {
         }
       };
 
-      if (flow && mockFlows.flows[flow as string]) {
+      if (flow && (mockFlows.flows as any)[flow as string]) {
         res.status(200).json({
           courseId,
           flow,
-          content: mockFlows.flows[flow as string]
+          content: (mockFlows.flows as any)[flow as string]
         });
       } else {
         res.status(200).json(mockFlows);
@@ -127,7 +127,7 @@ class KnowledgePreparationController {
       console.error('❌ KPE Controller: Get flows failed:', error);
       res.status(500).json({ 
         error: 'Failed to retrieve processed flows',
-        details: error.message 
+        details: (error as Error).message 
       });
     }
   }
@@ -150,8 +150,8 @@ class KnowledgePreparationController {
       const flowAnalysis = Object.entries(processedContent.flowMapping).map(([flowType, contents]) => ({
         flow: flowType,
         contentPieces: contents.length,
-        totalCharacters: contents.reduce((sum, content) => sum + content.content.length, 0),
-        lessons_covered: [...new Set(contents.map(c => c.lessonId))].length,
+        totalCharacters: contents.reduce((sum: number, content: any) => sum + content.content.length, 0),
+        lessons_covered: [...new Set(contents.map((c: any) => c.lessonId))].length,
         sample_content: contents[0]?.content.substring(0, 200) + '...' || 'No content'
       }));
 
@@ -181,7 +181,7 @@ class KnowledgePreparationController {
       console.error('❌ KPE Controller: 12 Archetypes test failed:', error);
       res.status(500).json({ 
         error: '12 Archetypes test failed',
-        details: error.message 
+        details: (error as Error).message 
       });
     }
   }
@@ -213,7 +213,7 @@ class KnowledgePreparationController {
       res.status(500).json({
         service: 'Knowledge Preparation Engine',
         status: 'unhealthy',
-        error: error.message
+        error: (error as Error).message
       });
     }
   }

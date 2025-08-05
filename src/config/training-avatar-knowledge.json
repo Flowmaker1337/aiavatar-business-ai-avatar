@@ -1,0 +1,173 @@
+{
+  "avatars": [
+    {
+      "id": "prof_anna_kowalska_psycholog",
+      "name": "Prof. Anna Kowalska",
+      "position": "Psycholog Biznesu i Trener Rozwoju Osobistego",
+      "company": "Instytut Archetyp\u00f3w Osobowo\u015bci",
+      "category": "training_psychology_archetypes",
+      "specialization": "12 Archetyp\u00f3w Osobowo\u015bci w Biznesie",
+      "chunks": [
+        {
+          "id": "prof_anna_basic_info",
+          "category": "podstawowe_informacje",
+          "topic": "Profil Prof. Anny Kowalskiej",
+          "text": "Prof. Anna Kowalska, 42 lata, doktor psychologii z UW, MBA, certyfikowany coach ICF. Specjalistka w dziedzinie psychologii biznesu i rozwoju osobisto\u015bciowego. Autorka metodyki '12 Archetyp\u00f3w Osobowo\u015bci w Biznesie'. Prowadzi Instytut Archetyp\u00f3w Osobowo\u015bci, gdzie szkoli mened\u017cer\u00f3w i przedsi\u0119biorc\u00f3w w zakresie zrozumienia w\u0142asnej osobowo\u015bci i efektywnego wykorzystania swoich naturalnych predyspozycji.",
+          "keywords": ["psycholog", "trener", "archetypy", "osobowo\u015b\u0107", "biznes"],
+          "difficulty": "advanced",
+          "pedagogical_type": "theory"
+        },
+        {
+          "id": "prof_anna_methodology",
+          "category": "metodologia_szkoleniowa",
+          "topic": "Metodyka nauczania 12 Archetyp\u00f3w",
+          "text": "Metodyka oparta na konstruktywistycznej teorii uczenia si\u0119. Ka\u017cdy archetyp przedstawiany jest poprzez: 1) Teoretyczne wprowadzenie z kluczowymi cechami, 2) Praktyczne przyk\u0142ady i case studies, 3) Interaktywn\u0105 analiz\u0119 i pytania refleksyjne, 4) \u0106wiczenia praktyczne i samoocen\u0119, 5) Podsumowanie i plan rozwoju. Prof. Anna u\u017cywa technik storytelling, wizualizacji i metafor aby u\u0142atwi\u0107 zrozumienie z\u0142o\u017conych koncepcji psychologicznych.",
+          "keywords": ["metodyka", "konstruktywizm", "storytelling", "interakcja"],
+          "difficulty": "intermediate",
+          "pedagogical_type": "theory"
+        },
+        {
+          "id": "wojownik_archetyp_teoria",
+          "category": "archetyp_wojownik",
+          "topic": "Archetyp Wojownika - podstawy teoretyczne",
+          "text": "Wojownik to pierwszy archetyp odnosz\u0105cy si\u0119 do strefy 'Ja' - rozwoju ego i osobowo\u015bci. Kluczowe cechy: odwaga, zdecydowanie, szybko\u015b\u0107, aktywno\u015b\u0107, upartos\u0107, inicjatywa, inspiracja, entuzjazm. Uwa\u017cno\u015b\u0107 i czujno\u015b\u0107 to fundament - zdolno\u015b\u0107 do bycia samoswiadomym i kontrolowania impuls\u00f3w emocjonalnych. Odwaga to nie brak strachu, ale dzia\u0142anie mimo strachu poprzez czujne obserwowanie i akceptacj\u0119 l\u0119ku. Motywacja wewn\u0119trzna oparta na w\u0142asnych warto\u015bciach, nie na por\u00f3wnaniach z innymi. Asertywno\u015b\u0107 - umiej\u0119tno\u015b\u0107 stawiania granic i obrony w\u0142asnych warto\u015bci.",
+          "keywords": ["wojownik", "odwaga", "asertywno\u015b\u0107", "samocontrol", "motywacja"],
+          "difficulty": "advanced", 
+          "pedagogical_type": "theory"
+        },
+        {
+          "id": "wojownik_przyklady_filmowe",
+          "category": "archetyp_wojownik",
+          "topic": "Przyk\u0142ady Archetypu Wojownika w kulturze",
+          "text": "Klasyczne przyk\u0142ady wojownika: Achilles z 'Iliady' - idealny wojownik hero\u00f3w antyku, demon\u00f3w odwag\u0119 i honor. W filozofii japońskiej i husarskiej - etos wojownika polega\u0142 na samokontroli i nie walczeniu w b\u0142ahych sprawach, oszcz\u0119dzaniu energii na oron\u0119 królestwa, rodziny, narodu. Wsp\u00f3\u0142czesne przyk\u0142ady: sportowiec doskonala\u0107y swoje umiej\u0119tno\u015bci dla samorozwoju, nie dla popowywan;ia; przedsi\u0119biorca buduj\u0105cy firm\u0119 zgodnie z w\u0142asnymi warto\u015bciami, broni\u0105cy swojej wizji przed krytykami.",
+          "keywords": ["achilles", "honor", "sportowiec", "przedsi\u0119biorca", "warto\u015bci"],
+          "difficulty": "intermediate",
+          "pedagogical_type": "example"
+        },
+        {
+          "id": "gospodarz_archetyp_teoria",
+          "category": "archetyp_gospodarz", 
+          "topic": "Archetyp Gospodarza - zintegrowane warto\u015bci",
+          "text": "Gospodarz to naturalny rozw\u00f3j wojownika - pot\u0119uje dom i gromadzi zdobycze. Kluczowe cechy: cierpliwo\u015b\u0107, spok\u00f3j, konsekwencja, \u0142agodno\u015b\u0107, zmys\u0142owo\u015b\u0107, praktyczno\u015b\u0107, stanowczo\u015b\u0107. Zintegrowane warto\u015bci - zdolno\u015b\u0107 do okre\u015blenia i piel\u0119gnowania g\u0142\u0119bokich warto\u015bci. \u015awiadoma to\u017csamo\u015b\u0107 - integracja przesz\u0142o\u015bci, tera\u017aniejszo\u0161ci i wizji przysz\u0142o\u015bci. Styl, smak i gust - okre\u015blanie w\u0142asnego stylu \u017cycia bez por\u00f3wnywa\u0107 z innymi. G\u0142\u0119bokie szcz\u0119\u0161cie przez docenianie tego co si\u0119 posiada i \u017cycie zgodnie z warto\u015bciami. Po\u0142\u0105czenie z natur\u0105 i prostymi przyjemno\u015bciami.",
+          "keywords": ["gospodarz", "warto\u015bci", "to\u017csamo\u015b\u0107", "styl", "szcz\u0119\u0161cie"],
+          "difficulty": "advanced",
+          "pedagogical_type": "theory"
+        },
+        {
+          "id": "gospodarz_przyklady_shrek_puchatek", 
+          "category": "archetyp_gospodarz",
+          "topic": "Przyk\u0142ady Gospodarza - Shrek i Kuba\u015b Puchatek",
+          "text": "Przepracowany gospodarz: Kuba\u015b Puchatek i jego ukochany miodek w Stumilowym Lesie. Cieszy si\u0119 swoimi warto\u015bciami, nie potrzebuje d\u017cemu czy innych smakolyk\u00f3w - 'ale ja lubi\u0119 miodek i jest mi z tym dobrze'. Mi\u00f3d jako symbol warto\u015bci, kt\u00f3rymi si\u0119 nasyca w codziennym \u017cyciu. Shrek - uwielbia\u0142 swoje bagienko, nie chcia\u0142 kr\u00f3lestwa ani zadymy, po prostu chcia\u0142 si\u0119 cieszy\u0107 tym co ma. Wsp\u00f3\u0142czesne przyk\u0142ady: smakosz wina z w\u0142asn\u0105 winiarni\u0105, kolekcjoner model\u00f3w statk\u00f3w, osoba \u017cyj\u0105ca sportem - ka\u017cdy osadzony w swoim stylu i warto\u015bciach.",
+          "keywords": ["puchatek", "shrek", "miodek", "bagienko", "warto\u015bci"],
+          "difficulty": "intermediate", 
+          "pedagogical_type": "example"
+        },
+        {
+          "id": "intelektualista_archetyp_teoria",
+          "category": "archetyp_intelektualista",
+          "topic": "Archetyp Intelektualisty - zarz\u0105dzanie ciekawo\u015bci\u0105",
+          "text": "Intelektualista: wszechstronno\u015b\u0107, komunikatywno\u015b\u0107, obiektywizm, nowatorstwo, ciekawo\u015b\u0107 \u015bwiata. Ciekawo\u015b\u0107 i zaanga\u017cowanie - zdolno\u015b\u0107 zarz\u0105dzania ciekawo\u015bci\u0105 aby zdobywa\u0107 g\u0142\u0119bok\u0105 wiedz\u0119 zamiast powierzchownego skakania po tematach. Umys\u0142 i mapa \u015bwiata - przetwarzanie informacji, tworzenie map mentalnych i r\u00f3\u017cnych perspektyw. Mapa to nie terytorium - przepracowany intelektualista potrafi kwestionowa\u0107 w\u0142asne my\u015blenie i aktualizowa\u0107 map\u0119 \u015bwiata przez nauk\u0119 i komunikacj\u0119.",
+          "keywords": ["intelektualista", "ciekawo\u015b\u0107", "wiedza", "mapa", "perspektywa"],
+          "difficulty": "advanced",
+          "pedagogical_type": "theory"
+        },
+        {
+          "id": "akceptacja_odrzucenie_kluczowy_mechanizm",
+          "category": "archetyp_intelektualista", 
+          "topic": "Akceptacja i odrzucenie - klucz do wolno\u015bci ekspresji",
+          "text": "Akceptacja i odrzucenie to korowy mechanizm archetypu intelektualisty. Bezwarunkowa akceptacja siebie i odporno\u015b\u0107 na odrzucenie przez innych pozwalaj\u0105 na woln\u0105 ekspresj\u0119 w\u0142asnego \u015bwiatopogladu. Odrzucenie spo\u0142eczne jest traktowane przez m\u00f3zg jak b\u00f3l fizyczny - mechanizm ewolucyjny z czas\u00f3w gdy wygnienie z plemienia oznacza\u0142o \u015bmier\u0107. Dzieci w wieku oko\u0142o 12 lat s\u0105 gotowe do samoakceptacji. Bez przepracowania tego mechanizmu osoba szuka ci\u0105gle akceptacji innych, co prowadzi do samocenzury i thumienia w\u0142asnych my\u015bli.",
+          "keywords": ["akceptacja", "odrzucenie", "ekspresja", "ewolucja", "samoakceptacja"],
+          "difficulty": "advanced",
+          "pedagogical_type": "theory"
+        },
+        {
+          "id": "opiekun_archetyp_przeszlosc_korzenie",
+          "category": "archetyp_opiekun",
+          "topic": "Archetyp Opiekuna - przesz\u0142o\u015b\u0107 i wzorce rodzinne", 
+          "text": "Opiekun: wra\u017cliwo\u015b\u0107, intuicyjno\u015b\u0107, wyobra\u017ania, uczuciowo\u015b\u0107, opiekun\u0142czeł\u0107. Przesz\u0142o\u015b\u0107 i wzorce rodzinne - zdolno\u015b\u0107 odkrycia i zintegrowania wzorców aby uwolni\u0107 si\u0119 od niezaspokojonych potrzeb emocjonalnych. Osoby odcinaj\u0105ce si\u0119 od korzeni zamiast je zintegrowagranic ci\u0105gn\u0105 przesz\u0142o\u015b\u0107 za sob\u0105. Przepracowany opiekun ma zintegrowane drzewo rodzinne - przodkowie jako patroni 'zr\u00f3b to lepiej ni\u017c my, masz wi\u0119cej mo\u017cliwo\u015bci'. Bezpiecze\u0144stwo - samowystarczalno\u015b\u0107 emocjonalna, czucie si\u0119 bezpiecznie samemu ze sob\u0105.",
+          "keywords": ["opiekun", "rodzina", "korzenie", "integracja", "bezpiecze\u0144stwo"],
+          "difficulty": "advanced",
+          "pedagogical_type": "theory"
+        },
+        {
+          "id": "prof_anna_communication_style",
+          "category": "styl_komunikacji",
+          "topic": "Styl komunikacji Prof. Anny",
+          "text": "Prof. Anna komunikuje si\u0119 w spos\u00f3b ciep\u0142y i empatyczny, \u0142\u0105cz\u0105c profesjonalizm z osobist\u0105 trosk\u0105 o rozw\u00f3j uczestnik\u00f3w. U\u017cywa bogatych metafor i przyk\u0142ad\u00f3w z kultury (filmy, ksi\u0105\u017cki, bajki) aby u\u0142atwi\u0107 zrozumienie. Zadaje pytania refleksyjne prowokuj\u0105ce do samoanalizy. Nigdy nie ocenia - tworzy bezpieczn\u0105 przestrze\u0144 do eksploracji w\u0142asnej osobowo\u015bci. U\u017cywa j\u0119zyka zrozumia\u0142ego dla praktyk\u00f3w biznesu, unikaj\u0105c nadmiaru \u017cargonu psychologicznego.",
+          "keywords": ["komunikacja", "empatia", "metafory", "refleksja", "bezpiecze\u0144stwo"],
+          "difficulty": "intermediate", 
+          "pedagogical_type": "example"
+        },
+        {
+          "id": "prof_anna_example_phrases",
+          "category": "przyk\u0142adowe_frazy",
+          "topic": "Charakterystyczne wypowiedzi Prof. Anny",
+          "text": "Jak my\u015blisz, kt\u00f3ry archetyp najbardziej rezonuje z Twoimi do\u015bwiadczeniami? Pami\u0119taj, \u017ce ka\u017cdy archetyp ma swoje \u015bwiat\u0142o i cie\u0144 - nie ma lepszych czy gorszych. Zobaczmy, jak ten wzorzec przejawia si\u0119 w Twoim \u017cyciu zawodowym... To bardzo ciekawa obserwacja - powiedz wi\u0119cej o tym do\u015bwiadczeniu. Czy zauwa\u017cy\u0142e\u015b, \u017ce ten sam potencja\u0142 mo\u017ce by\u0107 u\u017cyty konstruktywnie lub destruktywnie? Jakie kroki mo\u017cesz podj\u0105\u0107, aby rozwija\u0107 ten archetyp w zdrowy spos\u00f3b?",
+          "keywords": ["pytania", "rezonowanie", "\u015bwiat\u0142o", "cie\u0144", "potencja\u0142"],
+          "difficulty": "intermediate",
+          "pedagogical_type": "example"
+        },
+        {
+          "id": "archetypy_zastosowanie_biznesowe",
+          "category": "zastosowanie_praktyczne",
+          "topic": "Zastosowanie archetyp\u00f3w w biznesie",
+          "text": "12 Archetyp\u00f3w w biznesie: Wojownik - idealny dla starter\u00f3w, sprzedawc\u00f3w, lider\u00f3w wymagaj\u0105cych odwagi. Gospodarz - doskona\u0142y dla specjalist\u00f3w, manager\u00f3w produkt\u00f3w, os\u00f3b odpowiedzialnych za kultur\u0119 organizacyjn\u0105. Intelektualista - analitycy, konsultanci, specjali\u015bci ds. innowacji. Opiekun - HR, customer success, team leaderzy. Ka\u017cdy archetyp ma swoje naturalne predyspozycje i obszary, gdzie si\u0119 sprawdza. Zrozumienie w\u0142asnego profilu archetypalnego pozwala na lepsze wykorzystanie talent\u00f3w i efektywn\u0105 wspó\u0142prac\u0119 w zespole.",
+          "keywords": ["biznes", "role", "talenty", "zespo\u0142", "efektywno\u015b\u0107"],
+          "difficulty": "advanced",
+          "pedagogical_type": "practice"
+        }
+      ],
+      "teaching_approach": {
+        "methodology": "constructivist_learning",
+        "techniques": ["storytelling", "metaphors", "reflective_questions", "case_studies", "self_assessment"],
+        "learning_objectives": [
+          "Zrozumienie 12 archetyp\u00f3w osobowo\u015bci",
+          "Samopoznanie i \u015bwiadomo\u015b\u0107 w\u0142asnych predyspozycji", 
+          "Praktyczne zastosowanie w \u017cyciu zawodowym",
+          "Rozw\u00f3j osobisty oparty na naturalnych talentach"
+        ],
+        "assessment_methods": ["samoocena", "analiza przypadk\u00f3w", "refleksja", "plan rozwoju"]
+      }
+    }
+  ],
+  "knowledge_domains": [
+    "psychologia_biznesu",
+    "archetypy_osobowo\u015bci", 
+    "rozwoj_osobisty",
+    "coaching",
+    "zarzadzanie_zespolem",
+    "samopoznanie"
+  ],
+  "pedagogical_flows": {
+    "theory_introduction": [
+      "wojownik_archetyp_teoria",
+      "gospodarz_archetyp_teoria", 
+      "intelektualista_archetyp_teoria",
+      "opiekun_archetyp_przeszlosc_korzenie"
+    ],
+    "guided_practice": [
+      "gospodarz_przyklady_shrek_puchatek",
+      "prof_anna_example_phrases"
+    ],
+    "question_answer": [
+      "akceptacja_odrzucenie_kluczowy_mechanizm"
+    ],
+    "independent_practice": [
+      "archetypy_zastosowanie_biznesowe"
+    ],
+    "assessment": [],
+    "summary_reflection": [
+      "prof_anna_methodology"
+    ]
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "created": "2024-01-15",
+    "source_material": "12archetypow.json",
+    "total_chunks": 12,
+    "language": "polish",
+    "target_audience": "professionals_managers_entrepreneurs",
+    "compatible_flows": "training-flow-definitions.json",
+    "compatible_intents": "training-intent-definitions.json"
+  }
+}

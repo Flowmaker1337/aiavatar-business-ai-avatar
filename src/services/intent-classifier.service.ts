@@ -46,6 +46,37 @@ class IntentClassifier {
     }
 
     /**
+     * Ładuje definicje intencji dla konkretnego typu avatara
+     */
+    public async loadIntentDefinitionsForAvatar(avatarType: string): Promise<void> {
+        try {
+            let fileName = 'intent-definitions.json'; // Default networker
+            
+            if (avatarType === 'trainer') {
+                fileName = 'training-intent-definitions.json';
+            }
+            
+            const filePath = path.resolve(__dirname, `../config/${fileName}`);
+            const rawData = fs.readFileSync(filePath, 'utf-8');
+            const data = JSON.parse(rawData);
+
+            this.intentDefinitions = data.intents;
+            this.initialized = true; // Mark as initialized after loading avatar-specific definitions
+            
+            console.log(`✅ IntentClassifier loaded ${this.intentDefinitions.length} intent definitions for avatar type: ${avatarType}`);
+        } catch (error) {
+            console.error(`❌ Failed to load intent definitions for avatar type ${avatarType}:`, error);
+            // Fallback to default if training definitions not found
+            if (avatarType === 'trainer') {
+                console.log('🔄 Falling back to default intent definitions');
+                await this.initialize();
+            } else {
+                throw error;
+            }
+        }
+    }
+
+    /**
      * Klasyfikuje intencję na podstawie wiadomości użytkownika
      */
     public async classifyIntent(

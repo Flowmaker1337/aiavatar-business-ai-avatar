@@ -61,6 +61,37 @@ class FlowManager {
     }
 
     /**
+     * Ładuje definicje flow dla konkretnego typu avatara
+     */
+    public async loadFlowDefinitionsForAvatar(avatarType: string): Promise<void> {
+        try {
+            let fileName = 'flow-definitions.json'; // Default networker
+            
+            if (avatarType === 'trainer') {
+                fileName = 'training-flow-definitions.json';
+            }
+            
+            const filePath = path.resolve(__dirname, `../config/${fileName}`);
+            const rawData = fs.readFileSync(filePath, 'utf-8');
+            const data = JSON.parse(rawData);
+
+            this.flowDefinitions = data.flows;
+            this.initialized = true; // Mark as initialized after loading avatar-specific definitions
+            
+            console.log(`✅ FlowManager loaded ${this.flowDefinitions.length} flow definitions for avatar type: ${avatarType}`);
+        } catch (error) {
+            console.error(`❌ Failed to load flow definitions for avatar type ${avatarType}:`, error);
+            // Fallback to default if training definitions not found
+            if (avatarType === 'trainer') {
+                console.log('🔄 Falling back to default flow definitions');
+                await this.initialize();
+            } else {
+                throw error;
+            }
+        }
+    }
+
+    /**
      * Rozpoczyna nowy flow dla użytkownika
      */
     public async startFlow(

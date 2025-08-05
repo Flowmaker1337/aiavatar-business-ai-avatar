@@ -48,7 +48,7 @@ class QueryController {
    */
   public async handleQuery(req: Request, res: Response): Promise<void> {
     try {
-      const { user_message, session_id }: UserQuery = req.body;
+      const { user_message, session_id, avatar_type }: UserQuery = req.body;
       
       this.logQueryStart(user_message, session_id);
       
@@ -59,14 +59,14 @@ class QueryController {
       }
 
       // Get/create session context
-      const sessionContext = await this.getOrCreateSessionContext(session_id);
+      const sessionContext = await this.getOrCreateSessionContext(session_id, avatar_type);
       if (!sessionContext) {
         this.sendErrorResponse(res, `Session with id = ${session_id} does not exist.`, 400);
         return;
       }
 
       // Process query (without streaming)
-      const result = await this.processUserQuery(user_message, sessionContext);
+      const result = await this.processUserQuery(user_message, sessionContext, avatar_type);
       
       this.logQueryEnd();
       
@@ -95,7 +95,7 @@ class QueryController {
    */
   public async handleStreamingQuery(req: Request, res: Response): Promise<void> {
     try {
-      const { user_message, session_id, request_id }: UserStreamingQuery = req.body;
+      const { user_message, session_id, request_id, avatar_type }: UserStreamingQuery = req.body;
       
       this.logStreamingQueryStart(user_message, session_id, request_id);
       
@@ -113,7 +113,7 @@ class QueryController {
       }
 
       // Get/create session context
-      const sessionContext = await this.getOrCreateSessionContext(session_id);
+      const sessionContext = await this.getOrCreateSessionContext(session_id, avatar_type);
       if (!sessionContext) {
         this.sendSSEError(sseResponse, `Session with id = ${session_id} does not exist.`, request_id);
         return;
@@ -126,7 +126,7 @@ class QueryController {
       });
 
       // Process query with callbacks for streaming
-      const result = await this.processUserQuery(user_message, sessionContext, {
+      const result = await this.processUserQuery(user_message, sessionContext, avatar_type, {
         onAnalysisComplete: (analysis: AnalysisResult) => this.handleAnalysisComplete(sseResponse, analysis, sessionContext.sessionId, request_id),
         onKnowledgeRetrieved: (contextFound: boolean) => this.handleKnowledgeRetrieved(sseResponse, contextFound, sessionContext.sessionId, request_id),
         onStreamingChunk: (chunk: string) => this.handleStreamingChunk(sseResponse, chunk, sessionContext.sessionId, request_id)
@@ -154,7 +154,7 @@ class QueryController {
   /**
    * Gets existing session context or creates new one
    */
-  private async getOrCreateSessionContext(sessionId?: string): Promise<SessionContext | null> {
+  private async getOrCreateSessionContext(sessionId?: string, avatarType?: string): Promise<SessionContext | null> {
     let currentSessionId: string;
     let chatHistory: ChatHistory[] = [];
     let avatarName: string | null = null;
@@ -170,8 +170,8 @@ class QueryController {
       const avatar = await DatabaseService.getInstance().getAvatarById(session.avatarId);
       if (avatar) {
         avatarName = avatar.firstName + ' ' + avatar.lastName;
-        // TODO: Później rozszerzyć o rzeczywiste dane BusinessAvatar
-        businessAvatar = await this.createMockBusinessAvatar(avatar);
+        // Create BusinessAvatar based on avatar type
+        businessAvatar = this.createBusinessAvatarByType(avatarType || 'networker');
       } else {
         console.error('No avatar found for session:', session.avatarId);
         // Stwórz domyślny BusinessAvatar
@@ -188,7 +188,7 @@ class QueryController {
       const avatar = await DatabaseService.getInstance().getAvatarById(session.avatarId);
       if (avatar) {
         avatarName = avatar.firstName + ' ' + avatar.lastName;
-        businessAvatar = await this.createMockBusinessAvatar(avatar);
+        businessAvatar = this.createBusinessAvatarByType(avatarType || 'networker');
       } else {
         console.error('No avatar found for session:', session.avatarId);
         // Stwórz domyślny BusinessAvatar
@@ -207,6 +207,91 @@ class QueryController {
       avatarName,
       businessAvatar,
       mindState
+    };
+  }
+
+  /**
+   * Creates BusinessAvatar based on avatar type
+   */
+  private createBusinessAvatarByType(avatarType: string): BusinessAvatar {
+    if (avatarType === 'trainer') {
+      return this.createTrainerBusinessAvatar();
+    } else {
+      return this.createNetworkerBusinessAvatar();
+    }
+  }
+
+  /**
+   * Creates Networker BusinessAvatar (Anna Kowalczyk)
+   */
+  private createNetworkerBusinessAvatar(): BusinessAvatar {
+    return {
+      _id: new ObjectId(),
+      firstName: "Anna",
+      lastName: "Kowalczyk",
+      company: {
+        name: "LogisPol International",
+        industry: "Logistyka i Transport",
+        location: "Warszawa",
+        size: "duża",
+        mission: "Dostarczanie najwyższej jakości usług logistycznych w Europie Środkowo-Wschodniej",
+        offer: ["Transport międzynarodowy", "Magazynowanie", "Fulfillment", "Logistyka kontraktowa"],
+        use_cases: ["E-commerce logistics", "B2B distribution", "Cross-docking", "Last-mile delivery"],
+        strategic_goals: ["Ekspansja na 8 nowych rynków europejskich", "Digitalizacja procesów", "Zrównoważony rozwój"],
+        business_needs: ["Partnerzy technologiczni", "Klienci e-commerce", "Dostawcy IT"],
+        specializations: ["Ekspansja zagraniczna", "Analiza rynków", "Negocjacje międzynarodowe"]
+      },
+      personality: {
+        style: "Profesjonalny i analityczny",
+        tone: "Ekspercki w zakresie logistyki",
+        business_motivation: "Pomoc polskim firmom w ekspansji zagranicznej",
+        communication_style: "Strukturalny, używa przykładów z rzeczywistych projektów",
+        emotional_traits: ["Analityczny", "Cierpliwy", "Zorientowany na rezultaty"],
+        strengths: ["Znajomość rynków europejskich", "Doświadczenie w ekspansji", "Umiejętności negocjacyjne"],
+        weaknesses: ["Czasem zbyt szczegółowy", "Fokus na logistyce"]
+      },
+      position: "Dyrektor ds. Ekspansji Zagranicznej",
+      experience_years: 12,
+      specializations: ["International Expansion", "Market Analysis", "Supply Chain Management"],
+      active_flows: [],
+      last_interaction: Date.now()
+    };
+  }
+
+  /**
+   * Creates Trainer BusinessAvatar (Prof. Anna Kowalska)
+   */
+  private createTrainerBusinessAvatar(): BusinessAvatar {
+    return {
+      _id: new ObjectId(),
+      firstName: "Prof. Anna",
+      lastName: "Kowalska",
+      company: {
+        name: "Instytut Archetypów Osobowości",
+        industry: "Edukacja i Rozwój Osobisty",
+        location: "Warszawa",
+        size: "średnia",
+        mission: "Wspieranie rozwoju osobistego przez zrozumienie archetypów osobowości",
+        offer: ["Szkolenia z archetypów", "Coaching biznesowy", "Warsztat rozwoju osobistego", "Analiza zespołowa"],
+        use_cases: ["Leadership development", "Team building", "Personal branding", "Career coaching"],
+        strategic_goals: ["Digitalizacja szkoleń", "Ekspansja metodyki", "Rozwój narzędzi diagnostycznych"],
+        business_needs: ["Partnerzy edukacyjni", "Klienci korporacyjni", "Platformy e-learningowe"],
+        specializations: ["12 Archetypów Osobowości", "Psychologia biznesu", "Metodyki szkoleniowe"]
+      },
+      personality: {
+        style: "Ciepły i empatyczny pedagog",
+        tone: "Mądry mentor z dużym doświadczeniem",
+        business_motivation: "Pomaganie ludziom w odkrywaniu swojego potencjału",
+        communication_style: "Używa metafor, przykładów z kultury, zadaje pytania refleksyjne",
+        emotional_traits: ["Empatyczny", "Cierpliwy", "Inspirujący"],
+        strengths: ["Głęboka wiedza psychologiczna", "Umiejętności dydaktyczne", "Doświadczenie coachingowe"],
+        weaknesses: ["Czasem zbyt teoretyczny", "Długie wyjaśnienia"]
+      },
+      position: "Psycholog Biznesu i Trener Rozwoju Osobistego",
+      experience_years: 15,
+      specializations: ["Personality Archetypes", "Business Psychology", "Adult Learning"],
+      active_flows: [],
+      last_interaction: Date.now()
     };
   }
 
@@ -292,10 +377,20 @@ class QueryController {
   private async processUserQuery(
     userMessage: string, 
     sessionContext: SessionContext,
+    avatarType?: string,
     streamingCallbacks?: StreamingCallbacks
   ): Promise<QueryProcessingResult> {
     // Add user message to chat history
     await this.addUserMessageToHistory(sessionContext.sessionId, userMessage);
+
+    // Load appropriate definitions for avatar type
+    if (avatarType) {
+      const intentClassifier = IntentClassifier.getInstance();
+      const flowManager = FlowManager.getInstance();
+      
+      await intentClassifier.loadIntentDefinitionsForAvatar(avatarType);
+      await flowManager.loadFlowDefinitionsForAvatar(avatarType);
+    }
 
     // STARY SYSTEM GOALS - WYŁĄCZONY
     // Check for goal execution (zachowujemy kompatybilność z starym systemem)
@@ -397,9 +492,22 @@ class QueryController {
     
     // 4. Pobierz kontekst z RAG jeśli potrzeba
     let ragContext = '';
-    if (intentResult.intent === 'general_questions' || intentResult.intent === 'solution_presentation') {
+    const trainerIntents = ['theory_request', 'show_me_how', 'ask_question', 'practice_together', 'test_me', 'summarize_learning', 'what_next'];
+    const networkerIntents = ['general_questions', 'solution_presentation'];
+    
+    if (networkerIntents.includes(intentResult.intent) || trainerIntents.includes(intentResult.intent)) {
       console.log('\n[KNOWLEDGE BASE] Searching for information in knowledge base...');
-      const contextKnowledge = await vectorDatabaseService.queryKnowledgeBase(userMessage);
+      
+      let contextKnowledge: string[] = [];
+      
+      if (trainerIntents.includes(intentResult.intent) && avatarType === 'trainer') {
+        // Use trainer knowledge base
+        contextKnowledge = await this.getTrainerKnowledgeContext(userMessage);
+      } else {
+        // Use networker knowledge base (vector database)
+        contextKnowledge = await vectorDatabaseService.queryKnowledgeBase(userMessage);
+      }
+      
       ragContext = contextKnowledge.join('\n');
       console.log('[KNOWLEDGE BASE] Found context:', contextKnowledge.length > 0 ? 'Found' : 'None');
       
@@ -1108,6 +1216,52 @@ class QueryController {
     } catch (error) {
       console.error('❌ Error in checkTTSHealth:', error);
       res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+  /**
+   * Gets trainer knowledge context from training-avatar-knowledge.json
+   */
+  private async getTrainerKnowledgeContext(userMessage: string): Promise<string[]> {
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      
+      const filePath = path.resolve(__dirname, '../config/training-avatar-knowledge.json');
+      const rawData = fs.readFileSync(filePath, 'utf-8');
+      const knowledgeData = JSON.parse(rawData);
+      
+      const contextChunks: string[] = [];
+      
+      // Search through trainer avatar chunks
+      if (knowledgeData.avatars && knowledgeData.avatars.length > 0) {
+        const trainerAvatar = knowledgeData.avatars[0]; // Prof. Anna Kowalska
+        
+        if (trainerAvatar.chunks) {
+          // Simple keyword matching for now (can be improved with embeddings later)
+          const queryLower = userMessage.toLowerCase();
+          
+          for (const chunk of trainerAvatar.chunks) {
+            const chunkTextLower = chunk.text.toLowerCase();
+            
+            // Check if query contains relevant keywords from chunk
+            if (queryLower.includes('archetyp') && chunkTextLower.includes('archetyp')) {
+              contextChunks.push(`[${chunk.topic}] ${chunk.text}`);
+            } else if (queryLower.includes('wojownik') && chunkTextLower.includes('wojownik')) {
+              contextChunks.push(`[${chunk.topic}] ${chunk.text}`);
+            } else if (queryLower.includes('teoria') && chunk.category === 'THEORY') {
+              contextChunks.push(`[${chunk.topic}] ${chunk.text}`);
+            }
+          }
+        }
+      }
+      
+      console.log(`[TRAINER KB] Found ${contextChunks.length} relevant chunks`);
+      return contextChunks.slice(0, 3); // Limit to top 3 chunks
+      
+    } catch (error) {
+      console.error('❌ Error loading trainer knowledge base:', error);
+      return [];
     }
   }
 }

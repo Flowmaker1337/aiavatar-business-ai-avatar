@@ -8,11 +8,13 @@ class AvatarDashboard {
         this.apiLog = [];
         this.performanceLog = [];
         this.debugVisible = false;
+        this.currentAvatarType = 'networker'; // Default avatar
         
         // Initialize components
         this.initializeEventListeners();
         this.initializeFlowGraph();
         this.loadFlowDefinitions();
+        this.updateAvatarDisplay();
         this.startHealthCheck();
     }
 
@@ -26,6 +28,7 @@ class AvatarDashboard {
         });
 
         // Header controls
+        document.getElementById('avatar-type').addEventListener('change', (e) => this.changeAvatar(e.target.value));
         document.getElementById('clear-session').addEventListener('click', () => this.clearSession());
         document.getElementById('export-data').addEventListener('click', () => this.exportData());
 
@@ -229,38 +232,96 @@ class AvatarDashboard {
 
     async loadFlowDefinitions() {
         try {
-            // Load flow definitions from the flow-definitions.json file
-            const flows = [
-                {
-                    id: 'greeting_flow',
-                    name: 'Powitanie i nawiązanie kontaktu',
-                    steps: [
-                        { id: 'initial_greeting', name: 'Powitanie', next_steps: ['company_introduction'] },
-                        { id: 'company_introduction', name: 'Przedstawienie firmy', next_steps: ['conversation_opener'] },
-                        { id: 'conversation_opener', name: 'Otwarcie rozmowy', next_steps: ['completed'] }
-                    ]
-                },
-                {
-                    id: 'company_presentation_flow',
-                    name: 'Prezentacja firmy NPC',
-                    steps: [
-                        { id: 'company_overview', name: 'Przegląd firmy', next_steps: ['services_presentation'] },
-                        { id: 'services_presentation', name: 'Prezentacja usług', next_steps: ['value_proposition'] },
-                        { id: 'value_proposition', name: 'Propozycja wartości', next_steps: ['examples_cases'] },
-                        { id: 'examples_cases', name: 'Przykłady zastosowań', next_steps: ['completed'] }
-                    ]
-                },
-                {
-                    id: 'needs_analysis_flow',
-                    name: 'Analiza potrzeb użytkownika',
-                    steps: [
-                        { id: 'pain_points', name: 'Punkty bólowe', next_steps: ['impact_assessment'] },
-                        { id: 'impact_assessment', name: 'Ocena wpływu', next_steps: ['solution_attempts'] },
-                        { id: 'solution_attempts', name: 'Próby rozwiązania', next_steps: ['success_metrics'] },
-                        { id: 'success_metrics', name: 'Metryki sukcesu', next_steps: ['completed'] }
-                    ]
-                }
-            ];
+            let flows = [];
+            
+            if (this.currentAvatarType === 'trainer') {
+                // Training flows for trainer avatar
+                flows = [
+                    {
+                        id: 'theory_introduction_flow',
+                        name: '🎓 Wprowadzenie teorii',
+                        steps: [
+                            { id: 'concept_introduction', name: 'Wprowadzenie koncepcji', next_steps: ['detailed_explanation'] },
+                            { id: 'detailed_explanation', name: 'Szczegółowe wyjaśnienie', next_steps: ['key_principles'] },
+                            { id: 'key_principles', name: 'Kluczowe zasady', next_steps: ['theory_summary'] },
+                            { id: 'theory_summary', name: 'Podsumowanie teorii', next_steps: ['completed'] }
+                        ]
+                    },
+                    {
+                        id: 'guided_practice_flow',
+                        name: '👥 Praktyka z przewodnikiem',
+                        steps: [
+                            { id: 'practice_setup', name: 'Przygotowanie do ćwiczenia', next_steps: ['step_by_step_guidance'] },
+                            { id: 'step_by_step_guidance', name: 'Przewodnictwo krok po kroku', next_steps: ['feedback_loop'] },
+                            { id: 'feedback_loop', name: 'Pętla zwrotna', next_steps: ['practice_completion'] },
+                            { id: 'practice_completion', name: 'Zakończenie ćwiczenia', next_steps: ['completed'] }
+                        ]
+                    },
+                    {
+                        id: 'question_answer_flow',
+                        name: '❓ Sesja pytań i odpowiedzi',
+                        steps: [
+                            { id: 'question_identification', name: 'Identyfikacja pytania', next_steps: ['knowledge_retrieval'] },
+                            { id: 'knowledge_retrieval', name: 'Wyszukiwanie wiedzy', next_steps: ['answer_formulation'] },
+                            { id: 'answer_formulation', name: 'Formułowanie odpowiedzi', next_steps: ['comprehension_check'] },
+                            { id: 'comprehension_check', name: 'Sprawdzenie zrozumienia', next_steps: ['completed'] }
+                        ]
+                    },
+                    {
+                        id: 'assessment_flow',
+                        name: '📊 Ocena i sprawdzenie',
+                        steps: [
+                            { id: 'assessment_preparation', name: 'Przygotowanie oceny', next_steps: ['knowledge_testing'] },
+                            { id: 'knowledge_testing', name: 'Testowanie wiedzy', next_steps: ['result_analysis'] },
+                            { id: 'result_analysis', name: 'Analiza wyników', next_steps: ['feedback_delivery'] },
+                            { id: 'feedback_delivery', name: 'Przekazanie feedbacku', next_steps: ['completed'] }
+                        ]
+                    },
+                    {
+                        id: 'summary_reflection_flow',
+                        name: '💭 Podsumowanie i refleksja',
+                        steps: [
+                            { id: 'content_recap', name: 'Powtórka treści', next_steps: ['key_insights'] },
+                            { id: 'key_insights', name: 'Kluczowe wnioski', next_steps: ['reflection_questions'] },
+                            { id: 'reflection_questions', name: 'Pytania refleksyjne', next_steps: ['next_steps_planning'] },
+                            { id: 'next_steps_planning', name: 'Planowanie kolejnych kroków', next_steps: ['completed'] }
+                        ]
+                    }
+                ];
+            } else {
+                // Business networking flows for networker avatar
+                flows = [
+                    {
+                        id: 'greeting_flow',
+                        name: '🤝 Powitanie i nawiązanie kontaktu',
+                        steps: [
+                            { id: 'initial_greeting', name: 'Powitanie', next_steps: ['company_introduction'] },
+                            { id: 'company_introduction', name: 'Przedstawienie firmy', next_steps: ['conversation_opener'] },
+                            { id: 'conversation_opener', name: 'Otwarcie rozmowy', next_steps: ['completed'] }
+                        ]
+                    },
+                    {
+                        id: 'company_presentation_flow',
+                        name: '🏢 Prezentacja firmy NPC',
+                        steps: [
+                            { id: 'company_overview', name: 'Przegląd firmy', next_steps: ['services_presentation'] },
+                            { id: 'services_presentation', name: 'Prezentacja usług', next_steps: ['value_proposition'] },
+                            { id: 'value_proposition', name: 'Propozycja wartości', next_steps: ['examples_cases'] },
+                            { id: 'examples_cases', name: 'Przykłady zastosowań', next_steps: ['completed'] }
+                        ]
+                    },
+                    {
+                        id: 'needs_analysis_flow',
+                        name: '🔍 Analiza potrzeb użytkownika',
+                        steps: [
+                            { id: 'pain_points', name: 'Punkty bólowe', next_steps: ['impact_assessment'] },
+                            { id: 'impact_assessment', name: 'Ocena wpływu', next_steps: ['solution_attempts'] },
+                            { id: 'solution_attempts', name: 'Próby rozwiązania', next_steps: ['success_metrics'] },
+                            { id: 'success_metrics', name: 'Metryki sukcesu', next_steps: ['completed'] }
+                        ]
+                    }
+                ];
+            }
             
             this.flows = flows;
             
@@ -569,6 +630,58 @@ class AvatarDashboard {
         a.click();
         
         URL.revokeObjectURL(url);
+    }
+
+    // ============ AVATAR MANAGEMENT ============
+
+    async changeAvatar(avatarType) {
+        console.log(`Changing avatar to: ${avatarType}`);
+        
+        // Update current avatar type
+        this.currentAvatarType = avatarType;
+        
+        // Clear current session when switching avatars
+        this.clearSession();
+        
+        // Reload flow definitions for new avatar
+        await this.loadFlowDefinitions();
+        
+        // Update avatar display
+        this.updateAvatarDisplay();
+        
+        // Reset graph
+        this.resetGraph();
+        
+        console.log(`Avatar switched to: ${avatarType}`);
+    }
+
+    updateAvatarDisplay() {
+        const avatarConfig = this.getAvatarConfig(this.currentAvatarType);
+        
+        // Update business avatar section
+        document.querySelector('#business-avatar .avatar-name').textContent = avatarConfig.name;
+        document.querySelector('#business-avatar .avatar-company').textContent = avatarConfig.company;
+        document.querySelector('#business-avatar .avatar-expertise').textContent = avatarConfig.expertise;
+        
+        // Update page title
+        document.title = `AI Avatar Business - ${avatarConfig.name}`;
+    }
+
+    getAvatarConfig(avatarType) {
+        const avatarConfigs = {
+            networker: {
+                name: 'Anna Kowalczyk',
+                company: 'LogisPol International',
+                expertise: 'Ekspansja zagraniczna, logistyka, networking biznesowy'
+            },
+            trainer: {
+                name: 'Prof. Anna Kowalska',
+                company: 'Instytut Archetypów Osobowości',
+                expertise: '12 Archetypów Osobowości, psychologia biznesu, coaching'
+            }
+        };
+        
+        return avatarConfigs[avatarType] || avatarConfigs.networker;
     }
 }
 

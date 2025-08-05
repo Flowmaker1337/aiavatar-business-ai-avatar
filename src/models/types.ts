@@ -2,6 +2,7 @@
 export interface UserQuery {
   user_message: string;
   session_id?: string;
+  avatar_type?: string;
 }
 
 export interface UserStreamingQuery extends UserQuery {

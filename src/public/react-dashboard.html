@@ -23,11 +23,68 @@
             line-height: 1.6;
         }
         
-        .dashboard {
+        .header {
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .header h1 {
+            color: #58a6ff;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .avatar-selector {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .avatar-selector label {
+            font-size: 0.875rem;
+            color: #7d8590;
+            font-weight: 500;
+        }
+
+        .avatar-dropdown {
+            padding: 0.5rem 0.75rem;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #e6edf3;
+            font-size: 0.875rem;
+            min-width: 220px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .avatar-dropdown:hover {
+            border-color: #58a6ff;
+            background: #161b22;
+        }
+
+        .avatar-dropdown:focus {
+            outline: none;
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 2px rgba(88,166,255,0.2);
+        }
+
+        .main-content {
             display: grid;
             grid-template-columns: 350px 1fr 300px;
             grid-template-rows: 1fr 200px;
-            height: 100vh;
+            height: calc(100vh - 80px);
             gap: 12px;
             padding: 12px;
         }
@@ -367,7 +424,7 @@
                 return response.json();
             },
             
-            async query(message, sessionId) {
+            async query(message, sessionId, avatarType) {
                 const response = await fetch('/api/query', {
                     method: 'POST',
                     headers: {
@@ -375,7 +432,8 @@
                     },
                     body: JSON.stringify({
                         user_message: message,
-                        session_id: sessionId
+                        session_id: sessionId,
+                        avatar_type: avatarType
                     })
                 });
                 return response.json();
@@ -392,14 +450,15 @@
                 return response.json();
             },
             
-            async getFlowDefinitions() {
-                const response = await fetch('/api/flows');
+            async getFlowDefinitions(avatarType) {
+                const url = avatarType ? `/api/flows?avatar_type=${avatarType}` : '/api/flows';
+                const response = await fetch(url);
                 return response.json();
             }
         };
         
         // Chat Panel Component
-        const ChatPanel = ({ sessionId, onSessionChange }) => {
+        const ChatPanel = ({ sessionId, onSessionChange, avatarConfig, currentAvatar }) => {
             const [messages, setMessages] = useState([]);
             const [inputMessage, setInputMessage] = useState('');
             const [isLoading, setIsLoading] = useState(false);
@@ -424,7 +483,7 @@
                 setMessages(prev => [...prev, userMsg]);
                 
                 try {
-                    const response = await apiService.query(userMessage, sessionId);
+                    const response = await apiService.query(userMessage, sessionId, currentAvatar);
                     
                     if (response.status === 'success') {
                         const avatarMsg = {
@@ -799,6 +858,7 @@
             const [isHealthy, setIsHealthy] = useState(false);
             const [sessionState, setSessionState] = useState(null);
             const [flowDefinitions, setFlowDefinitions] = useState([]);
+            const [currentAvatar, setCurrentAvatar] = useState('networker');
             
             const fetchSessionState = useCallback(async () => {
                 if (!sessionId) return;
@@ -823,11 +883,12 @@
                     }
                 };
                 
-                const fetchFlows = async () => {
+                const fetchFlows = async (avatarType) => {
                     try {
-                        const response = await apiService.getFlowDefinitions();
+                        const response = await apiService.getFlowDefinitions(avatarType);
                         if (response.status === 'success') {
                             setFlowDefinitions(response.flows);
+                            console.log(`✅ Loaded ${response.flows.length} flows for avatar: ${avatarType || 'networker'}`);
                         }
                     } catch (err) {
                         console.error('Failed to fetch flow definitions:', err);
@@ -835,11 +896,11 @@
                 };
                 
                 checkHealth();
-                fetchFlows();
+                fetchFlows(currentAvatar);
                 const interval = setInterval(checkHealth, 30000);
                 
                 return () => clearInterval(interval);
-            }, []);
+            }, [currentAvatar]);
             
             useEffect(() => {
                 fetchSessionState();
@@ -852,23 +913,83 @@
                 // Fetch initial history for new session
                 // The ChatPanel will do this itself via its useEffect
             };
+
+            const handleAvatarChange = async (avatarType) => {
+                console.log(`Switching to avatar: ${avatarType}`);
+                setCurrentAvatar(avatarType);
+                // Clear session when switching avatars
+                setSessionId(null);
+                setSessionState(null);
+                
+                // Reload flow definitions for new avatar type
+                try {
+                    const response = await apiService.getFlowDefinitions(avatarType);
+                    if (response.status === 'success') {
+                        setFlowDefinitions(response.flows);
+                        console.log(`✅ Reloaded ${response.flows.length} flows for avatar: ${avatarType}`);
+                    }
+                } catch (err) {
+                    console.error('Failed to reload flow definitions after avatar change:', err);
+                }
+            };
+
+            const getAvatarConfig = (avatarType) => {
+                const avatarConfigs = {
+                    networker: {
+                        name: 'Anna Kowalczyk',
+                        company: 'LogisPol International',
+                        expertise: 'Ekspansja zagraniczna, logistyka, networking biznesowy'
+                    },
+                    trainer: {
+                        name: 'Prof. Anna Kowalska',
+                        company: 'Instytut Archetypów Osobowości',
+                        expertise: '12 Archetypów Osobowości, psychologia biznesu, coaching'
+                    }
+                };
+                return avatarConfigs[avatarType] || avatarConfigs.networker;
+            };
+
+            const avatarConfig = getAvatarConfig(currentAvatar);
             
             return (
-                <div className="dashboard">
-                    <ChatPanel 
-                        sessionId={sessionId} 
-                        onSessionChange={handleSessionChange}
-                    />
-                    <FlowGraph 
-                        sessionId={sessionId}
-                        flows={flowDefinitions}
-                        activeFlow={sessionState?.activeFlow}
-                    />
-                    <MindStatePanel 
-                        sessionId={sessionId} 
-                        mindState={sessionState?.mindState}
-                    />
-                    <DebugPanel />
+                <div>
+                    <header className="header">
+                        <h1>🤖 AI Avatar Business Dashboard</h1>
+                        <div className="header-controls">
+                            <div className="avatar-selector">
+                                <label htmlFor="avatar-type">👤 Avatar:</label>
+                                <select 
+                                    id="avatar-type" 
+                                    className="avatar-dropdown"
+                                    value={currentAvatar}
+                                    onChange={(e) => handleAvatarChange(e.target.value)}
+                                >
+                                    <option value="networker">🤝 Networker (Anna Kowalczyk)</option>
+                                    <option value="trainer">🎓 Trener (Prof. Anna Kowalska)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </header>
+                    <div className="main-content">
+                        <ChatPanel 
+                            sessionId={sessionId} 
+                            onSessionChange={handleSessionChange}
+                            avatarConfig={avatarConfig}
+                            currentAvatar={currentAvatar}
+                        />
+                        <FlowGraph 
+                            sessionId={sessionId}
+                            flows={flowDefinitions}
+                            activeFlow={sessionState?.activeFlow}
+                            avatarType={currentAvatar}
+                        />
+                        <MindStatePanel 
+                            sessionId={sessionId} 
+                            mindState={sessionState?.mindState}
+                            avatarConfig={avatarConfig}
+                        />
+                        <DebugPanel />
+                    </div>
                 </div>
             );
         };

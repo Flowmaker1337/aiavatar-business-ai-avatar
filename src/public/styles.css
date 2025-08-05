@@ -40,6 +40,42 @@ body {
 .header-controls {
     display: flex;
     gap: 1rem;
+    align-items: center;
+}
+
+.avatar-selector {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.avatar-selector label {
+    font-size: 0.875rem;
+    color: #7d8590;
+    font-weight: 500;
+}
+
+.avatar-dropdown {
+    padding: 0.5rem 0.75rem;
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    color: #e6edf3;
+    font-size: 0.875rem;
+    min-width: 220px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.avatar-dropdown:hover {
+    border-color: #58a6ff;
+    background: #161b22;
+}
+
+.avatar-dropdown:focus {
+    outline: none;
+    border-color: #58a6ff;
+    box-shadow: 0 0 0 2px rgba(88,166,255,0.2);
 }
 
 /* Main Content */
