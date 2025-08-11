@@ -6,8 +6,14 @@ import sessionController from '../controllers/session.controller';
 import healthController from '../controllers/health.controller';
 import flowController from '../controllers/flow.controller';
 import knowledgePrepareController from '../controllers/knowledge-prepare.controller';
+import SimulationController from '../controllers/simulation.controller';
+import PersonaController from '../controllers/persona.controller';
 
 const router = Router();
+
+// Initialize controllers
+const simulationController = new SimulationController();
+const personaController = new PersonaController();
 
 // Endpoint for processing queries
 router.post('/query', queryController.handleQuery.bind(queryController));
@@ -66,5 +72,67 @@ router.post('/knowledge/test-12archetypes', knowledgePrepareController.test12Arc
 
 // Health check for Knowledge Preparation Engine
 router.get('/knowledge/health', knowledgePrepareController.healthCheck.bind(knowledgePrepareController));
+
+// ============ SIMULATION ENDPOINTS ============
+
+// Create new simulation
+router.post('/simulation/create', simulationController.createSimulation.bind(simulationController));
+
+// Get simulation info
+router.get('/simulation/:id', simulationController.getSimulation.bind(simulationController));
+
+// Get simulation messages
+router.get('/simulation/:id/messages', simulationController.getSimulationMessages.bind(simulationController));
+
+// Get simulation analysis
+router.get('/simulation/:id/analysis', simulationController.getSimulationAnalysis.bind(simulationController));
+
+// Pause simulation
+router.post('/simulation/:id/pause', simulationController.pauseSimulation.bind(simulationController));
+
+// Resume simulation
+router.post('/simulation/:id/resume', simulationController.resumeSimulation.bind(simulationController));
+
+// Get all active simulations
+router.get('/simulation/active', simulationController.getActiveSimulations.bind(simulationController));
+
+// Get scenario templates
+router.get('/simulation/templates/scenarios', simulationController.getScenarioTemplates.bind(simulationController));
+
+// Get persona templates
+router.get('/simulation/templates/personas', simulationController.getPersonaTemplates.bind(simulationController));
+
+// Export simulation
+router.post('/simulation/export/:id', simulationController.exportSimulation.bind(simulationController));
+
+// ============ PERSONA ENDPOINTS ============
+
+// Generate new persona
+router.post('/persona/generate', personaController.generatePersona.bind(personaController));
+
+// Generate example personas
+router.post('/persona/examples', personaController.generateExamples.bind(personaController));
+
+// Persona library management
+router.get('/persona/library', personaController.getPersonaLibrary.bind(personaController));
+router.get('/persona/library/stats', personaController.getLibraryStats.bind(personaController));
+router.get('/persona/library/popular', personaController.getPopularPersonas.bind(personaController));
+
+// Import/Export library
+router.post('/persona/library/export', personaController.exportLibrary.bind(personaController));
+router.post('/persona/library/import', personaController.importLibrary.bind(personaController));
+
+// Individual persona management
+router.get('/persona/:id', personaController.getPersona.bind(personaController));
+router.put('/persona/:id', personaController.updatePersona.bind(personaController));
+router.delete('/persona/:id', personaController.deletePersona.bind(personaController));
+
+// Persona actions
+router.post('/persona/:id/favorite', personaController.toggleFavorite.bind(personaController));
+router.post('/persona/:id/rate', personaController.ratePersona.bind(personaController));
+router.post('/persona/:id/tags', personaController.addTags.bind(personaController));
+
+// Convert persona to simulation participant
+router.post('/persona/:id/participant', personaController.createParticipant.bind(personaController));
 
 export default router; 

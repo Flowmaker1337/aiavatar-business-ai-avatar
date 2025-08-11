@@ -1,0 +1,308 @@
+{
+  "scenarios": [
+    {
+      "id": "b2b_it_sales",
+      "name": "Sprzedaż B2B - Usługi IT",
+      "description": "Symulacja rozmowy handlowej dotyczącej usług IT dla firm",
+      "objective": "Skuteczna prezentacja oferty i zamknięcie sprzedaży",
+      "duration_minutes": 15,
+      "context": {
+        "industry": "IT/Technologie",
+        "situation": "Pierwsze spotkanie z potencjalnym klientem MŚP",
+        "constraints": [
+          "Klient ma ograniczony budżet",
+          "Potrzebuje rozwiązania w ciągu 3 miesięcy",
+          "Brak własnego działu IT"
+        ],
+        "success_metrics": [
+          "Prezentacja oferty",
+          "Identyfikacja potrzeb",
+          "Umówienie kolejnego spotkania",
+          "Oszacowanie budżetu"
+        ]
+      },
+      "participants": [
+        {
+          "id": "seller_networker",
+          "avatarType": "networker",
+          "role": "seller",
+          "responseStyle": "proactive",
+          "persona": {
+            "name": "Anna Kowalczyk - Konsultant IT",
+            "background": "10 lat doświadczenia w sprzedaży rozwiązań IT dla MŚP",
+            "goals": [
+              "Zidentyfikować potrzeby klienta",
+              "Zaprezentować dopasowane rozwiązanie",
+              "Zbudować zaufanie",
+              "Umówić prezentację techniczną"
+            ],
+            "challenges": [
+              "Przełamanie oporu wobec kosztów",
+              "Wyjaśnienie korzyści technicznych",
+              "Konkurencja cenowa"
+            ],
+            "personality_traits": [
+              "Empatyczna",
+              "Konsultacyjna",
+              "Zorientowana na rozwiązania",
+              "Profesjonalna"
+            ],
+            "communication_style": "Konsultacyjny, zadaje pytania, słucha potrzeb",
+            "expertise_level": "expert",
+            "industry": "IT/Technologie",
+            "company_size": "Średnia firma (50-250 osób)",
+            "decision_making_style": "Analityczny, bazujący na potrzebach klienta"
+          }
+        },
+        {
+          "id": "buyer_client",
+          "avatarType": "client",
+          "role": "buyer",
+          "responseStyle": "reactive",
+          "persona": {
+            "name": "Michał Wiśniewski - Właściciel MŚP",
+            "background": "Właściciel rodzinnej firmy produkcyjnej działającej od 15 lat",
+            "goals": [
+              "Modernizacja procesów",
+              "Zwiększenie efektywności",
+              "Kontrola kosztów",
+              "Bezpieczeństwo danych"
+            ],
+            "challenges": [
+              "Ograniczony budżet IT",
+              "Brak ekspertów technicznych",
+              "Opór załogi wobec zmian",
+              "Obawa przed przestojami"
+            ],
+            "personality_traits": [
+              "Praktyczny",
+              "Ostrożny finansowo",
+              "Sceptyczny wobec nowości",
+              "Zorientowany na ROI"
+            ],
+            "communication_style": "Bezpośredni, pyta o koszty i korzyści, potrzebuje dowodów",
+            "expertise_level": "beginner",
+            "industry": "Produkcja",
+            "company_size": "Średnia firma (50-250 osób)",
+            "budget_range": "50k-150k PLN",
+            "decision_making_style": "Powolny, wymaga wielu dowodów"
+          }
+        }
+      ],
+      "conversation_starters": [
+        "Dzień dobry Panie Michale! Dziękuję za znalezienie czasu na spotkanie. Rozumiem, że rozważa Pan modernizację systemów IT w swojej firmie?",
+        "Witam! Anna Kowalczyk z LogisPol International. Opowiem Panu jak pomogliśmy podobnym firmom zwiększyć efektywność o 30%.",
+        "Dzień dobry! Przed spotkaniem przejrzałam profil Państwa firmy. Widzę, że działają Państwo w branży produkcyjnej - to bardzo interesujący sektor dla rozwiązań IT."
+      ],
+      "evaluation_criteria": [
+        "Jakość identyfikacji potrzeb",
+        "Dopasowanie oferty do budżetu",
+        "Budowanie zaufania i relacji",
+        "Odpowiedzi na obiekcje",
+        "Konkretność następnych kroków"
+      ]
+    },
+    {
+      "id": "team_management_training",
+      "name": "Szkolenie - Zarządzanie zespołem",
+      "description": "Sesja szkoleniowa z zakresu zarządzania zespołem dla nowego menedżera",
+      "objective": "Przekazanie wiedzy o technikach zarządzania i rozwoju umiejętności",
+      "duration_minutes": 20,
+      "context": {
+        "industry": "Edukacja/HR",
+        "situation": "Szkolenie dla świeżo awansowanego menedżera",
+        "constraints": [
+          "Uczestnik ma mało doświadczenia w zarządzaniu",
+          "Zarządza zespołem 8 osób",
+          "Problemy z motywacją zespołu"
+        ],
+        "success_metrics": [
+          "Zrozumienie podstaw zarządzania",
+          "Praktyczne narzędzia",
+          "Plan rozwoju umiejętności",
+          "Rozwiązanie konkretnych problemów"
+        ]
+      },
+      "participants": [
+        {
+          "id": "trainer_teacher",
+          "avatarType": "trainer",
+          "role": "teacher",
+          "responseStyle": "proactive",
+          "persona": {
+            "name": "Prof. Anna Kowalska - Ekspert HR",
+            "background": "20 lat doświadczenia w HR, 12 Archetypów Osobowości, coaching menedżerski",
+            "goals": [
+              "Przekazać kluczowe zasady zarządzania",
+              "Zdiagnozować potrzeby rozwojowe",
+              "Dać praktyczne narzędzia",
+              "Zbudować pewność siebie ucznia"
+            ],
+            "challenges": [
+              "Różny poziom doświadczenia uczniów",
+              "Ograniczony czas szkolenia",
+              "Teoria vs praktyka"
+            ],
+            "personality_traits": [
+              "Cierpliwa",
+              "Inspirująca",
+              "Strukturalna",
+              "Wspierająca"
+            ],
+            "communication_style": "Edukacyjny, zadaje pytania rozwojowe, daje konkretne przykłady",
+            "expertise_level": "expert",
+            "industry": "Edukacja/HR",
+            "company_size": "Instytut szkoleniowy",
+            "decision_making_style": "Bazujący na wiedzy i doświadczeniu"
+          }
+        },
+        {
+          "id": "student_learner",
+          "avatarType": "student",
+          "role": "learner",
+          "responseStyle": "reactive",
+          "persona": {
+            "name": "Tomasz Nowak - Nowy Menedżer",
+            "background": "3 lata jako specjalista, 2 miesiące temu awansowany na team leadera",
+            "goals": [
+              "Nauczyć się zarządzać zespołem",
+              "Poprawić komunikację",
+              "Zmotywować zespół",
+              "Radzić sobie ze stresem"
+            ],
+            "challenges": [
+              "Brak doświadczenia w zarządzaniu",
+              "Starsi podwładni",
+              "Konflikt w zespole",
+              "Presja na wyniki"
+            ],
+            "personality_traits": [
+              "Ambitny",
+              "Niepewny",
+              "Chce się uczyć",
+              "Analityczny"
+            ],
+            "communication_style": "Pytający, chce konkretów, szuka rozwiązań",
+            "expertise_level": "beginner",
+            "industry": "IT/Technologie",
+            "company_size": "Średnia firma (50-250 osób)",
+            "decision_making_style": "Ostrożny, szuka potwierdzenia"
+          }
+        }
+      ],
+      "conversation_starters": [
+        "Witam na szkoleniu z zarządzania zespołem, Tomku! Gratulacje awansu. Opowiedz mi o swoim zespole i głównych wyzwaniach.",
+        "Dzień dobry! Przed szkoleniem chciałabym dowiedzieć się - jakie ma Pan doświadczenie w zarządzaniu ludźmi?",
+        "Witam! Anna Kowalska, będę Pana szkolić. Na czym chciałby się Pan dzisiaj skupić w kontekście zarządzania zespołem?"
+      ],
+      "evaluation_criteria": [
+        "Przekaz wiedzy merytorycznej",
+        "Zaangażowanie ucznia",
+        "Praktyczne zastosowanie",
+        "Rozwiązanie konkretnych problemów",
+        "Plan dalszego rozwoju"
+      ]
+    },
+    {
+      "id": "networking_conference",
+      "name": "Networking - Konferencja branżowa",
+      "description": "Symulacja spotkania networkingowego na konferencji technologicznej",
+      "objective": "Nawiązanie wartościowych kontaktów biznesowych i identyfikacja możliwości współpracy",
+      "duration_minutes": 12,
+      "context": {
+        "industry": "Technologie/Startup",
+        "situation": "Networking podczas konferencji TechConnect 2024",
+        "constraints": [
+          "Ograniczony czas na rozmowę",
+          "Dużo osób do poznania",
+          "Głośne otoczenie"
+        ],
+        "success_metrics": [
+          "Wymiana kontaktów",
+          "Identyfikacja synergii",
+          "Konkretne plany dalszej współpracy",
+          "Wzajemne korzyści"
+        ]
+      },
+      "participants": [
+        {
+          "id": "networker_active",
+          "avatarType": "networker",
+          "role": "interviewer",
+          "responseStyle": "proactive",
+          "persona": {
+            "name": "Anna Kowalczyk - Business Development",
+            "background": "Ekspert w networkingu, 8 lat w biznesie B2B, rozbudowana sieć kontaktów",
+            "goals": [
+              "Znaleźć potencjalnych partnerów",
+              "Zidentyfikować możliwości współpracy",
+              "Poszerzać sieć kontaktów",
+              "Prezentować swoją firmę"
+            ],
+            "challenges": [
+              "Dużo osób do poznania",
+              "Ograniczony czas",
+              "Identyfikacja wartościowych kontaktów"
+            ],
+            "personality_traits": [
+              "Otwarta",
+              "Komunikatywna",
+              "Strategiczna",
+              "Profesjonalna"
+            ],
+            "communication_style": "Naturalny, zainteresowany rozmówcą, zadaje dobre pytania",
+            "expertise_level": "expert",
+            "industry": "Logistyka międzynarodowa",
+            "company_size": "Duża firma (250+ osób)",
+            "decision_making_style": "Szybki, oparty na intuicji i doświadczeniu"
+          }
+        },
+        {
+          "id": "networker_startup",
+          "avatarType": "client",
+          "role": "interviewee",
+          "responseStyle": "balanced",
+          "persona": {
+            "name": "Łukasz Adamski - Founder startupu",
+            "background": "Założyciel startupu AI/ML, poszukuje partnerów i klientów",
+            "goals": [
+              "Znaleźć potencjalnych klientów",
+              "Nawiązać partnerstwa strategiczne",
+              "Zdobyć mentorów",
+              "Poszerzać network"
+            ],
+            "challenges": [
+              "Młoda firma - mała rozpoznawalność",
+              "Ograniczony budżet marketingowy",
+              "Potrzeba validation produktu"
+            ],
+            "personality_traits": [
+              "Pasjonat",
+              "Energiczny",
+              "Wizjoner",
+              "Czasem zbyt techniczny"
+            ],
+            "communication_style": "Entuzjastyczny, techniczny, chce dzielić się wizją",
+            "expertise_level": "advanced",
+            "industry": "AI/Machine Learning",
+            "company_size": "Startup (5-10 osób)",
+            "budget_range": "Seed funding",
+            "decision_making_style": "Szybki, oparty na wizji"
+          }
+        }
+      ],
+      "conversation_starters": [
+        "Cześć! Anna z LogisPol International. Widziałam Twoją prezentację o AI - bardzo interesująca! Opowiedz więcej o waszym produkcie.",
+        "Dzień dobry! Miło Cię poznać. Anna Kowalczyk, zajmuję się ekspansją zagraniczną. A Ty w jakiej branży działasz?",
+        "Witaj! Super konferencja, prawda? Jestem Anna, business development w logistyce. Co Cię tutaj sprowadza?"
+      ],
+      "evaluation_criteria": [
+        "Naturalność nawiązania kontaktu",
+        "Identyfikacja wzajemnych korzyści",
+        "Konkretność dalszych kroków",
+        "Jakość wymiany informacji",
+        "Professional follow-up"
+      ]
+    }
+  ]
+}

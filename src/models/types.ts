@@ -409,3 +409,133 @@ export interface PromptTemplate {
     variables: string[];
     priority: number;
 }
+
+// ============ CONVERSATION SIMULATION INTERFACES ============
+
+export interface SimulationParticipant {
+    id: string;
+    avatarType: 'networker' | 'trainer' | 'client' | 'student';
+    role: 'teacher' | 'learner' | 'seller' | 'buyer' | 'interviewer' | 'interviewee';
+    avatar: BusinessAvatar;
+    persona: SimulationPersona;
+    responseStyle: 'proactive' | 'reactive' | 'balanced';
+}
+
+export interface SimulationPersona {
+    name: string;
+    background: string;
+    goals: string[];
+    challenges: string[];
+    personality_traits: string[];
+    communication_style: string;
+    expertise_level: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+    industry: string;
+    company_size: string;
+    budget_range?: string;
+    decision_making_style: string;
+}
+
+export interface SimulationScenario {
+    id: string;
+    name: string;
+    description: string;
+    objective: string;
+    duration_minutes: number;
+    context: {
+        industry: string;
+        situation: string;
+        constraints?: string[];
+        success_metrics: string[];
+    };
+    participants: SimulationParticipant[];
+    conversation_starters: string[];
+    evaluation_criteria: string[];
+}
+
+export interface SimulationMessage {
+    id: string;
+    simulation_id: string;
+    participant_id: string;
+    content: string;
+    timestamp: number;
+    intent: string;
+    flow_step?: string;
+    response_time_ms: number;
+    metadata: {
+        confidence: number;
+        flow_triggered: boolean;
+        rag_used: boolean;
+        tokens_used: number;
+    };
+}
+
+export interface SimulationExecution {
+    id: string;
+    scenario: SimulationScenario;
+    status: 'setting_up' | 'running' | 'paused' | 'completed' | 'failed';
+    start_time: number;
+    end_time?: number;
+    current_turn: number;
+    max_turns: number;
+    messages: SimulationMessage[];
+    analysis: SimulationAnalysis;
+    participants_sessions: Map<string, string>; // participant_id -> session_id
+}
+
+export interface SimulationAnalysis {
+    conversation_quality_score: number;
+    participant_performance: Map<string, ParticipantPerformance>;
+    flow_analysis: FlowAnalysis;
+    intent_distribution: Map<string, number>;
+    response_times: {
+        average: number;
+        min: number;
+        max: number;
+    };
+    conversation_metrics: {
+        total_turns: number;
+        avg_message_length: number;
+        topic_consistency: number;
+        goal_achievement_rate: number;
+    };
+    insights: string[];
+    improvement_suggestions: string[];
+}
+
+export interface ParticipantPerformance {
+    participant_id: string;
+    message_count: number;
+    avg_response_time: number;
+    intent_accuracy: number;
+    flow_completion_rate: number;
+    conversation_contribution: number;
+    goal_achievement: number;
+    strengths: string[];
+    weaknesses: string[];
+    improvement_areas: string[];
+}
+
+export interface FlowAnalysis {
+    flows_triggered: Map<string, number>;
+    flow_completion_rates: Map<string, number>;
+    flow_transitions: Array<{
+        from: string;
+        to: string;
+        count: number;
+    }>;
+    stuck_points: Array<{
+        flow_step: string;
+        frequency: number;
+        avg_duration: number;
+    }>;
+}
+
+export interface SimulationConfig {
+    auto_start: boolean;
+    turn_timeout_seconds: number;
+    max_message_length: number;
+    enable_real_time_analysis: boolean;
+    save_to_database: boolean;
+    export_format: 'json' | 'csv' | 'xlsx';
+    analysis_depth: 'basic' | 'detailed' | 'comprehensive';
+}

@@ -24,6 +24,13 @@ export class ExecutionTimerService {
         console.log(`Time executed for ${this.label}: ${formatted}`);
     }
 
+    getElapsedTime(): number {
+        if (this.startTime === -1) {
+            return 0;
+        }
+        return performance.now() - this.startTime;
+    }
+
     private static formatDuration(ms: number): string {
         const totalMs = Math.floor(ms);
         const hours = Math.floor(totalMs / (1000 * 60 * 60));

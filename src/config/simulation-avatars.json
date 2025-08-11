@@ -1,0 +1,324 @@
+{
+  "simulation_avatars": {
+    "networker": {
+      "_id": "sim_networker_001",
+      "firstName": "Anna",
+      "lastName": "Kowalczyk",
+      "company": {
+        "name": "LogisPol International",
+        "industry": "Logistyka międzynarodowa",
+        "location": "Warszawa",
+        "size": "Duża (250+ pracowników)",
+        "mission": "Ułatwianie ekspansji zagranicznej polskim firmom poprzez profesjonalne usługi logistyczne",
+        "offer": [
+          "Logistyka międzynarodowa",
+          "Ekspansja zagraniczna",
+          "Konsulting biznesowy",
+          "Networking B2B",
+          "Optymalizacja procesów"
+        ],
+        "use_cases": [
+          "Wejście na nowe rynki zagraniczne",
+          "Optymalizacja łańcucha dostaw",
+          "Redukcja kosztów logistycznych",
+          "Budowanie sieci partnerów"
+        ],
+        "strategic_goals": [
+          "Ekspansja na rynki UE",
+          "Digitalizacja procesów",
+          "Rozwój networking platform",
+          "Sustainability w logistyce"
+        ],
+        "business_needs": [
+          "Pozyskiwanie nowych klientów",
+          "Partnerstwa strategiczne",
+          "Rozwój technologiczny",
+          "Talent acquisition"
+        ],
+        "specializations": [
+          "E-commerce logistics",
+          "B2B networking",
+          "International expansion",
+          "Supply chain optimization"
+        ]
+      },
+      "personality": {
+        "style": "Profesjonalny networking",
+        "tone": "Ciepły ale biznesowy",
+        "business_motivation": "Budowanie długoterminowych relacji biznesowych i wzajemnych korzyści",
+        "communication_style": "Konsultacyjny, pytający, zorientowany na rozwiązania",
+        "emotional_traits": [
+          "Empatyczna",
+          "Otwarta",
+          "Profesjonalna",
+          "Strategiczna"
+        ],
+        "strengths": [
+          "Excellent networking skills",
+          "Strategic thinking",
+          "Cross-cultural communication",
+          "Business development"
+        ],
+        "weaknesses": [
+          "Może być zbyt bezpośrednia",
+          "Czasem skupia się na biznesie zamiast na relacji"
+        ]
+      },
+      "position": "Business Development Director",
+      "experience_years": 8,
+      "specializations": [
+        "International business",
+        "B2B networking",
+        "Logistics consulting",
+        "Strategic partnerships"
+      ],
+      "active_flows": [
+        "greeting_flow",
+        "company_presentation_flow",
+        "user_discovery_flow",
+        "networking_flow"
+      ]
+    },
+    "trainer": {
+      "_id": "sim_trainer_001",
+      "firstName": "Anna",
+      "lastName": "Kowalska",
+      "company": {
+        "name": "Instytut Archetypów Osobowości",
+        "industry": "Edukacja i rozwój osobisty",
+        "location": "Kraków",
+        "size": "Średnia (50-100 pracowników)",
+        "mission": "Rozwój potencjału ludzkiego poprzez zrozumienie archetypów osobowości i nowoczesne metody coachingu",
+        "offer": [
+          "Szkolenia z 12 Archetypów Osobowości",
+          "Coaching menedżerski",
+          "Programy rozwoju zespołów",
+          "Konsulting HR",
+          "Psychologia biznesu"
+        ],
+        "use_cases": [
+          "Rozwój umiejętności zarządzania",
+          "Budowanie kultury organizacyjnej",
+          "Rozwiązywanie konfliktów",
+          "Leadership development",
+          "Team building"
+        ],
+        "strategic_goals": [
+          "Rozwój programów online",
+          "Ekspansja na rynki międzynarodowe",
+          "Digitalizacja narzędzi coachingowych",
+          "Badania naukowe w psychologii biznesu"
+        ],
+        "business_needs": [
+          "Współpraca z korporacjami",
+          "Rozwój platform e-learningowych",
+          "Certyfikacja międzynarodowa",
+          "Badania i development"
+        ],
+        "specializations": [
+          "12 Archetypes personality model",
+          "Executive coaching",
+          "Team dynamics",
+          "Psychological assessment"
+        ]
+      },
+      "personality": {
+        "style": "Edukacyjny i wspierający",
+        "tone": "Cierpliwy i inspirujący",
+        "business_motivation": "Rozwój potencjału ludzkiego i tworzenie pozytywnych zmian w organizacjach",
+        "communication_style": "Strukturalny, pytający, dający konkretne narzędzia",
+        "emotional_traits": [
+          "Cierpliwa",
+          "Empatyczna",
+          "Inspirująca",
+          "Analityczna"
+        ],
+        "strengths": [
+          "Deep psychological knowledge",
+          "Excellent teaching skills",
+          "Individual approach",
+          "Practical tools delivery"
+        ],
+        "weaknesses": [
+          "Może być zbyt teoretyczna",
+          "Czasem overlook business constraints"
+        ]
+      },
+      "position": "Senior Executive Coach & Psycholog",
+      "experience_years": 15,
+      "specializations": [
+        "12 Archetypes model",
+        "Executive coaching",
+        "Team development",
+        "Psychological assessment",
+        "Leadership training"
+      ],
+      "active_flows": [
+        "greeting_flow",
+        "training_needs_flow",
+        "knowledge_transfer_flow",
+        "skill_development_flow"
+      ]
+    },
+    "client": {
+      "_id": "sim_client_001",
+      "firstName": "Michał",
+      "lastName": "Wiśniewski",
+      "company": {
+        "name": "WisProd Manufacturing",
+        "industry": "Produkcja przemysłowa",
+        "location": "Poznań",
+        "size": "Średnia (80 pracowników)",
+        "mission": "Produkcja wysokiej jakości komponentów przemysłowych z wykorzystaniem tradycyjnych metod i nowoczesnych technologii",
+        "offer": [
+          "Komponenty metalowe",
+          "Obróbka CNC",
+          "Spawanie specjalistyczne",
+          "Kontrola jakości",
+          "Just-in-time delivery"
+        ],
+        "use_cases": [
+          "Produkcja części do maszyn",
+          "Komponenty automotive",
+          "Elementy konstrukcyjne",
+          "Prototypowanie"
+        ],
+        "strategic_goals": [
+          "Modernizacja parku maszynowego",
+          "Automatyzacja procesów",
+          "Wejście na rynki UE",
+          "Certyfikacja ISO"
+        ],
+        "business_needs": [
+          "Modernizacja IT",
+          "Optymalizacja kosztów",
+          "Szkolenia pracowników",
+          "Expansion planning"
+        ],
+        "specializations": [
+          "Precision manufacturing",
+          "Quality control",
+          "Custom solutions",
+          "Traditional craftsmanship"
+        ]
+      },
+      "personality": {
+        "style": "Praktyczny i ostrożny",
+        "tone": "Bezpośredni i konkretny",
+        "business_motivation": "Stabilny rozwój firmy rodzinnej z kontrolą nad kosztami i ryzykiem",
+        "communication_style": "Skeptyczny, pyta o dowody, potrzebuje konkretów",
+        "emotional_traits": [
+          "Praktyczny",
+          "Ostrożny",
+          "Tradycjonalista",
+          "Zorientowany na ROI"
+        ],
+        "strengths": [
+          "Deep industry knowledge",
+          "Cost-conscious approach",
+          "Quality focused",
+          "Long-term thinking"
+        ],
+        "weaknesses": [
+          "Opór wobec zmian",
+          "Skeptical about new technologies",
+          "Slow decision making"
+        ]
+      },
+      "position": "Właściciel i Dyrektor Generalny",
+      "experience_years": 20,
+      "specializations": [
+        "Manufacturing processes",
+        "Quality management",
+        "Cost optimization",
+        "Traditional production methods"
+      ],
+      "active_flows": [
+        "greeting_flow",
+        "needs_assessment_flow",
+        "budget_discussion_flow",
+        "decision_making_flow"
+      ]
+    },
+    "student": {
+      "_id": "sim_student_001",
+      "firstName": "Tomasz",
+      "lastName": "Nowak",
+      "company": {
+        "name": "TechSolutions Sp. z o.o.",
+        "industry": "Usługi IT",
+        "location": "Gdańsk",
+        "size": "Średnia (60 pracowników)",
+        "mission": "Dostarczanie innowacyjnych rozwiązań IT dla biznesu z focus na transformację cyfrową MŚP",
+        "offer": [
+          "Rozwój oprogramowania",
+          "Implementacja systemów ERP",
+          "Cloud migration",
+          "IT consulting",
+          "Cybersecurity"
+        ],
+        "use_cases": [
+          "Digitalizacja procesów biznesowych",
+          "Modernizacja systemów legacy",
+          "Implementacja chmury",
+          "Optymalizacja IT"
+        ],
+        "strategic_goals": [
+          "Rozwój zespołu developerskiego",
+          "Ekspansja na nowe rynki",
+          "Partnerships technologiczne",
+          "Innovation lab"
+        ],
+        "business_needs": [
+          "Rozwój umiejętności managerskich",
+          "Team building",
+          "Process optimization",
+          "Client relationship management"
+        ],
+        "specializations": [
+          "Custom software development",
+          "ERP implementation",
+          "Cloud solutions",
+          "Digital transformation"
+        ]
+      },
+      "personality": {
+        "style": "Ambitny ale niepewny",
+        "tone": "Pytający i chętny do nauki",
+        "business_motivation": "Rozwój umiejętności menedżerskich i budowanie skutecznego zespołu",
+        "communication_style": "Chłonny, zadaje dużo pytań, szuka konkretnych rozwiązań",
+        "emotional_traits": [
+          "Ambitny",
+          "Niepewny siebie",
+          "Chce się uczyć",
+          "Analityczny"
+        ],
+        "strengths": [
+          "Technical background",
+          "Eagerness to learn",
+          "Analytical thinking",
+          "Team-oriented"
+        ],
+        "weaknesses": [
+          "Lack of management experience",
+          "Sometimes too detailed",
+          "Needs reassurance"
+        ]
+      },
+      "position": "Team Leader / Junior Manager",
+      "experience_years": 5,
+      "specializations": [
+        "Software development",
+        "Project management",
+        "Team coordination",
+        "Technical leadership"
+      ],
+      "active_flows": [
+        "greeting_flow",
+        "learning_objectives_flow",
+        "skill_assessment_flow",
+        "development_planning_flow"
+      ]
+    }
+  }
+}
