@@ -8,12 +8,16 @@ import flowController from '../controllers/flow.controller';
 import knowledgePrepareController from '../controllers/knowledge-prepare.controller';
 import SimulationController from '../controllers/simulation.controller';
 import PersonaController from '../controllers/persona.controller';
+import FlowWizardController from '../controllers/flow-wizard.controller';
+import CustomAvatarController from '../controllers/custom-avatar.controller';
 
 const router = Router();
 
 // Initialize controllers
 const simulationController = new SimulationController();
 const personaController = new PersonaController();
+const flowWizardController = new FlowWizardController();
+const customAvatarController = new CustomAvatarController();
 
 // Endpoint for processing queries
 router.post('/query', queryController.handleQuery.bind(queryController));
@@ -134,5 +138,66 @@ router.post('/persona/:id/tags', personaController.addTags.bind(personaControlle
 
 // Convert persona to simulation participant
 router.post('/persona/:id/participant', personaController.createParticipant.bind(personaController));
+
+// ============ FLOW WIZARD ENDPOINTS ============
+
+// Generate complete flow with AI
+router.post('/flow-wizard/generate', flowWizardController.generateFlow.bind(flowWizardController));
+
+// Generate quick flow from templates
+router.post('/flow-wizard/generate-quick', flowWizardController.generateQuickFlow.bind(flowWizardController));
+
+// Get available quick templates
+router.get('/flow-wizard/templates', flowWizardController.getTemplates.bind(flowWizardController));
+
+// Save flow package to files
+router.post('/flow-wizard/save', flowWizardController.saveFlowPackage.bind(flowWizardController));
+
+// Validate flow package structure
+router.post('/flow-wizard/validate', flowWizardController.validateFlowPackage.bind(flowWizardController));
+
+// Generate example flow packages
+router.post('/flow-wizard/examples', flowWizardController.generateExamples.bind(flowWizardController));
+
+// Generate specific avatar field with AI
+router.post('/flow-wizard/generate-avatar-field', flowWizardController.generateAvatarField.bind(flowWizardController));
+
+// ============ CUSTOM AVATAR ENDPOINTS ============
+
+// Save new custom avatar from Creator
+router.post('/avatar/save', customAvatarController.saveAvatar.bind(customAvatarController));
+
+// Get all custom avatars
+router.get('/avatars', customAvatarController.getAllAvatars.bind(customAvatarController));
+
+// Get custom avatar by ID
+router.get('/avatar/:id', customAvatarController.getAvatarById.bind(customAvatarController));
+
+// Update custom avatar
+router.put('/avatar/:id', customAvatarController.updateAvatar.bind(customAvatarController));
+
+// Delete custom avatar
+router.delete('/avatar/:id', customAvatarController.deleteAvatar.bind(customAvatarController));
+
+// Activate custom avatar
+router.post('/avatar/:id/activate', customAvatarController.activateAvatar.bind(customAvatarController));
+
+// Get avatar flows
+router.get('/avatar/:id/flows', customAvatarController.getAvatarFlows.bind(customAvatarController));
+
+// Get avatar intents
+router.get('/avatar/:id/intents', customAvatarController.getAvatarIntents.bind(customAvatarController));
+
+// Get avatars statistics
+router.get('/avatars/stats', customAvatarController.getAvatarsStats.bind(customAvatarController));
+
+// Get flow definitions for custom avatar
+router.get('/avatar/:avatarId/flow-definitions', flowController.getFlowDefinitionsForCustomAvatar.bind(flowController));
+
+// Process knowledge files for avatar
+router.post('/avatar/:avatarId/process-knowledge', customAvatarController.processKnowledgeFiles.bind(customAvatarController));
+
+// Upload knowledge file to avatar
+router.post('/avatar/:avatarId/upload-knowledge', customAvatarController.uploadKnowledgeFile.bind(customAvatarController));
 
 export default router; 

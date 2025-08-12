@@ -7,6 +7,8 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/d3@7/dist/d3.min.js"></script>
+    <script src="https://unpkg.com/dagre-d3@0.6.4/dist/dagre-d3.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -654,6 +656,12 @@
                                 🎨 Kreator Scenariusza
                             </button>
                             <button 
+                                className={`btn ${activeTab === 'wizard' ? 'btn-primary' : 'btn-secondary'}`}
+                                onClick={() => window.open('/avatar-flow-creator.html', '_blank')}
+                            >
+                                🧙‍♂️ Avatar & Flow Creator
+                            </button>
+                            <button 
                                 className={`btn ${activeTab === 'monitor' ? 'btn-primary' : 'btn-secondary'}`}
                                 onClick={() => setActiveTab('monitor')}
                             >
@@ -694,6 +702,12 @@
                             <CustomScenarioCreator 
                                 personas={personaLibrary}
                                 onScenarioCreated={setCustomScenario}
+                                setError={setError}
+                            />
+                        )}
+
+                        {activeTab === 'wizard' && (
+                            <VisualFlowDesigner 
                                 setError={setError}
                             />
                         )}
@@ -1134,6 +1148,658 @@
                         </div>
                     </div>
                 </div>
+            );
+        }
+
+        // ============ VISUAL FLOW DESIGNER COMPONENT ============
+        function VisualFlowDesigner({ setError }) {
+            const [activeDesignerTab, setActiveDesignerTab] = React.useState('canvas');
+            const [flowData, setFlowData] = React.useState({
+                id: '',
+                name: 'New Flow',
+                description: '',
+                avatarType: 'networker',
+                nodes: [],
+                edges: []
+            });
+            const [selectedNode, setSelectedNode] = React.useState(null);
+            const [nodeModalOpen, setNodeModalOpen] = React.useState(false);
+            const [editingNode, setEditingNode] = React.useState(null);
+            const svgRef = React.useRef(null);
+
+            // Load templates on mount
+            React.useEffect(() => {
+                loadTemplates();
+            }, []);
+
+            const loadTemplates = async () => {
+                setLoadingTemplates(true);
+                try {
+                    const response = await fetch('/api/flow-wizard/templates');
+                    const result = await response.json();
+                    if (result.success) {
+                        setTemplates(Object.entries(result.data.templates).map(([key, template]) => ({
+                            id: key,
+                            ...template
+                        })));
+                    }
+                } catch (error) {
+                    setError('Failed to load templates: ' + error.message);
+                } finally {
+                    setLoadingTemplates(false);
+                }
+            };
+
+            const generateQuickFlow = async (templateId) => {
+                setGeneratingFlow(true);
+                try {
+                    const response = await fetch('/api/flow-wizard/generate-quick', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ template: templateId })
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        setGeneratedFlow(result.data.flow_package);
+                        setActiveWizardTab('result');
+                    } else {
+                        setError('Failed to generate flow: ' + result.error);
+                    }
+                } catch (error) {
+                    setError('Failed to generate flow: ' + error.message);
+                } finally {
+                    setGeneratingFlow(false);
+                }
+            };
+
+            const generateCustomFlow = async () => {
+                if (!customFlowData.businessContext || !customFlowData.flowPurpose) {
+                    setError('Business context and flow purpose are required');
+                    return;
+                }
+
+                setGeneratingFlow(true);
+                try {
+                    const response = await fetch('/api/flow-wizard/generate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(customFlowData)
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        setGeneratedFlow(result.data.flow_package);
+                        setActiveWizardTab('result');
+                    } else {
+                        setError('Failed to generate custom flow: ' + result.error);
+                    }
+                } catch (error) {
+                    setError('Failed to generate custom flow: ' + error.message);
+                } finally {
+                    setGeneratingFlow(false);
+                }
+            };
+
+            const saveFlowPackage = async () => {
+                if (!generatedFlow) return;
+
+                try {
+                    const response = await fetch('/api/flow-wizard/save', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ flowPackage: generatedFlow })
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        setError('✅ Flow package saved successfully!');
+                    } else {
+                        setError('Failed to save flow package: ' + result.error);
+                    }
+                } catch (error) {
+                    setError('Failed to save flow package: ' + error.message);
+                }
+            };
+
+            return React.createElement('div', { 
+                className: 'flow-wizard', 
+                style: { 
+                    padding: '40px', 
+                    margin: '20px',
+                    backgroundColor: '#f8f9fa', 
+                    borderRadius: '12px',
+                    minHeight: '80vh'
+                } 
+            },
+                React.createElement('div', { 
+                    className: 'wizard-header mb-5 text-center',
+                    style: { paddingBottom: '30px' }
+                },
+                    React.createElement('h2', { 
+                        style: { 
+                            color: '#2c3e50', 
+                            marginBottom: '20px', 
+                            fontSize: '36px',
+                            fontWeight: 'bold'
+                        } 
+                    }, '🧙‍♂️ Flow Wizard'),
+                    React.createElement('p', { 
+                        className: 'text-muted', 
+                        style: { 
+                            fontSize: '18px', 
+                            color: '#6c757d',
+                            maxWidth: '600px',
+                            margin: '0 auto',
+                            lineHeight: '1.6'
+                        } 
+                    }, 'Automatycznie generuj kompletne flows z intencjami, promptami i knowledge base')
+                ),
+
+                // Sub tabs
+                React.createElement('div', { 
+                    className: 'wizard-tabs mb-5 d-flex justify-content-center', 
+                    style: { 
+                        gap: '15px',
+                        paddingBottom: '40px'
+                    } 
+                },
+                    React.createElement('button', {
+                        className: `btn ${activeWizardTab === 'templates' ? 'btn-primary' : 'btn-outline-primary'} btn-lg`,
+                        style: { 
+                            minWidth: '180px', 
+                            fontWeight: 'bold',
+                            padding: '12px 24px',
+                            fontSize: '16px',
+                            borderRadius: '10px'
+                        },
+                        onClick: () => setActiveWizardTab('templates')
+                    }, '📋 Quick Templates'),
+                    React.createElement('button', {
+                        className: `btn ${activeWizardTab === 'custom' ? 'btn-primary' : 'btn-outline-primary'} btn-lg`,
+                        style: { 
+                            minWidth: '180px', 
+                            fontWeight: 'bold',
+                            padding: '12px 24px',
+                            fontSize: '16px',
+                            borderRadius: '10px'
+                        },
+                        onClick: () => setActiveWizardTab('custom')
+                    }, '🎨 Custom Flow'),
+                    generatedFlow && React.createElement('button', {
+                        className: `btn ${activeWizardTab === 'result' ? 'btn-success' : 'btn-outline-success'} btn-lg`,
+                        style: { 
+                            minWidth: '180px', 
+                            fontWeight: 'bold',
+                            padding: '12px 24px',
+                            fontSize: '16px',
+                            borderRadius: '10px'
+                        },
+                        onClick: () => setActiveWizardTab('result')
+                    }, '✨ Generated Flow')
+                ),
+
+                // Quick Templates Tab
+                activeWizardTab === 'templates' && React.createElement('div', { 
+                    className: 'templates-tab', 
+                    style: { 
+                        backgroundColor: 'white', 
+                        padding: '40px', 
+                        borderRadius: '12px', 
+                        border: '1px solid #dee2e6',
+                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                    } 
+                },
+                    React.createElement('h4', { 
+                        style: { 
+                            color: '#495057', 
+                            marginBottom: '30px', 
+                            textAlign: 'center',
+                            fontSize: '24px',
+                            fontWeight: 'bold'
+                        } 
+                    }, '📋 Gotowe szablony flows'),
+                    loadingTemplates && React.createElement('div', { className: 'text-center', style: { padding: '40px' } },
+                        React.createElement('div', { className: 'spinner-border text-primary', role: 'status' }),
+                        React.createElement('p', { className: 'mt-2' }, 'Ładowanie szablonów...')
+                    ),
+                    !loadingTemplates && React.createElement('div', { className: 'row' },
+                        templates.map(template => 
+                            React.createElement('div', { key: template.id, className: 'col-lg-4 col-md-6 mb-4' },
+                                React.createElement('div', { 
+                                    className: 'card h-100 shadow-sm',
+                                    style: { 
+                                        border: '1px solid #e3e6ea', 
+                                        borderRadius: '10px',
+                                        transition: 'transform 0.2s, box-shadow 0.2s',
+                                        cursor: 'pointer'
+                                    },
+                                    onMouseEnter: (e) => {
+                                        e.target.style.transform = 'translateY(-5px)';
+                                        e.target.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
+                                    },
+                                    onMouseLeave: (e) => {
+                                        e.target.style.transform = 'translateY(0)';
+                                        e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                                    }
+                                },
+                                    React.createElement('div', { className: 'card-header', style: { backgroundColor: '#f8f9fa', borderBottom: '1px solid #dee2e6' } },
+                                        React.createElement('h5', { className: 'card-title mb-0', style: { color: '#495057', fontSize: '18px' } }, 
+                                            template.id.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+                                        )
+                                    ),
+                                    React.createElement('div', { className: 'card-body d-flex flex-column' },
+                                        React.createElement('p', { className: 'card-text flex-grow-1', style: { color: '#6c757d', lineHeight: '1.5' } }, template.description),
+                                        React.createElement('div', { className: 'mb-3' },
+                                            React.createElement('div', { className: 'badge bg-secondary me-2 mb-1' }, template.avatarType),
+                                            template.useRAG && React.createElement('div', { className: 'badge bg-info' }, 'RAG Enabled')
+                                        ),
+                                        React.createElement('div', { className: 'small text-muted mb-3', style: { fontSize: '14px' } },
+                                            `📋 ${template.businessContext}`
+                                        ),
+                                        React.createElement('button', {
+                                            className: `btn ${generatingFlow ? 'btn-secondary' : 'btn-primary'} w-100`,
+                                            style: { 
+                                                fontWeight: 'bold',
+                                                borderRadius: '6px',
+                                                padding: '10px'
+                                            },
+                                            onClick: () => generateQuickFlow(template.id),
+                                            disabled: generatingFlow
+                                        }, 
+                                            generatingFlow ? 
+                                                React.createElement('span', null,
+                                                    React.createElement('span', { className: 'spinner-border spinner-border-sm me-2' }),
+                                                    'Generating...'
+                                                ) : 
+                                                '🚀 Generate Flow'
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                ),
+
+                // Custom Flow Tab
+                activeWizardTab === 'custom' && React.createElement('div', { 
+                    className: 'custom-tab',
+                    style: { 
+                        backgroundColor: 'white', 
+                        padding: '50px', 
+                        borderRadius: '12px', 
+                        border: '1px solid #dee2e6',
+                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                    React.createElement('h4', { 
+                        style: { 
+                            color: '#495057', 
+                            marginBottom: '40px', 
+                            textAlign: 'center',
+                            fontSize: '24px',
+                            fontWeight: 'bold'
+                        } 
+                    }, '🎨 Stwórz własny flow'),
+                    React.createElement('div', { className: 'row justify-content-center' },
+                        React.createElement('div', { className: 'col-lg-10 col-xl-8' },
+                            React.createElement('div', { className: 'mb-5' },
+                                React.createElement('label', { 
+                                    className: 'form-label fw-bold',
+                                    style: { 
+                                        color: '#495057', 
+                                        fontSize: '18px',
+                                        marginBottom: '12px',
+                                        display: 'block'
+                                    }
+                                }, '🏢 Kontekst biznesowy *'),
+                                React.createElement('input', {
+                                    type: 'text',
+                                    className: 'form-control form-control-lg',
+                                    style: { 
+                                        borderRadius: '10px',
+                                        border: '2px solid #e9ecef',
+                                        padding: '16px 20px',
+                                        fontSize: '17px',
+                                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                        transition: 'border-color 0.3s, box-shadow 0.3s'
+                                    },
+                                    value: customFlowData.businessContext,
+                                    onChange: (e) => setCustomFlowData({...customFlowData, businessContext: e.target.value}),
+                                    placeholder: 'np. Sprzedaż samochodów premium, Konsultacje IT, Szkolenia biznesowe...'
+                                })
+                            ),
+                            React.createElement('div', { className: 'mb-5' },
+                                React.createElement('label', { 
+                                    className: 'form-label fw-bold',
+                                    style: { 
+                                        color: '#495057', 
+                                        fontSize: '18px',
+                                        marginBottom: '12px',
+                                        display: 'block'
+                                    }
+                                }, '🎯 Cel flow *'),
+                                React.createElement('input', {
+                                    type: 'text',
+                                    className: 'form-control form-control-lg',
+                                    style: { 
+                                        borderRadius: '10px',
+                                        border: '2px solid #e9ecef',
+                                        padding: '16px 20px',
+                                        fontSize: '17px',
+                                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                        transition: 'border-color 0.3s, box-shadow 0.3s'
+                                    },
+                                    value: customFlowData.flowPurpose,
+                                    onChange: (e) => setCustomFlowData({...customFlowData, flowPurpose: e.target.value}),
+                                    placeholder: 'np. Kwalifikacja klienta i prezentacja modeli, Analiza potrzeb technologicznych...'
+                                })
+                            ),
+                            React.createElement('div', { className: 'row mb-5' },
+                                React.createElement('div', { className: 'col-md-6' },
+                                    React.createElement('div', { className: 'mb-4' },
+                                        React.createElement('label', { 
+                                            className: 'form-label fw-bold',
+                                            style: { 
+                                                color: '#495057', 
+                                                fontSize: '18px',
+                                                marginBottom: '12px',
+                                                display: 'block'
+                                            }
+                                        }, '👤 Typ avatara'),
+                                        React.createElement('select', {
+                                            className: 'form-select form-select-lg',
+                                            style: { 
+                                                borderRadius: '10px',
+                                                border: '2px solid #e9ecef',
+                                                padding: '16px 20px',
+                                                fontSize: '17px',
+                                                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                            },
+                                            value: customFlowData.avatarType,
+                                            onChange: (e) => setCustomFlowData({...customFlowData, avatarType: e.target.value})
+                                        },
+                                            React.createElement('option', { value: 'networker' }, '🤝 Networker'),
+                                            React.createElement('option', { value: 'trainer' }, '👨‍🏫 Trainer'),
+                                            React.createElement('option', { value: 'client' }, '👥 Client'),
+                                            React.createElement('option', { value: 'custom' }, '⚡ Custom')
+                                        )
+                                    )
+                                ),
+                                React.createElement('div', { className: 'col-md-6' },
+                                    React.createElement('div', { className: 'mb-4' },
+                                        React.createElement('label', { 
+                                            className: 'form-label fw-bold',
+                                            style: { 
+                                                color: '#495057', 
+                                                fontSize: '18px',
+                                                marginBottom: '12px',
+                                                display: 'block'
+                                            }
+                                        }, '🧠 Użyj RAG'),
+                                        React.createElement('div', { 
+                                            className: 'form-check',
+                                            style: { 
+                                                padding: '20px 24px',
+                                                backgroundColor: '#f8f9fa',
+                                                borderRadius: '10px',
+                                                border: '2px solid #e9ecef'
+                                            }
+                                        },
+                                            React.createElement('input', {
+                                                className: 'form-check-input',
+                                                type: 'checkbox',
+                                                style: { transform: 'scale(1.5)', marginTop: '2px' },
+                                                checked: customFlowData.useRAG,
+                                                onChange: (e) => setCustomFlowData({...customFlowData, useRAG: e.target.checked})
+                                            }),
+                                            React.createElement('label', { 
+                                                className: 'form-check-label ms-3',
+                                                style: { fontSize: '16px', color: '#495057', fontWeight: '500' }
+                                            },
+                                                '📚 Generuj knowledge base'
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            React.createElement('div', { className: 'text-center', style: { paddingTop: '20px' } },
+                                React.createElement('button', {
+                                    className: `btn btn-lg ${generatingFlow ? 'btn-secondary' : 'btn-success'}`,
+                                    style: { 
+                                        padding: '20px 50px',
+                                        fontSize: '20px',
+                                        fontWeight: 'bold',
+                                        borderRadius: '12px',
+                                        minWidth: '300px',
+                                        boxShadow: '0 4px 12px rgba(40, 167, 69, 0.3)',
+                                        transition: 'all 0.3s ease'
+                                    },
+                                    onClick: generateCustomFlow,
+                                    disabled: generatingFlow || !customFlowData.businessContext || !customFlowData.flowPurpose
+                                }, 
+                                    generatingFlow ? 
+                                        React.createElement('span', null,
+                                            React.createElement('span', { className: 'spinner-border spinner-border-sm me-3' }),
+                                            'Generating...'
+                                        ) : 
+                                        '🚀 Generate Custom Flow'
+                                )
+                            )
+                        )
+                    )
+                ),
+
+                // Generated Flow Result Tab
+                activeWizardTab === 'result' && generatedFlow && React.createElement('div', { 
+                    className: 'result-tab',
+                    style: { 
+                        backgroundColor: 'white', 
+                        padding: '40px', 
+                        borderRadius: '12px', 
+                        border: '1px solid #dee2e6',
+                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                    React.createElement('div', { 
+                        className: 'flow-result-header d-flex justify-content-between align-items-center mb-5',
+                        style: { paddingBottom: '30px', borderBottom: '2px solid #e9ecef' }
+                    },
+                        React.createElement('h4', { 
+                            style: { 
+                                color: '#28a745', 
+                                marginBottom: '0', 
+                                fontSize: '28px',
+                                fontWeight: 'bold'
+                            }
+                        }, `✨ ${generatedFlow.name}`),
+                        React.createElement('button', {
+                            className: 'btn btn-success btn-lg',
+                            style: { 
+                                fontWeight: 'bold',
+                                borderRadius: '8px',
+                                padding: '10px 25px'
+                            },
+                            onClick: saveFlowPackage
+                        }, '💾 Save to Files')
+                    ),
+                    
+                    React.createElement('div', { className: 'row' },
+                        // Flow Definition
+                        React.createElement('div', { className: 'col-md-6 mb-4' },
+                            React.createElement('div', { 
+                                className: 'card h-100 shadow-sm',
+                                style: { borderRadius: '10px', border: '1px solid #e3e6ea' }
+                            },
+                                React.createElement('div', { 
+                                    className: 'card-header',
+                                    style: { backgroundColor: '#f8f9fa', borderBottom: '1px solid #dee2e6' }
+                                },
+                                    React.createElement('h5', { 
+                                        className: 'mb-0',
+                                        style: { color: '#495057', fontSize: '18px' }
+                                    }, '🔄 Flow Definition')
+                                ),
+                                React.createElement('div', { className: 'card-body' },
+                                    React.createElement('div', { className: 'mb-3' },
+                                        React.createElement('span', { className: 'badge bg-primary fs-6' }, 
+                                            `${generatedFlow.flow_definition.steps.length} Steps`
+                                        )
+                                    ),
+                                    React.createElement('div', { className: 'list-group list-group-flush' },
+                                        generatedFlow.flow_definition.steps.map((step, index) =>
+                                            React.createElement('div', { 
+                                                key: step.id, 
+                                                className: 'list-group-item px-0',
+                                                style: { border: 'none', fontSize: '14px' }
+                                            },
+                                                React.createElement('strong', null, `${index + 1}. `),
+                                                step.name
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+
+                        // Intents
+                        React.createElement('div', { className: 'col-md-6 mb-4' },
+                            React.createElement('div', { 
+                                className: 'card h-100 shadow-sm',
+                                style: { borderRadius: '10px', border: '1px solid #e3e6ea' }
+                            },
+                                React.createElement('div', { 
+                                    className: 'card-header',
+                                    style: { backgroundColor: '#f8f9fa', borderBottom: '1px solid #dee2e6' }
+                                },
+                                    React.createElement('h5', { 
+                                        className: 'mb-0',
+                                        style: { color: '#495057', fontSize: '18px' }
+                                    }, '🎯 Intents')
+                                ),
+                                React.createElement('div', { className: 'card-body' },
+                                    React.createElement('div', { className: 'mb-3' },
+                                        React.createElement('span', { className: 'badge bg-info fs-6' }, 
+                                            `${generatedFlow.intent_definitions.length} Intents`
+                                        )
+                                    ),
+                                    React.createElement('div', { className: 'list-group list-group-flush' },
+                                        generatedFlow.intent_definitions.map(intent =>
+                                            React.createElement('div', { 
+                                                key: intent.name, 
+                                                className: 'list-group-item px-0',
+                                                style: { border: 'none', fontSize: '14px' }
+                                            },
+                                                `• ${intent.name}`
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+
+                        // Prompts
+                        React.createElement('div', { className: 'col-md-6 mb-4' },
+                            React.createElement('div', { 
+                                className: 'card h-100 shadow-sm',
+                                style: { borderRadius: '10px', border: '1px solid #e3e6ea' }
+                            },
+                                React.createElement('div', { 
+                                    className: 'card-header',
+                                    style: { backgroundColor: '#f8f9fa', borderBottom: '1px solid #dee2e6' }
+                                },
+                                    React.createElement('h5', { 
+                                        className: 'mb-0',
+                                        style: { color: '#495057', fontSize: '18px' }
+                                    }, '💬 Prompts')
+                                ),
+                                React.createElement('div', { className: 'card-body' },
+                                    React.createElement('div', { className: 'mb-3' },
+                                        React.createElement('span', { className: 'badge bg-warning fs-6' }, 
+                                            `${generatedFlow.prompt_templates.length} Templates`
+                                        )
+                                    ),
+                                    React.createElement('div', { className: 'list-group list-group-flush' },
+                                        generatedFlow.prompt_templates.map(prompt =>
+                                            React.createElement('div', { 
+                                                key: prompt.id, 
+                                                className: 'list-group-item px-0',
+                                                style: { border: 'none', fontSize: '14px' }
+                                            },
+                                                `• ${prompt.name}`
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+
+                        // Knowledge Base
+                        generatedFlow.knowledge_base && React.createElement('div', { className: 'col-md-6 mb-4' },
+                            React.createElement('div', { 
+                                className: 'card h-100 shadow-sm',
+                                style: { borderRadius: '10px', border: '1px solid #e3e6ea' }
+                            },
+                                React.createElement('div', { 
+                                    className: 'card-header',
+                                    style: { backgroundColor: '#f8f9fa', borderBottom: '1px solid #dee2e6' }
+                                },
+                                    React.createElement('h5', { 
+                                        className: 'mb-0',
+                                        style: { color: '#495057', fontSize: '18px' }
+                                    }, '📚 Knowledge Base')
+                                ),
+                                React.createElement('div', { className: 'card-body' },
+                                    React.createElement('div', { className: 'mb-3' },
+                                        React.createElement('span', { className: 'badge bg-success fs-6' }, 
+                                            generatedFlow.knowledge_base.industry
+                                        )
+                                    ),
+                                    React.createElement('div', { className: 'list-group list-group-flush' },
+                                        Object.keys(generatedFlow.knowledge_base.knowledge_areas).map(area =>
+                                            React.createElement('div', { 
+                                                key: area, 
+                                                className: 'list-group-item px-0',
+                                                style: { border: 'none', fontSize: '14px' }
+                                            },
+                                                `• ${area.replace(/_/g, ' ')}`
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    ),
+
+                    // Integration Instructions
+                    React.createElement('div', { 
+                        className: 'card mt-4 shadow-sm',
+                        style: { borderRadius: '10px', border: '1px solid #e3e6ea' }
+                    },
+                        React.createElement('div', { 
+                            className: 'card-header',
+                            style: { backgroundColor: '#f8f9fa', borderBottom: '1px solid #dee2e6' }
+                        },
+                            React.createElement('h5', { 
+                                className: 'mb-0',
+                                style: { color: '#495057', fontSize: '18px' }
+                            }, '📋 Integration Instructions')
+                        ),
+                        React.createElement('div', { className: 'card-body' },
+                            React.createElement('ol', { style: { fontSize: '15px', lineHeight: '1.6' } },
+                                generatedFlow.integration_instructions.map((instruction, index) =>
+                                    React.createElement('li', { 
+                                        key: index,
+                                        style: { marginBottom: '8px', color: '#495057' }
+                                    }, instruction)
+                                )
+                            )
+                        )
+                    )
+                )
             );
         }
 

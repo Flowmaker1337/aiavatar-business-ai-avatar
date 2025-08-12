@@ -291,6 +291,12 @@ export interface IntentDefinition {
     repeatable: boolean;
     max_age?: number;
     priority: number;
+    confidence_threshold?: number;
+    user_prompt_template?: string;
+    system_prompt_template?: string;
+    response_template?: string;
+    enabled?: boolean;
+    avatar_type?: string;
 }
 
 // ============ BUSINESS AVATAR INTERFACES ============
@@ -329,6 +335,84 @@ export interface BusinessAvatar extends Avatar {
     last_interaction?: number;
 }
 
+// ============ CUSTOM AVATAR INTERFACES ============
+
+export interface CustomAvatar {
+    id: string;
+    name: string;
+    description: string;
+    personality: string;
+    specialization: string;
+    communication_style: string;
+    background: string;
+    avatar_type: 'custom';
+    created_at: number;
+    updated_at: number;
+    status: 'draft' | 'active' | 'archived';
+    
+    // Knowledge files
+    knowledge_files: KnowledgeFile[];
+    
+    // Associated flows and intents
+    flows: CustomFlow[];
+    intents: CustomIntent[];
+    
+    // Metadata
+    creator_id?: string;
+    usage_stats?: AvatarUsageStats;
+}
+
+export interface KnowledgeFile {
+    id: string;
+    name: string;
+    original_name: string;
+    file_type: string;
+    file_size: number;
+    uploaded_at: number;
+    processed: boolean;
+    processing_status: 'pending' | 'processing' | 'completed' | 'failed';
+    content_preview?: string;
+    vector_ids?: string[]; // IDs in vector database
+}
+
+export interface CustomFlow {
+    id: string;
+    name: string;
+    description: string;
+    steps: FlowStep[];
+    entry_intents: string[];
+    priority: number;
+    success_criteria: string[];
+    max_duration: number;
+    repeatable: boolean;
+    created_from: 'ai_generated' | 'manual' | 'hybrid';
+}
+
+export interface CustomIntent {
+    name: string;
+    description: string;
+    keywords: string[];
+    examples: string[];
+    requires_flow: boolean;
+    flow_name?: string;
+    repeatable: boolean;
+    priority: number;
+    system_prompt?: string;
+    user_prompt_template?: string;
+    confidence_threshold: number;
+    created_from: 'ai_generated' | 'manual';
+}
+
+export interface AvatarUsageStats {
+    total_conversations: number;
+    total_messages: number;
+    average_conversation_length: number;
+    most_used_flows: string[];
+    most_triggered_intents: string[];
+    last_used: number;
+    success_rate?: number;
+}
+
 // ============ FLOW MANAGEMENT INTERFACES ============
 
 export interface FlowStep {
@@ -354,6 +438,8 @@ export interface FlowDefinition {
     repeatable: boolean;
     tags?: string[];
     category?: string;
+    avatar_type?: string;
+    business_context?: string;
 }
 
 export interface FlowStepExecution {
@@ -396,6 +482,7 @@ export interface PromptContext {
     rag_context?: string;
     session_context?: Record<string, any>;
     flow_context?: Record<string, any>;
+    avatar_id?: string; // UUID dla custom avatarów
 }
 
 export interface PromptTemplate {

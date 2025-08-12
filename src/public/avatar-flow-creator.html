@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avatar & Flow Creator</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1a;
+            color: #e1e5e9;
+            line-height: 1.6;
+        }
+
+        .creator-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .creator-header {
+            background: #2a2a2a;
+            padding: 20px;
+            border-bottom: 2px solid #3a3a3a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .creator-title {
+            font-size: 24px;
+            color: #58a6ff;
+            font-weight: bold;
+        }
+
+        .creator-tabs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tab-btn {
+            background: #3a3a3a;
+            color: #e1e5e9;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: #58a6ff;
+            color: white;
+        }
+
+        .tab-btn:hover {
+            background: #4a4a4a;
+        }
+
+        .tab-btn.active:hover {
+            background: #4285f4;
+        }
+
+        .creator-body {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .form-panel {
+            flex: 1;
+            padding: 30px;
+            background: #2a2a2a;
+            overflow-y: auto;
+            border-right: 2px solid #3a3a3a;
+        }
+
+        .preview-panel {
+            width: 500px;
+            background: #1e1e1e;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .form-section {
+            background: #3a3a3a;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid #4a4a4a;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #4a4a4a;
+            gap: 15px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #58a6ff;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .ai-generate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+            white-space: nowrap;
+            flex-shrink: 0;
+            min-width: 140px;
+        }
+
+        .ai-generate-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #e1e5e9;
+            font-size: 15px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: #2a2a2a;
+            border: 2px solid #4a4a4a;
+            border-radius: 8px;
+            color: #e1e5e9;
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .form-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 12px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 40px;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .btn {
+            background: #58a6ff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #4285f4;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-large {
+            padding: 16px 32px;
+            font-size: 18px;
+        }
+
+        .preview-section {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #3a3a3a;
+        }
+
+        .preview-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #58a6ff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .preview-content {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #3a3a3a;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #c9d1d9;
+            white-space: pre-wrap;
+        }
+
+        .keyword-input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .keyword-tag {
+            display: inline-block;
+            background: #58a6ff;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            margin: 2px;
+            cursor: pointer;
+        }
+
+        .keyword-tag:hover {
+            background: #4285f4;
+        }
+
+        .keywords-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+            padding: 10px;
+            background: #2a2a2a;
+            border-radius: 8px;
+            border: 1px solid #4a4a4a;
+            min-height: 50px;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #3a3a3a;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .step.active {
+            background: #58a6ff;
+            color: white;
+        }
+
+        .step.completed {
+            background: #28a745;
+            color: white;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #3a3a3a;
+            border-radius: 50%;
+            border-top-color: #58a6ff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid #28a745;
+            color: #28a745;
+        }
+
+        .alert-error {
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid #dc3545;
+            color: #dc3545;
+        }
+
+        .flow-step {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #4a4a4a;
+        }
+
+        .flow-step-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .flow-step-title {
+            font-weight: bold;
+            color: #58a6ff;
+        }
+
+        .remove-step-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .knowledge-upload-area {
+            border: 2px dashed #4a4a4a;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            background: #2a2a2a;
+            margin: 15px 0;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .knowledge-upload-area:hover {
+            border-color: #58a6ff;
+            background: #333;
+        }
+
+        .knowledge-upload-area.dragover {
+            border-color: #58a6ff;
+            background: #1a3a5c;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .uploaded-files {
+            margin-top: 15px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #3a3a3a;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin: 5px 0;
+            border: 1px solid #4a4a4a;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-icon {
+            font-size: 16px;
+        }
+
+        .file-name {
+            font-weight: 500;
+            color: #e1e5e9;
+        }
+
+        .file-size {
+            font-size: 12px;
+            color: #7d8590;
+        }
+
+        .remove-file-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .flow-visualization {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid #3a3a3a;
+        }
+
+        .flow-step-node {
+            background: #3a3a3a;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #58a6ff;
+            position: relative;
+        }
+
+        .flow-step-node::after {
+            content: '↓';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #58a6ff;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .flow-step-node:last-child::after {
+            display: none;
+        }
+
+        .add-step-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            margin: 10px 0;
+            transition: all 0.3s;
+        }
+
+        .add-step-btn:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // API Service
+        const CreatorAPI = {
+            async saveAvatar(avatarData, flowData, intentData) {
+                try {
+                    const response = await fetch('/api/avatar/save', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            name: avatarData.name,
+                            description: avatarData.description,
+                            personality: avatarData.personality,
+                            specialization: avatarData.specialization,
+                            communication_style: avatarData.communication_style,
+                            background: avatarData.background,
+                            knowledge_files: avatarData.knowledge_files,
+                            flows: flowData.steps.length > 0 ? [{
+                                id: flowData.id || `flow_${Date.now()}`,
+                                name: flowData.name,
+                                description: flowData.description,
+                                steps: flowData.steps,
+                                entry_intents: flowData.entry_intents || [],
+                                priority: flowData.priority || 5,
+                                success_criteria: [],
+                                max_duration: 3600,
+                                repeatable: true,
+                                created_from: 'hybrid'
+                            }] : [],
+                            intents: intentData.name ? [{
+                                name: intentData.name,
+                                description: `Intent for ${avatarData.name}`,
+                                keywords: intentData.keywords,
+                                examples: intentData.examples,
+                                requires_flow: true,
+                                flow_name: flowData.name,
+                                repeatable: true,
+                                priority: 5,
+                                system_prompt: intentData.system_prompt,
+                                user_prompt_template: intentData.user_prompt_template,
+                                confidence_threshold: intentData.confidence_threshold,
+                                created_from: 'ai_generated'
+                            }] : []
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    return result;
+                } catch (error) {
+                    console.error('Error saving avatar:', error);
+                    throw error;
+                }
+            },
+            async generateAvatarField(fieldName, description) {
+                try {
+                    const response = await fetch('/api/flow-wizard/generate-avatar-field', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            fieldName: fieldName,
+                            description: description
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    return result;
+                } catch (error) {
+                    console.error('Error generating avatar field:', error);
+                    
+                    // Fallback to mock data if API fails
+                    const mockResponses = {
+                        name: "Prezes Firmy",
+                        specialization: "Zarządzanie strategiczne, rozwój biznesu, leadership, transformacja cyfrowa, budowanie zespołów",
+                        personality: "Charyzmatyczny, wizjonerski, pewny siebie, inspirujący innych, zorientowany na wyniki, empatyczny w kontaktach z zespołem",
+                        communication_style: "Pewny siebie, motywujący, jasny w przekazie, słucha aktywnie, zadaje strategiczne pytania, inspiruje do działania",
+                        background: "15-letnie doświadczenie w branży technologicznej, prowadził 3 startupy, zbudował zespoły ponad 200 osób, doświadczenie międzynarodowe w Europie i USA"
+                    };
+
+                    return {
+                        success: true,
+                        data: mockResponses[fieldName] || "Wygenerowana wartość (fallback)"
+                    };
+                }
+            },
+
+            async generateFlowField(fieldName, avatarName, specialization) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                const mockFlowResponses = {
+                    name: "Leadership & Vision Flow",
+                    description: "Flow dla prezesa - leadership i wizja strategiczna, budowanie relacji biznesowych i inspirowanie zespołu",
+                    steps: [
+                        {
+                            id: "strategic_greeting",
+                            name: "Strategiczne powitanie",
+                            description: "Powitanie z perspektywy lidera, nawiązanie kontaktu biznesowego"
+                        },
+                        {
+                            id: "vision_sharing",
+                            name: "Dzielenie się wizją",
+                            description: "Prezentacja wizji i strategii firmy, inspirowanie rozmówcy"
+                        },
+                        {
+                            id: "leadership_guidance",
+                            name: "Wskazówki przywódcze",
+                            description: "Udzielanie rad z pozycji lidera, coaching biznesowy"
+                        },
+                        {
+                            id: "business_networking",
+                            name: "Networking biznesowy",
+                            description: "Budowanie relacji, poszukiwanie synergii biznesowych"
+                        }
+                    ]
+                };
+
+                return {
+                    success: true,
+                    data: mockFlowResponses[fieldName] || "Wygenerowana wartość"
+                };
+            },
+
+            async generateIntentField(fieldName, intentName, context) {
+                await new Promise(resolve => setTimeout(resolve, 800));
+                
+                const mockIntentResponses = {
+                    name: "strategic_vision",
+                    keywords: ["strategia", "wizja", "przywództwo", "kierowanie", "liderowanie", "rozwój", "innowacje"],
+                    examples: [
+                        "Opowiedz o swojej wizji firmy",
+                        "Jak widzisz przyszłość naszej branży?",
+                        "Jakie są twoje priorytety strategiczne?",
+                        "Jak budujesz zespół?",
+                        "Jakie wyzwania widzisz w leadership?"
+                    ],
+                    system_prompt: `Jesteś doświadczonym prezesem firmy z 15-letnim stażem w branży technologicznej. Odpowiadasz z perspektywy lidera, który ma jasną wizję i strategię. Twój styl to pewność siebie, inspirowanie innych i zorientowanie na wyniki. Prowadzisz rozmowy biznesowe z potencjalnymi partnerami i klientami.`,
+                    user_prompt_template: `Rozmówca pyta o: "{{user_message}}"
+
+Jako doświadczony prezes firmy:
+1. Odpowiedz z perspektywy strategicznej i wizjonerskiej
+2. Pokaż swoją wiedzę i doświadczenie w leadership
+3. Zainspiruj rozmówcę swoją pasją do biznesu
+4. Zakończ pytaniem o jego cele biznesowe lub wyzwania
+5. Utrzymaj profesjonalny, ale ciepły ton rozmowy
+
+Historia rozmowy: {{conversation_history}}
+
+Twoja odpowiedź:`
+                };
+
+                return {
+                    success: true,
+                    data: mockIntentResponses[fieldName] || "Wygenerowana wartość"
+                };
+            }
+        };
+
+        // Main Creator Component
+        function AvatarFlowCreator() {
+            const [activeTab, setActiveTab] = useState('avatar');
+            const [currentStep, setCurrentStep] = useState(1);
+            const [isGenerating, setIsGenerating] = useState(false);
+            const [message, setMessage] = useState('');
+
+            // Avatar Creator State
+            const [avatarData, setAvatarData] = useState({
+                name: '',
+                description: '',
+                personality: '',
+                specialization: '',
+                communication_style: '',
+                background: '',
+                knowledge_files: []
+            });
+
+            // Flow Creator State
+            const [flowData, setFlowData] = useState({
+                id: '',
+                name: '',
+                description: '',
+                avatar_type: 'custom',
+                steps: [],
+                entry_intents: [],
+                priority: 5
+            });
+
+            // Intent Creator State
+            const [intentData, setIntentData] = useState({
+                name: '',
+                keywords: [],
+                examples: [],
+                system_prompt: '',
+                user_prompt_template: '',
+                confidence_threshold: 0.7
+            });
+
+            const [newKeyword, setNewKeyword] = useState('');
+            const [newExample, setNewExample] = useState('');
+            const [newStepName, setNewStepName] = useState('');
+            const [newStepDescription, setNewStepDescription] = useState('');
+
+            // Generate specific Avatar field with AI
+            const generateAvatarField = async (fieldName) => {
+                if (!avatarData.description.trim()) {
+                    setMessage('Podaj najpierw opis avatara (dla AI)');
+                    return;
+                }
+
+                setIsGenerating(true);
+                try {
+                    const result = await CreatorAPI.generateAvatarField(fieldName, avatarData.description);
+                    if (result.success) {
+                        setAvatarData({ ...avatarData, [fieldName]: result.data });
+                        setMessage(`✅ ${fieldName} wygenerowane!`);
+                    }
+                } catch (error) {
+                    setMessage(`❌ Błąd generowania ${fieldName}`);
+                } finally {
+                    setIsGenerating(false);
+                }
+            };
+
+            // Generate specific Flow field with AI
+            const generateFlowField = async (fieldName) => {
+                if (!avatarData.name.trim()) {
+                    setMessage('Najpierw stwórz avatara');
+                    return;
+                }
+
+                setIsGenerating(true);
+                try {
+                    const result = await CreatorAPI.generateFlowField(fieldName, avatarData.name, avatarData.specialization);
+                    if (result.success) {
+                        setFlowData({ ...flowData, [fieldName]: result.data });
+                        setMessage(`✅ ${fieldName} wygenerowane!`);
+                    }
+                } catch (error) {
+                    setMessage(`❌ Błąd generowania ${fieldName}`);
+                } finally {
+                    setIsGenerating(false);
+                }
+            };
+
+            // Generate specific Intent field with AI
+            const generateIntentField = async (fieldName) => {
+                if (!intentData.name.trim() && fieldName !== 'name') {
+                    setMessage('Podaj najpierw nazwę intencji');
+                    return;
+                }
+
+                setIsGenerating(true);
+                try {
+                    const result = await CreatorAPI.generateIntentField(fieldName, intentData.name, avatarData.specialization);
+                    if (result.success) {
+                        if (fieldName === 'keywords' || fieldName === 'examples') {
+                            setIntentData({ ...intentData, [fieldName]: result.data });
+                        } else {
+                            setIntentData({ ...intentData, [fieldName]: result.data });
+                        }
+                        setMessage(`✅ ${fieldName} wygenerowane!`);
+                    }
+                } catch (error) {
+                    setMessage(`❌ Błąd generowania ${fieldName}`);
+                } finally {
+                    setIsGenerating(false);
+                }
+            };
+
+            // Add keyword
+            const addKeyword = () => {
+                if (newKeyword.trim() && !intentData.keywords.includes(newKeyword.trim())) {
+                    setIntentData({
+                        ...intentData,
+                        keywords: [...intentData.keywords, newKeyword.trim()]
+                    });
+                    setNewKeyword('');
+                }
+            };
+
+            // Remove keyword
+            const removeKeyword = (keyword) => {
+                setIntentData({
+                    ...intentData,
+                    keywords: intentData.keywords.filter(k => k !== keyword)
+                });
+            };
+
+            // Add example
+            const addExample = () => {
+                if (newExample.trim() && !intentData.examples.includes(newExample.trim())) {
+                    setIntentData({
+                        ...intentData,
+                        examples: [...intentData.examples, newExample.trim()]
+                    });
+                    setNewExample('');
+                }
+            };
+
+            // Remove example
+            const removeExample = (example) => {
+                setIntentData({
+                    ...intentData,
+                    examples: intentData.examples.filter(e => e !== example)
+                });
+            };
+
+            // File upload handlers
+            const handleFileUpload = (files) => {
+                const validTypes = ['application/pdf', 'text/csv', 'text/markdown', 'text/plain', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+                const maxSize = 10 * 1024 * 1024; // 10MB
+
+                const validFiles = Array.from(files).filter(file => {
+                    if (!validTypes.includes(file.type) && !file.name.match(/\.(pdf|csv|md|txt|docx)$/i)) {
+                        setMessage('❌ Nieprawidłowy typ pliku. Akceptowane: PDF, CSV, MD, TXT, DOCX');
+                        return false;
+                    }
+                    if (file.size > maxSize) {
+                        setMessage('❌ Plik za duży. Maksymalny rozmiar: 10MB');
+                        return false;
+                    }
+                    return true;
+                });
+
+                if (validFiles.length > 0) {
+                    const newFiles = validFiles.map(file => ({
+                        id: Date.now() + Math.random(),
+                        name: file.name,
+                        size: file.size,
+                        type: file.type,
+                        file: file
+                    }));
+
+                    setAvatarData({
+                        ...avatarData,
+                        knowledge_files: [...avatarData.knowledge_files, ...newFiles]
+                    });
+
+                    setMessage(`✅ Dodano ${validFiles.length} plików`);
+                }
+            };
+
+            const removeFile = (fileId) => {
+                setAvatarData({
+                    ...avatarData,
+                    knowledge_files: avatarData.knowledge_files.filter(f => f.id !== fileId)
+                });
+            };
+
+            const formatFileSize = (bytes) => {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            };
+
+            const getFileIcon = (fileName) => {
+                const ext = fileName.split('.').pop().toLowerCase();
+                const icons = {
+                    pdf: '📄',
+                    csv: '📊',
+                    md: '📝',
+                    txt: '📝',
+                    docx: '📄'
+                };
+                return icons[ext] || '📄';
+            };
+
+            // Flow step handlers
+            const addManualStep = () => {
+                if (!newStepName.trim() || !newStepDescription.trim()) {
+                    setMessage('Podaj nazwę i opis kroku');
+                    return;
+                }
+
+                const newStep = {
+                    id: `manual_step_${Date.now()}`,
+                    name: newStepName.trim(),
+                    description: newStepDescription.trim(),
+                    required: true,
+                    next_steps: []
+                };
+
+                setFlowData({
+                    ...flowData,
+                    steps: [...flowData.steps, newStep]
+                });
+
+                setNewStepName('');
+                setNewStepDescription('');
+                setMessage('✅ Krok dodany!');
+            };
+
+            const removeStep = (stepId) => {
+                setFlowData({
+                    ...flowData,
+                    steps: flowData.steps.filter(s => s.id !== stepId)
+                });
+            };
+
+            // Save complete avatar
+            const saveCompleteAvatar = async () => {
+                if (!avatarData.name.trim()) {
+                    setMessage('❌ Nazwa avatara jest wymagana');
+                    return;
+                }
+
+                setIsGenerating(true);
+                try {
+                    const result = await CreatorAPI.saveAvatar(avatarData, flowData, intentData);
+                    if (result.success) {
+                        setMessage(`✅ Avatar "${result.data.name}" zapisany! ID: ${result.data.id}`);
+                        console.log('✅ Saved avatar:', result.data);
+                    } else {
+                        setMessage('❌ Błąd zapisywania avatara');
+                    }
+                } catch (error) {
+                    console.error('Error saving avatar:', error);
+                    setMessage('❌ Błąd połączenia z API');
+                } finally {
+                    setIsGenerating(false);
+                }
+            };
+
+            return React.createElement('div', { className: 'creator-container' },
+                // Header
+                React.createElement('div', { className: 'creator-header' },
+                    React.createElement('div', { className: 'creator-title' }, '🧙‍♂️ Avatar & Flow Creator'),
+                    React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: '20px' } },
+                        React.createElement('button', {
+                            className: 'btn btn-success btn-large',
+                            onClick: saveCompleteAvatar,
+                            disabled: isGenerating || !avatarData.name.trim(),
+                            style: { 
+                                background: avatarData.name.trim() ? '#28a745' : '#6c757d',
+                                cursor: avatarData.name.trim() ? 'pointer' : 'not-allowed'
+                            }
+                        }, isGenerating ? 
+                            React.createElement('span', { className: 'loading' }) : '💾 Zapisz Avatar'
+                        ),
+                        React.createElement('div', { className: 'creator-tabs' },
+                        React.createElement('button', {
+                            className: `tab-btn ${activeTab === 'avatar' ? 'active' : ''}`,
+                            onClick: () => setActiveTab('avatar')
+                        }, '👤 Avatar Creator'),
+                        React.createElement('button', {
+                            className: `tab-btn ${activeTab === 'flow' ? 'active' : ''}`,
+                            onClick: () => setActiveTab('flow')
+                        }, '🔄 Flow Creator'),
+                        React.createElement('button', {
+                            className: `tab-btn ${activeTab === 'intent' ? 'active' : ''}`,
+                            onClick: () => setActiveTab('intent')
+                        }, '🎯 Intent Creator')
+                        )
+                    )
+                ),
+
+                // Body
+                React.createElement('div', { className: 'creator-body' },
+                    // Form Panel
+                    React.createElement('div', { className: 'form-panel' },
+                        // Message
+                        message && React.createElement('div', { 
+                            className: `alert ${message.includes('✅') ? 'alert-success' : 'alert-error'}` 
+                        }, message),
+
+                        // Avatar Creator Tab
+                        activeTab === 'avatar' && React.createElement('div', null,
+                            // Base Description Section
+                            React.createElement('div', { className: 'form-section' },
+                                React.createElement('div', { className: 'section-header' },
+                                    React.createElement('h3', { className: 'section-title' }, '📝 Opis bazowy (dla AI)')
+                                ),
+                                
+                                React.createElement('div', { className: 'form-group' },
+                                    React.createElement('label', { className: 'form-label' }, 'Opis avatara (dla AI) *'),
+                                    React.createElement('textarea', {
+                                        className: 'form-input form-textarea',
+                                        value: avatarData.description,
+                                        onChange: (e) => setAvatarData({ ...avatarData, description: e.target.value }),
+                                        placeholder: 'np. Doświadczony prezes firmy technologicznej, charyzmatyczny lider z wizją strategiczną...'
+                                    })
+                                )
+                            ),
+
+                            // Name Section
+                            React.createElement('div', { className: 'form-section' },
+                                React.createElement('div', { className: 'section-header' },
+                                    React.createElement('h3', { className: 'section-title' }, '👤 Nazwa avatara'),
+                                    React.createElement('button', {
+                                        className: 'ai-generate-btn',
+                                        onClick: () => generateAvatarField('name'),
+                                        disabled: isGenerating
+                                    }, isGenerating ? 
+                                        React.createElement('span', { className: 'loading' }) : '✨ Generuj nazwę'
+                                    )
+                                ),
+
+                                React.createElement('div', { className: 'form-group' },
+                                    React.createElement('input', {
+                                        type: 'text',
+                                        className: 'form-input',
+                                        value: avatarData.name,
+                                        onChange: (e) => setAvatarData({ ...avatarData, name: e.target.value }),
+                                        placeholder: 'np. Prezes Firmy'
+                                    })
+                                )
+                            ),
+
+                            // Specialization Section
+                            React.createElement('div', { className: 'form-section' },
+                                React.createElement('div', { className: 'section-header' },
+                                    React.createElement('h3', { className: 'section-title' }, '🎯 Specjalizacja'),
+                                    React.createElement('button', {
+                                        className: 'ai-generate-btn',
+                                        onClick: () => generateAvatarField('specialization'),
+                                        disabled: isGenerating
+                                    }, isGenerating ? 
+                                        React.createElement('span', { className: 'loading' }) : '✨ Generuj specjalizację'
+                                    )
+                                ),
+
+                                React.createElement('div', { className: 'form-group' },
+                                    React.createElement('textarea', {
+                                        className: 'form-input form-textarea',
+                                        value: avatarData.specialization,
+                                        onChange: (e) => setAvatarData({ ...avatarData, specialization: e.target.value }),
+                                        placeholder: 'np. Zarządzanie strategiczne, rozwój biznesu, leadership'
+                                    })
+                                )
+                            ),
+
+                            // Personality Section
+                            React.createElement('div', { className: 'form-section' },
+                                React.createElement('div', { className: 'section-header' },
+                                    React.createElement('h3', { className: 'section-title' }, '🧠 Osobowość'),
+                                    React.createElement('button', {
+                                        className: 'ai-generate-btn',
+                                        onClick: () => generateAvatarField('personality'),
+                                        disabled: isGenerating
+                                    }, isGenerating ? 
+                                        React.createElement('span', { className: 'loading' }) : '✨ Generuj osobowość'
+                                    )
+                                ),
+
+                                React.createElement('div', { className: 'form-group' },
+                                    React.createElement('textarea', {
+                                        className: 'form-input form-textarea',
+                                        value: avatarData.personality,
+                                        onChange: (e) => setAvatarData({ ...avatarData, personality: e.target.value }),
+                                        placeholder: 'np. Charyzmatyczny, pewny siebie, inspirujący'
+                                    })
+                                )
+                            ),
+
+                            // Communication Style Section
+                            React.createElement('div', { className: 'form-section' },
+                                React.createElement('div', { className: 'section-header' },
+                                    React.createElement('h3', { className: 'section-title' }, '💬 Styl komunikacji'),
+                                    React.createElement('button', {
+                                        className: 'ai-generate-btn',
+                                        onClick: () => generateAvatarField('communication_style'),
+                                        disabled: isGenerating
+                                    }, isGenerating ? 
+                                        React.createElement('span', { className: 'loading' }) : '✨ Generuj styl'
+                                    )
+                                ),
+
+                                React.createElement('div', { className: 'form-group' },
+                                    React.createElement('textarea', {
+                                        className: 'form-input form-textarea',
+                                        value: avatarData.communication_style,
+                                        onChange: (e) => setAvatarData({ ...avatarData, communication_style: e.target.value }),
+                                        placeholder: 'np. Pewny siebie, zorientowany na wyniki, motywujący'
+                                    })
+                                )
+                            ),
+
+                            // Background Section
+                            React.createElement('div', { className: 'form-section' },
+                                React.createElement('div', { className: 'section-header' },
+                                    React.createElement('h3', { className: 'section-title' }, '📖 Tło/Doświadczenie'),
+                                    React.createElement('button', {
+                                        className: 'ai-generate-btn',
+                                        onClick: () => generateAvatarField('background'),
+                                        disabled: isGenerating
+                                    }, isGenerating ? 
+                                        React.createElement('span', { className: 'loading' }) : '✨ Generuj tło'
+                                    )
+                                ),
+
+                                React.createElement('div', { className: 'form-group' },
+                                    React.createElement('textarea', {
+                                        className: 'form-input form-textarea',
+                                        value: avatarData.background,
+                                        onChange: (e) => setAvatarData({ ...avatarData, background: e.target.value }),
+                                        placeholder: 'np. 15-letnie doświadczenie w branży tech, prowadził 3 startupy...'
+                                    })
+                                )
+                            ),
+
+                            // Knowledge Upload Section
+                            React.createElement('div', { className: 'form-section' },
+                                React.createElement('div', { className: 'section-header' },
+                                    React.createElement('h3', { className: 'section-title' }, '📚 Baza wiedzy'),
+                                    React.createElement('button', {
+                                        className: 'ai-generate-btn',
+                                        onClick: () => document.getElementById('knowledge-file-input').click()
+                                    }, '📁 Dodaj pliki')
+                                ),
+
+                                React.createElement('div', { className: 'form-group' },
+                                    React.createElement('input', {
+                                        id: 'knowledge-file-input',
+                                        type: 'file',
+                                        className: 'file-input',
+                                        multiple: true,
+                                        accept: '.pdf,.csv,.md,.txt,.docx',
+                                        onChange: (e) => handleFileUpload(e.target.files)
+                                    }),
+
+                                    React.createElement('div', {
+                                        className: 'knowledge-upload-area',
+                                        onClick: () => document.getElementById('knowledge-file-input').click(),
+                                        onDragOver: (e) => {
+                                            e.preventDefault();
+                                            e.currentTarget.classList.add('dragover');
+                                        },
+                                        onDragLeave: (e) => {
+                                            e.preventDefault();
+                                            e.currentTarget.classList.remove('dragover');
+                                        },
+                                        onDrop: (e) => {
+                                            e.preventDefault();
+                                            e.currentTarget.classList.remove('dragover');
+                                            handleFileUpload(e.dataTransfer.files);
+                                        }
+                                    },
+                                        React.createElement('div', { style: { fontSize: '48px', marginBottom: '10px' } }, '📚'),
+                                        React.createElement('h4', { style: { margin: '10px 0', color: '#58a6ff' } }, 'Przeciągnij pliki lub kliknij aby dodać'),
+                                        React.createElement('p', { style: { color: '#7d8590', fontSize: '14px' } }, 'Obsługiwane formaty: PDF, CSV, MD, TXT, DOCX (max 10MB)')
+                                    ),
+
+                                    avatarData.knowledge_files.length > 0 && React.createElement('div', { className: 'uploaded-files' },
+                                        React.createElement('h4', { style: { color: '#58a6ff', marginBottom: '10px' } }, 
+                                            `📁 Dodane pliki (${avatarData.knowledge_files.length})`
+                                        ),
+                                        avatarData.knowledge_files.map(file =>
+                                            React.createElement('div', { key: file.id, className: 'file-item' },
+                                                React.createElement('div', { className: 'file-info' },
+                                                    React.createElement('span', { className: 'file-icon' }, getFileIcon(file.name)),
+                                                    React.createElement('div', null,
+                                                        React.createElement('div', { className: 'file-name' }, file.name),
+                                                        React.createElement('div', { className: 'file-size' }, formatFileSize(file.size))
+                                                    )
+                                                ),
+                                                React.createElement('button', {
+                                                    className: 'remove-file-btn',
+                                                    onClick: () => removeFile(file.id)
+                                                }, '×')
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+
+                        // Flow Creator Tab
+                        activeTab === 'flow' && React.createElement('div', null,
+                            // Flow Name Section
+                            React.createElement('div', { className: 'form-section' },
+                                React.createElement('div', { className: 'section-header' },
+                                    React.createElement('h3', { className: 'section-title' }, '🔄 Nazwa Flow'),
+                                    React.createElement('button', {
+                                        className: 'ai-generate-btn',
+                                        onClick: () => generateFlowField('name'),
+                                        disabled: isGenerating
+                                    }, isGenerating ? 
+                                        React.createElement('span', { className: 'loading' }) : '✨ Generuj nazwę'
+                                    )
+                                ),
+
+                                React.createElement('div', { className: 'form-group' },
+                                    React.createElement('input', {
+                                        type: 'text',
+                                        className: 'form-input',
+                                        value: flowData.name,
+                                        onChange: (e) => setFlowData({ ...flowData, name: e.target.value }),
+                                        placeholder: 'np. Leadership Flow'
+                                    })
+                                )
+                            ),
+
+                            // Flow Description Section
+                            React.createElement('div', { className: 'form-section' },
+                                React.createElement('div', { className: 'section-header' },
+                                    React.createElement('h3', { className: 'section-title' }, '📝 Opis Flow'),
+                                    React.createElement('button', {
+                                        className: 'ai-generate-btn',
+                                        onClick: () => generateFlowField('description'),
+                                        disabled: isGenerating
+                                    }, isGenerating ? 
+                                        React.createElement('span', { className: 'loading' }) : '✨ Generuj opis'
+                                    )
+                                ),
+
+                                React.createElement('div', { className: 'form-group' },
+                                    React.createElement('textarea', {
+                                        className: 'form-input form-textarea',
+                                        value: flowData.description,
+                                        onChange: (e) => setFlowData({ ...flowData, description: e.target.value }),
+                                        placeholder: 'np. Flow dla prezesa - leadership i wizja strategiczna'
+                                    })
+                                )
+                            ),
+
+                            // Flow Steps Section
+                            React.createElement('div', { className: 'form-section' },
+                                React.createElement('div', { className: 'section-header' },
+                                    React.createElement('h3', { className: 'section-title' }, '📋 Kroki Flow'),
+                                    React.createElement('button', {
+                                        className: 'ai-generate-btn',
+                                        onClick: () => generateFlowField('steps'),
+                                        disabled: isGenerating
+                                    }, isGenerating ? 
+                                        React.createElement('span', { className: 'loading' }) : '✨ Generuj kroki'
+                                    )
+                                ),
+
+                                React.createElement('div', { className: 'form-group' },
+                                    React.createElement('label', { className: 'form-label' }, 'Priorytet (1-10)'),
+                                    React.createElement('input', {
+                                        type: 'number',
+                                        min: '1',
+                                        max: '10',
+                                        className: 'form-input',
+                                        value: flowData.priority,
+                                        onChange: (e) => setFlowData({ ...flowData, priority: parseInt(e.target.value) })
+                                    })
+                                )
+                            ),
+
+                            // Flow Visualization
+                            flowData.steps.length > 0 && React.createElement('div', { className: 'form-section' },
+                                React.createElement('div', { className: 'section-header' },
+                                    React.createElement('h3', { className: 'section-title' }, '🎯 Wizualizacja Flow')
+                                ),
+                                React.createElement('div', { className: 'flow-visualization' },
+                                    flowData.steps.map((step, index) =>
+                                        React.createElement('div', { key: step.id, className: 'flow-step-node' },
+                                            React.createElement('div', { className: 'flow-step-header' },
+                                                React.createElement('span', { className: 'flow-step-title' }, 
+                                                    `${index + 1}. ${step.name}`
+                                                ),
+                                                React.createElement('button', {
+                                                    className: 'remove-step-btn',
+                                                    onClick: () => removeStep(step.id)
+                                                }, '×')
+                                            ),
+                                            React.createElement('p', { style: { color: '#c9d1d9', fontSize: '14px', margin: '10px 0 0 0' } }, 
+                                                step.description
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+
+                            // Manual Step Creator
+                            React.createElement('div', { className: 'form-section' },
+                                React.createElement('div', { className: 'section-header' },
+                                    React.createElement('h3', { className: 'section-title' }, '➕ Dodaj krok ręcznie')
+                                ),
+
+                                React.createElement('div', { className: 'form-group' },
+                                    React.createElement('label', { className: 'form-label' }, 'Nazwa kroku'),
+                                    React.createElement('input', {
+                                        type: 'text',
+                                        className: 'form-input',
+                                        value: newStepName,
+                                        onChange: (e) => setNewStepName(e.target.value),
+                                        placeholder: 'np. Powitanie klienta'
+                                    })
+                                ),
+
+                                React.createElement('div', { className: 'form-group' },
+                                    React.createElement('label', { className: 'form-label' }, 'Opis kroku'),
+                                    React.createElement('textarea', {
+                                        className: 'form-input form-textarea',
+                                        value: newStepDescription,
+                                        onChange: (e) => setNewStepDescription(e.target.value),
+                                        placeholder: 'np. Przywitaj się z klientem i przedstaw cel rozmowy'
+                                    })
+                                ),
+
+                                React.createElement('button', {
+                                    className: 'add-step-btn',
+                                    onClick: addManualStep
+                                }, '➕ Dodaj krok')
+                            )
+                        ),
+
+                        // Intent Creator Tab
+                        activeTab === 'intent' && React.createElement('div', null,
+                            // Intent Name Section
+                            React.createElement('div', { className: 'form-section' },
+                                React.createElement('div', { className: 'section-header' },
+                                    React.createElement('h3', { className: 'section-title' }, '🎯 Nazwa Intencji'),
+                                    React.createElement('button', {
+                                        className: 'ai-generate-btn',
+                                        onClick: () => generateIntentField('name'),
+                                        disabled: isGenerating
+                                    }, isGenerating ? 
+                                        React.createElement('span', { className: 'loading' }) : '✨ Generuj nazwę'
+                                    )
+                                ),
+
+                                React.createElement('div', { className: 'form-group' },
+                                    React.createElement('input', {
+                                        type: 'text',
+                                        className: 'form-input',
+                                        value: intentData.name,
+                                        onChange: (e) => setIntentData({ ...intentData, name: e.target.value }),
+                                        placeholder: 'np. strategic_vision'
+                                    })
+                                )
+                            ),
+
+                            // Keywords Section
+                            React.createElement('div', { className: 'form-section' },
+                                React.createElement('div', { className: 'section-header' },
+                                    React.createElement('h3', { className: 'section-title' }, '🔍 Słowa kluczowe'),
+                                    React.createElement('button', {
+                                        className: 'ai-generate-btn',
+                                        onClick: () => generateIntentField('keywords'),
+                                        disabled: isGenerating
+                                    }, isGenerating ? 
+                                        React.createElement('span', { className: 'loading' }) : '✨ Generuj keywords'
+                                    )
+                                ),
+
+                                React.createElement('div', { className: 'form-group' },
+                                    React.createElement('div', { className: 'keyword-input-container' },
+                                        React.createElement('input', {
+                                            type: 'text',
+                                            className: 'form-input',
+                                            value: newKeyword,
+                                            onChange: (e) => setNewKeyword(e.target.value),
+                                            onKeyPress: (e) => e.key === 'Enter' && addKeyword(),
+                                            placeholder: 'Dodaj słowo kluczowe...'
+                                        }),
+                                        React.createElement('button', {
+                                            className: 'btn',
+                                            onClick: addKeyword
+                                        }, 'Dodaj')
+                                    ),
+                                    React.createElement('div', { className: 'keywords-container' },
+                                        intentData.keywords.map((keyword, index) =>
+                                            React.createElement('span', {
+                                                key: index,
+                                                className: 'keyword-tag',
+                                                onClick: () => removeKeyword(keyword)
+                                            }, keyword + ' ×')
+                                        )
+                                    )
+                                )
+                            ),
+
+                            // Examples Section
+                            React.createElement('div', { className: 'form-section' },
+                                React.createElement('div', { className: 'section-header' },
+                                    React.createElement('h3', { className: 'section-title' }, '💬 Przykłady wypowiedzi'),
+                                    React.createElement('button', {
+                                        className: 'ai-generate-btn',
+                                        onClick: () => generateIntentField('examples'),
+                                        disabled: isGenerating
+                                    }, isGenerating ? 
+                                        React.createElement('span', { className: 'loading' }) : '✨ Generuj przykłady'
+                                    )
+                                ),
+
+                                React.createElement('div', { className: 'form-group' },
+                                    React.createElement('div', { className: 'keyword-input-container' },
+                                        React.createElement('input', {
+                                            type: 'text',
+                                            className: 'form-input',
+                                            value: newExample,
+                                            onChange: (e) => setNewExample(e.target.value),
+                                            onKeyPress: (e) => e.key === 'Enter' && addExample(),
+                                            placeholder: 'Dodaj przykład wypowiedzi...'
+                                        }),
+                                        React.createElement('button', {
+                                            className: 'btn',
+                                            onClick: addExample
+                                        }, 'Dodaj')
+                                    ),
+                                    React.createElement('div', { className: 'keywords-container' },
+                                        intentData.examples.map((example, index) =>
+                                            React.createElement('span', {
+                                                key: index,
+                                                className: 'keyword-tag',
+                                                onClick: () => removeExample(example)
+                                            }, example + ' ×')
+                                        )
+                                    )
+                                )
+                            ),
+
+                            // System Prompt Section
+                            React.createElement('div', { className: 'form-section' },
+                                React.createElement('div', { className: 'section-header' },
+                                    React.createElement('h3', { className: 'section-title' }, '🤖 System Prompt'),
+                                    React.createElement('button', {
+                                        className: 'ai-generate-btn',
+                                        onClick: () => generateIntentField('system_prompt'),
+                                        disabled: isGenerating
+                                    }, isGenerating ? 
+                                        React.createElement('span', { className: 'loading' }) : '✨ Generuj prompt'
+                                    )
+                                ),
+
+                                React.createElement('div', { className: 'form-group' },
+                                    React.createElement('textarea', {
+                                        className: 'form-input form-textarea',
+                                        value: intentData.system_prompt,
+                                        onChange: (e) => setIntentData({ ...intentData, system_prompt: e.target.value }),
+                                        placeholder: 'System prompt dla tej intencji...',
+                                        style: { minHeight: '120px' }
+                                    })
+                                )
+                            ),
+
+                            // User Prompt Template Section
+                            React.createElement('div', { className: 'form-section' },
+                                React.createElement('div', { className: 'section-header' },
+                                    React.createElement('h3', { className: 'section-title' }, '👤 User Prompt Template'),
+                                    React.createElement('button', {
+                                        className: 'ai-generate-btn',
+                                        onClick: () => generateIntentField('user_prompt_template'),
+                                        disabled: isGenerating
+                                    }, isGenerating ? 
+                                        React.createElement('span', { className: 'loading' }) : '✨ Generuj template'
+                                    )
+                                ),
+
+                                React.createElement('div', { className: 'form-group' },
+                                    React.createElement('textarea', {
+                                        className: 'form-input form-textarea',
+                                        value: intentData.user_prompt_template,
+                                        onChange: (e) => setIntentData({ ...intentData, user_prompt_template: e.target.value }),
+                                        placeholder: 'Template dla user prompt...',
+                                        style: { minHeight: '150px' }
+                                    })
+                                )
+                            )
+                        )
+                    ),
+
+                    // Preview Panel
+                    React.createElement('div', { className: 'preview-panel' },
+                        React.createElement('h3', { 
+                            style: { 
+                                color: '#58a6ff', 
+                                marginBottom: '25px', 
+                                fontSize: '20px',
+                                textAlign: 'center'
+                            } 
+                        }, '👁️ Live Preview'),
+
+                        // Avatar Preview
+                        activeTab === 'avatar' && React.createElement('div', null,
+                            avatarData.name && React.createElement('div', { className: 'preview-section' },
+                                React.createElement('div', { className: 'preview-title' }, '👤 Avatar'),
+                                React.createElement('div', { className: 'preview-content' },
+                                    `Nazwa: ${avatarData.name}\n` +
+                                    `Specjalizacja: ${avatarData.specialization}\n` +
+                                    `Osobowość: ${avatarData.personality}\n` +
+                                    `Styl: ${avatarData.communication_style}`
+                                )
+                            ),
+
+                            avatarData.background && React.createElement('div', { className: 'preview-section' },
+                                React.createElement('div', { className: 'preview-title' }, '📖 Background'),
+                                React.createElement('div', { className: 'preview-content' }, avatarData.background)
+                            ),
+
+                            avatarData.knowledge_files.length > 0 && React.createElement('div', { className: 'preview-section' },
+                                React.createElement('div', { className: 'preview-title' }, '📚 Knowledge Files'),
+                                React.createElement('div', { className: 'preview-content' },
+                                    avatarData.knowledge_files.map(file => 
+                                        `${getFileIcon(file.name)} ${file.name} (${formatFileSize(file.size)})`
+                                    ).join('\n')
+                                )
+                            )
+                        ),
+
+                        // Flow Preview
+                        activeTab === 'flow' && React.createElement('div', null,
+                            flowData.name && React.createElement('div', { className: 'preview-section' },
+                                React.createElement('div', { className: 'preview-title' }, '🔄 Flow Definition'),
+                                React.createElement('div', { className: 'preview-content' },
+                                    JSON.stringify({
+                                        id: flowData.id,
+                                        name: flowData.name,
+                                        description: flowData.description,
+                                        priority: flowData.priority,
+                                        steps: flowData.steps
+                                    }, null, 2)
+                                )
+                            )
+                        ),
+
+                        // Intent Preview
+                        activeTab === 'intent' && React.createElement('div', null,
+                            intentData.system_prompt && React.createElement('div', { className: 'preview-section' },
+                                React.createElement('div', { className: 'preview-title' }, '🤖 System Prompt'),
+                                React.createElement('div', { className: 'preview-content' }, intentData.system_prompt)
+                            ),
+
+                            intentData.user_prompt_template && React.createElement('div', { className: 'preview-section' },
+                                React.createElement('div', { className: 'preview-title' }, '👤 User Prompt Template'),
+                                React.createElement('div', { className: 'preview-content' }, intentData.user_prompt_template)
+                            ),
+
+                            intentData.keywords.length > 0 && React.createElement('div', { className: 'preview-section' },
+                                React.createElement('div', { className: 'preview-title' }, '🔍 Keywords & Examples'),
+                                React.createElement('div', { className: 'preview-content' },
+                                    `Keywords: ${intentData.keywords.join(', ')}\n\n` +
+                                    `Examples:\n${intentData.examples.map(e => `- ${e}`).join('\n')}`
+                                )
+                            )
+                        )
+                    )
+                )
+            );
+        }
+
+        // Render the app
+        ReactDOM.render(React.createElement(AvatarFlowCreator), document.getElementById('root'));
+    </script>
+</body>
+</html>

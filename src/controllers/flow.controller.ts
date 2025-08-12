@@ -37,6 +37,42 @@ class FlowController {
       });
     }
   }
+
+  /**
+   * Gets flow definitions for custom avatar (including custom flows)
+   */
+  public async getFlowDefinitionsForCustomAvatar(req: Request, res: Response): Promise<void> {
+    try {
+      const { avatarId } = req.params;
+      const flowManager = FlowManager.getInstance();
+      
+      // Initialize flow manager if needed
+      if (!flowManager.isInitialized()) {
+        await flowManager.initialize();
+      }
+
+      // Load custom flows for this avatar
+      await flowManager.loadCustomFlowsForAvatar(avatarId);
+      
+      // Get all flows (standard + custom)
+      const flows = flowManager.getFlowDefinitionsForAvatar(avatarId);
+      
+      res.status(200).json({
+        status: 'success',
+        count: flows.length,
+        flows: flows,
+        avatar_id: avatarId,
+        avatar_type: 'custom'
+      });
+    } catch (error: any) {
+      console.error(`❌ Error getting flow definitions for custom avatar ${req.params.avatarId}:`, error);
+      res.status(500).json({
+        status: 'error',
+        message: 'Failed to get flow definitions for custom avatar',
+        error: error.message
+      });
+    }
+  }
 }
 
 export default new FlowController(); 

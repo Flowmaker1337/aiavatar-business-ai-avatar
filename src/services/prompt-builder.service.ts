@@ -9,6 +9,7 @@ import {
     UserPrompt 
 } from '../models/types';
 import { ExecutionTimerService } from './execution-timer.service';
+import IntentClassifier from './intent-classifier.service';
 
 /**
  * PromptBuilder - buduje prompty na podstawie intencji, kontekstu i szablonów
@@ -19,8 +20,11 @@ class PromptBuilder {
     private templates: PromptTemplate[] = [];
     private defaultSystemPrompt: PromptTemplate | null = null;
     private initialized = false;
+    private intentClassifier: IntentClassifier;
 
-    private constructor() {}
+    private constructor() {
+        this.intentClassifier = IntentClassifier.getInstance();
+    }
 
     public static getInstance(): PromptBuilder {
         if (!PromptBuilder.instance) {
@@ -73,9 +77,17 @@ class PromptBuilder {
             template = this.findTemplateForFlowStep(context.current_flow_step);
         }
         
-        // Jeśli nie znaleziono template'a dla kroku, użyj template'a dla intencji
+        // Jeśli nie znaleziono template'a dla kroku, sprawdź custom intent lub użyj standard template
         if (!template) {
-            template = this.findTemplate(context.current_intent);
+            // Sprawdź czy to custom intent z własnym prompt
+            const customTemplate = await this.findCustomIntentTemplate(context.current_intent, context.avatar_id);
+            if (customTemplate) {
+                console.log(`🎯 PromptBuilder: Using custom template for intent '${context.current_intent}'`);
+                template = customTemplate;
+            } else {
+                console.log(`🎯 PromptBuilder: Using standard template for intent '${context.current_intent}'`);
+                template = this.findTemplate(context.current_intent);
+            }
         }
         
         if (!template) {
@@ -86,14 +98,44 @@ class PromptBuilder {
         let systemPrompt = this.buildSystemPrompt(template, context);
         const userPrompt = this.buildUserPrompt(template, context);
 
-        // Dodaj domyślny system prompt, jeśli istnieje
-        if (this.defaultSystemPrompt) {
+        // Dodaj domyślny system prompt, jeśli istnieje i nie jest to custom intent
+        if (this.defaultSystemPrompt && !context.avatar_id) {
+            console.log(`🎯 PromptBuilder: Adding default system prompt (non-custom avatar)`);
             const defaultSystemText = this.replacePlaceholders(this.defaultSystemPrompt.system_prompt, context);
             systemPrompt.content = `${defaultSystemText}\n\n${systemPrompt.content}`;
+        } else if (context.avatar_id) {
+            console.log(`🎯 PromptBuilder: Skipping default system prompt (custom avatar detected)`);
         }
         
         timer.stop();
         return { systemPrompt, userPrompt };
+    }
+
+    /**
+     * Sprawdza czy intent jest custom intent i zwraca jego template
+     */
+    private async findCustomIntentTemplate(intentName: string, avatarId?: string): Promise<PromptTemplate | null> {
+        // Sprawdź czy to custom avatar z avatarId
+        if (avatarId) {
+            // Pobierz custom intents dla tego avatara
+            const customIntents = this.intentClassifier.getIntentDefinitionsForAvatar(avatarId);
+            const customIntent = customIntents.find(intent => intent.name === intentName);
+            
+            if (customIntent && customIntent.system_prompt_template && customIntent.user_prompt_template) {
+                // Konwertuj custom intent na PromptTemplate
+                return {
+                    id: `custom_${intentName}`,
+                    name: `Custom ${intentName} Template`,
+                    intent: intentName,
+                    system_prompt: customIntent.system_prompt_template,
+                    user_prompt_template: customIntent.user_prompt_template,
+                    variables: [],
+                    priority: 1
+                };
+            }
+        }
+        
+        return null;
     }
 
     /**
@@ -132,8 +174,46 @@ class PromptBuilder {
     private buildSystemPrompt(template: PromptTemplate, context: PromptContext): SystemPrompt {
         let systemPrompt = template.system_prompt;
 
+        // CUSTOM AVATAR: Sprawdź czy to custom avatar
+        if (context.avatar && 'avatar_type' in context.avatar && context.avatar.avatar_type === 'custom') {
+            // Dla custom avatarów użyj ich własnej personality jako system prompt
+            const customAvatar = context.avatar as any; // Cast to CustomAvatar type
+            console.log('🎯 PromptBuilder: Custom avatar detected:', customAvatar.name);
+            console.log('🎯 PromptBuilder: Personality type:', typeof customAvatar.personality);
+            console.log('🎯 PromptBuilder: Personality value:', customAvatar.personality);
+            
+            if (customAvatar.specialization) {
+                // Bezpieczne pobieranie personality - może być string lub object
+                let personalityText = '';
+                if (typeof customAvatar.personality === 'string') {
+                    personalityText = customAvatar.personality;
+                } else if (customAvatar.personality && typeof customAvatar.personality === 'object') {
+                    // Jeśli to object, użyj tone lub style
+                    personalityText = customAvatar.personality.tone || customAvatar.personality.style || 'Profesjonalny i kompetentny';
+                } else {
+                    personalityText = 'Profesjonalny i kompetentny';
+                }
+
+                systemPrompt = `Jesteś ${customAvatar.firstName || customAvatar.name}, ekspertem w dziedzinie ${customAvatar.specialization}.
+${personalityText}
+${customAvatar.communication_style || 'Odpowiadasz w sposób profesjonalny i rzeczowy.'}
+${customAvatar.background || ''}
+
+Twoje odpowiedzi są oparte na Twojej specjalizacji i doświadczeniu.
+Prowadź rozmowę naturalnie, słuchaj uważnie i oferuj konkretne rozwiązania.
+Zakaz używania: formatowania tekstu, znaków końca linii, znaków wcięć, znaków tabulacji, list wypunktowanych i numerycznych, wyliczeń, akapitów.
+WAŻNE! Odpowiadaj krótkimi zdaniami w maksymalnej ilości 3 zdań i cała odpowiedź ma mieć maksymalnie 350 znaków.`;
+                
+                console.log('✅ PromptBuilder: Generated custom system prompt');
+                console.log('🔧 PromptBuilder: Custom system prompt content:', systemPrompt.substring(0, 100) + '...');
+            } else {
+                console.log('⚠️ PromptBuilder: Custom avatar missing specialization');
+            }
+        }
+
         // Zamień placeholdery
         systemPrompt = this.replacePlaceholders(systemPrompt, context);
+        console.log('🔧 PromptBuilder: Final system prompt content:', systemPrompt.substring(0, 100) + '...');
 
         return {
             role: 'system',
@@ -145,6 +225,9 @@ class PromptBuilder {
      * Buduje user prompt
      */
     private buildUserPrompt(template: PromptTemplate, context: PromptContext): UserPrompt {
+        console.log(`🔧 PromptBuilder: Building user prompt for template '${template.id}' (${template.intent})`);
+        console.log(`🔧 PromptBuilder: Template content preview: ${template.user_prompt_template.substring(0, 100)}...`);
+        
         let userPrompt = template.user_prompt_template;
 
         // Zamień placeholdery
@@ -152,6 +235,8 @@ class PromptBuilder {
 
         // Dodaj kontekst
         userPrompt = this.addContextToPrompt(userPrompt, context);
+
+        console.log(`🔧 PromptBuilder: Final user prompt preview: ${userPrompt.substring(0, 200)}...`);
 
         return {
             role: 'user',
@@ -290,7 +375,8 @@ class PromptBuilder {
         mindState: MindStateStack,
         ragContext?: string,
         chatHistory?: string,
-        flowContext?: Record<string, any>
+        flowContext?: Record<string, any>,
+        avatarId?: string
     ): Promise<{ systemPrompt: SystemPrompt; userPrompt: UserPrompt }> {
         const context: PromptContext = {
             user_message: userMessage,
@@ -301,7 +387,8 @@ class PromptBuilder {
             current_flow: mindState.current_flow,
             current_flow_step: mindState.current_flow_step,
             rag_context: ragContext,
-            flow_context: flowContext
+            flow_context: flowContext,
+            avatar_id: avatarId // Dodaj avatarId do context
         };
 
         return await this.buildPrompt(context);

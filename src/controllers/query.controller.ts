@@ -11,6 +11,7 @@ import PromptBuilder from '../services/prompt-builder.service';
 import ElevenLabsService from '../services/elevenlabs.service';
 import ConversationLoggerService from '../services/conversation-logger.service';
 import FlowManager from '../services/flow-manager.service';
+import CustomAvatarService from '../services/custom-avatar.service';
 import { v4 as uuidv4 } from 'uuid';
 import { ObjectId } from 'mongodb';
 
@@ -171,7 +172,8 @@ class QueryController {
       if (avatar) {
         avatarName = avatar.firstName + ' ' + avatar.lastName;
         // Create BusinessAvatar based on avatar type
-        businessAvatar = this.createBusinessAvatarByType(avatarType || 'networker');
+        console.log('🔧 QueryController: avatarType from request:', avatarType);
+        businessAvatar = await this.createBusinessAvatarByType(avatarType || 'networker');
       } else {
         console.error('No avatar found for session:', session.avatarId);
         // Stwórz domyślny BusinessAvatar
@@ -188,7 +190,8 @@ class QueryController {
       const avatar = await DatabaseService.getInstance().getAvatarById(session.avatarId);
       if (avatar) {
         avatarName = avatar.firstName + ' ' + avatar.lastName;
-        businessAvatar = this.createBusinessAvatarByType(avatarType || 'networker');
+        console.log('🔧 QueryController: avatarType from request (else branch):', avatarType);
+        businessAvatar = await this.createBusinessAvatarByType(avatarType || 'networker');
       } else {
         console.error('No avatar found for session:', session.avatarId);
         // Stwórz domyślny BusinessAvatar
@@ -213,12 +216,81 @@ class QueryController {
   /**
    * Creates BusinessAvatar based on avatar type
    */
-  private createBusinessAvatarByType(avatarType: string): BusinessAvatar {
+  private async createBusinessAvatarByType(avatarType: string): Promise<BusinessAvatar> {
+    console.log('🔧 QueryController: createBusinessAvatarByType called with:', avatarType);
+    
+    // Check if it's a custom avatar (UUID format: 8-4-4-4-12 characters)
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (avatarType && uuidRegex.test(avatarType)) {
+      console.log('✅ QueryController: Detected UUID format, calling createCustomBusinessAvatar');
+      return await this.createCustomBusinessAvatar(avatarType);
+    }
+    
     if (avatarType === 'trainer') {
+      console.log('✅ QueryController: Creating trainer avatar');
       return this.createTrainerBusinessAvatar();
     } else {
+      console.log('✅ QueryController: Creating networker avatar (default)');
       return this.createNetworkerBusinessAvatar();
     }
+  }
+
+  /**
+   * Creates BusinessAvatar from CustomAvatar
+   */
+  private async createCustomBusinessAvatar(avatarId: string): Promise<BusinessAvatar> {
+    console.log('🔧 QueryController: createCustomBusinessAvatar called with ID:', avatarId);
+    const customAvatarService = CustomAvatarService.getInstance();
+    const customAvatar = await customAvatarService.getCustomAvatarById(avatarId);
+    
+    console.log('🔧 QueryController: Retrieved custom avatar:', customAvatar?.name);
+    
+    if (!customAvatar) {
+      console.warn(`❌ Custom avatar ${avatarId} not found, falling back to networker`);
+      return this.createNetworkerBusinessAvatar();
+    }
+
+    // Convert CustomAvatar to BusinessAvatar
+    const result = {
+      _id: new ObjectId(),
+      firstName: customAvatar.name.split(' ')[0] || customAvatar.name,
+      lastName: customAvatar.name.split(' ').slice(1).join(' ') || '',
+      company: {
+        name: 'Custom Avatar Company',
+        industry: customAvatar.specialization || 'Technology',
+        location: 'Warszawa',
+        size: 'średnia',
+        mission: customAvatar.description,
+        offer: [customAvatar.specialization],
+        use_cases: ['AI Solutions', 'Business Consulting'],
+        strategic_goals: ['Innovation', 'Growth', 'Excellence'],
+        business_needs: ['Technology Partners', 'Clients'],
+        specializations: [customAvatar.specialization]
+      },
+      personality: {
+        style: customAvatar.communication_style || 'Professional',
+        tone: customAvatar.personality || 'Expert and friendly',
+        business_motivation: customAvatar.description || 'Excellence in business',
+        communication_style: customAvatar.communication_style || 'Clear and professional',
+        emotional_traits: customAvatar.personality?.split(', ') || ['Professional', 'Knowledgeable'],
+        strengths: [customAvatar.specialization || 'Business expertise'],
+        weaknesses: ['Perfectionism']
+      },
+      position: 'CEO',
+      experience_years: 10,
+      specializations: [customAvatar.specialization],
+      active_flows: [],
+      // KLUCZOWE: Dodaj custom avatar fields dla PromptBuilder i FlowManager
+      avatar_type: 'custom' as const,
+      id: avatarId, // UUID dla FlowManager
+      name: customAvatar.name,
+      description: customAvatar.description,
+      specialization: customAvatar.specialization,
+      background: customAvatar.background
+    } as any; // Type assertion żeby TypeScript nie narzekał
+    
+    console.log('✅ QueryController: Created BusinessAvatar with avatar_type:', (result as any).avatar_type);
+    return result;
   }
 
   /**
@@ -388,8 +460,16 @@ class QueryController {
       const intentClassifier = IntentClassifier.getInstance();
       const flowManager = FlowManager.getInstance();
       
-      await intentClassifier.loadIntentDefinitionsForAvatar(avatarType);
-      await flowManager.loadFlowDefinitionsForAvatar(avatarType);
+      // Check if it's a custom avatar
+      if (avatarType.length > 10 && avatarType.includes('-')) {
+        // Custom avatar - load custom definitions
+        await intentClassifier.loadCustomIntentsForAvatar(avatarType);
+        await flowManager.loadCustomFlowsForAvatar(avatarType);
+      } else {
+        // Standard avatar
+        await intentClassifier.loadIntentDefinitionsForAvatar(avatarType);
+        await flowManager.loadFlowDefinitionsForAvatar(avatarType);
+      }
     }
 
     // STARY SYSTEM GOALS - WYŁĄCZONY
@@ -403,7 +483,8 @@ class QueryController {
     
     // 1. Klasyfikacja intencji
     const intentClassifier = IntentClassifier.getInstance();
-    let intentResult = await intentClassifier.classifyIntent(userMessage, sessionContext.mindState);
+    const avatarIdForIntent = (avatarType && avatarType.length > 10 && avatarType.includes('-')) ? avatarType : undefined;
+    let intentResult = await intentClassifier.classifyIntent(userMessage, sessionContext.mindState, avatarIdForIntent);
     
     // Specjalna logika: jeśli użytkownik przedstawia ofertę, NPC może wyrazić zainteresowanie
     if (intentResult.intent === 'user_presenting_offer') {
@@ -525,6 +606,13 @@ class QueryController {
     const flowContext = existingFlow?.context || {};
     
     const promptBuilder = PromptBuilder.getInstance();
+    
+    // Sprawdź czy to custom avatar i przekaż jego ID
+    let avatarIdForPrompt: string | undefined;
+    if (avatarType && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(avatarType)) {
+      avatarIdForPrompt = avatarType;
+    }
+    
     const { systemPrompt, userPrompt } = await promptBuilder.buildPromptForIntent(
       intentResult.intent,
       userMessage,
@@ -532,7 +620,8 @@ class QueryController {
       sessionContext.mindState,
       ragContext,
       this.formatChatHistory(sessionContext.chatHistory),
-      flowContext
+      flowContext,
+      avatarIdForPrompt
     );
     
     // 6. Generowanie odpowiedzi

@@ -454,6 +454,11 @@
                 const url = avatarType ? `/api/flows?avatar_type=${avatarType}` : '/api/flows';
                 const response = await fetch(url);
                 return response.json();
+            },
+
+            async getFlowDefinitionsForCustomAvatar(avatarId) {
+                const response = await fetch(`/api/avatar/${avatarId}/flow-definitions`);
+                return response.json();
             }
         };
         
@@ -589,11 +594,27 @@
             const graphRef = React.useRef(null);
             
             useEffect(() => {
-                if (!graphRef.current || !flows.length) return;
+                if (!graphRef.current) return;
                 
-                // Clear previous graph
+                // Clear previous graph first
                 d3.select(graphRef.current).selectAll("*").remove();
                 
+                // If no flows, show empty state
+                if (!flows || !flows.length) {
+                    const svg = d3.select(graphRef.current);
+                    svg.attr("width", 400);
+                    svg.attr("height", 100);
+                    
+                    svg.append("text")
+                        .attr("x", 200)
+                        .attr("y", 50)
+                        .attr("text-anchor", "middle")
+                        .style("fill", "#8b949e")
+                        .style("font-size", "14px")
+                        .text("Brak flows dla tego avatara");
+                    
+                    return;
+                }
                 const svg = d3.select(graphRef.current);
                 const margin = { top: 20, right: 20, bottom: 20, left: 200 };
                 const flowHeight = 80;
@@ -859,6 +880,7 @@
             const [sessionState, setSessionState] = useState(null);
             const [flowDefinitions, setFlowDefinitions] = useState([]);
             const [currentAvatar, setCurrentAvatar] = useState('networker');
+            const [customAvatars, setCustomAvatars] = useState([]);
             
             const fetchSessionState = useCallback(async () => {
                 if (!sessionId) return;
@@ -885,18 +907,69 @@
                 
                 const fetchFlows = async (avatarType) => {
                     try {
-                        const response = await apiService.getFlowDefinitions(avatarType);
-                        if (response.status === 'success') {
-                            setFlowDefinitions(response.flows);
-                            console.log(`✅ Loaded ${response.flows.length} flows for avatar: ${avatarType || 'networker'}`);
+                        console.log('🔧 Dashboard: fetchFlows called with avatarType:', avatarType);
+                        
+                        // Check if it's a custom avatar (UUID format: 8-4-4-4-12 characters)
+                        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+                        if (avatarType && uuidRegex.test(avatarType)) {
+                            console.log('✅ Dashboard: Detected UUID, fetching custom flows');
+                            // Custom avatar - use different endpoint
+                            const response = await apiService.getFlowDefinitionsForCustomAvatar(avatarType);
+                            console.log('🔧 Dashboard: Custom flow response:', response);
+                            console.log('🔧 Dashboard: response.status:', response.status);
+                            console.log('🔧 Dashboard: response.flows:', response.flows);
+                            if (response.status === 'success' && response.flows) {
+                                console.log('✅ Dashboard: Loaded', response.flows.length, 'custom flows');
+                                console.log('🔧 Dashboard: First flow:', response.flows[0]);
+                                console.log('🔧 Dashboard: About to call setFlowDefinitions with:', response.flows);
+                                setFlowDefinitions(response.flows);
+                                console.log('✅ Dashboard: setFlowDefinitions called with custom flows');
+                                
+                                // Force debug - sprawdź czy state się zmienił
+                                setTimeout(() => {
+                                    console.log('🔧 Dashboard: Current flowDefinitions state after 100ms - should be updated now');
+                                }, 100);
+                            } else {
+                                console.log('❌ Dashboard: No custom flows found or error');
+                                setFlowDefinitions([]);
+                            }
+                        } else {
+                            console.log('✅ Dashboard: Standard avatar, fetching standard flows');
+                            // Standard avatar
+                            const response = await apiService.getFlowDefinitions(avatarType);
+                            if (response.status === 'success' && response.flows) {
+                                console.log('✅ Dashboard: Loaded', response.flows.length, 'standard flows');
+                                setFlowDefinitions(response.flows);
+                            }
                         }
                     } catch (err) {
                         console.error('Failed to fetch flow definitions:', err);
+                        setFlowDefinitions([]); // Fallback to empty array
+                    }
+                };
+
+                const fetchCustomAvatars = async () => {
+                    try {
+                        const response = await fetch('/api/avatars');
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.success && Array.isArray(data.data)) {
+                                setCustomAvatars(data.data);
+                            } else {
+                                setCustomAvatars([]);
+                            }
+                        } else {
+                            setCustomAvatars([]);
+                        }
+                    } catch (err) {
+                        console.error('Error fetching custom avatars:', err);
+                        setCustomAvatars([]);
                     }
                 };
                 
                 checkHealth();
                 fetchFlows(currentAvatar);
+                fetchCustomAvatars();
                 const interval = setInterval(checkHealth, 30000);
                 
                 return () => clearInterval(interval);
@@ -934,6 +1007,19 @@
             };
 
             const getAvatarConfig = (avatarType) => {
+                // Check if it's a custom avatar (and customAvatars is loaded)
+                if (customAvatars && Array.isArray(customAvatars)) {
+                    const customAvatar = customAvatars.find(avatar => avatar.id === avatarType);
+                    if (customAvatar) {
+                        return {
+                            name: customAvatar.name,
+                            company: 'Custom Avatar',
+                            expertise: customAvatar.specialization || customAvatar.description
+                        };
+                    }
+                }
+
+                // Standard avatars
                 const avatarConfigs = {
                     networker: {
                         name: 'Anna Kowalczyk',
@@ -968,8 +1054,19 @@
                                     value={currentAvatar}
                                     onChange={(e) => handleAvatarChange(e.target.value)}
                                 >
-                                    <option value="networker">🤝 Networker (Anna Kowalczyk)</option>
-                                    <option value="trainer">🎓 Trener (Prof. Anna Kowalska)</option>
+                                    <optgroup label="🏢 Standard Avatars">
+                                        <option value="networker">🤝 Networker (Anna Kowalczyk)</option>
+                                        <option value="trainer">🎓 Trener (Prof. Anna Kowalska)</option>
+                                    </optgroup>
+                                    {customAvatars && Array.isArray(customAvatars) && customAvatars.length > 0 && (
+                                        <optgroup label="🎭 Custom Avatars">
+                                            {customAvatars.map(avatar => (
+                                                <option key={avatar.id} value={avatar.id}>
+                                                    🎯 {avatar.name} ({avatar.specialization})
+                                                </option>
+                                            ))}
+                                        </optgroup>
+                                    )}
                                 </select>
                             </div>
                         </div>

@@ -214,6 +214,63 @@ class DatabaseService {
     return this.chatHistory!.find({ sessionId }).sort({ timestamp: 'asc' }).toArray();
   }
 
+  // ============ GENERIC COLLECTION METHODS ============
+
+  /**
+   * Generic create method for any collection
+   */
+  public async create<T>(collectionName: string, data: any): Promise<T> {
+    this.assertInitialized();
+    const collection = this.db!.collection(collectionName);
+    const result = await collection.insertOne(data);
+    return { ...data, _id: result.insertedId } as T;
+  }
+
+  /**
+   * Generic findAll method for any collection
+   */
+  public async findAll<T>(collectionName: string): Promise<T[]> {
+    this.assertInitialized();
+    const collection = this.db!.collection(collectionName);
+    const results = await collection.find({}).toArray();
+    return results as T[];
+  }
+
+  /**
+   * Generic findById method for any collection
+   */
+  public async findById<T>(collectionName: string, id: string): Promise<T | null> {
+    this.assertInitialized();
+    const collection = this.db!.collection(collectionName);
+    // Use 'id' field instead of '_id' for custom collections
+    const result = await collection.findOne({ id: id });
+    return result as T | null;
+  }
+
+  /**
+   * Generic update method for any collection
+   */
+  public async update<T>(collectionName: string, id: string, updates: any): Promise<T | null> {
+    this.assertInitialized();
+    const collection = this.db!.collection(collectionName);
+    const result = await collection.findOneAndUpdate(
+      { id: id },
+      { $set: updates },
+      { returnDocument: 'after' }
+    );
+    return result ? (result as T) : null;
+  }
+
+  /**
+   * Generic delete method for any collection
+   */
+  public async delete(collectionName: string, id: string): Promise<boolean> {
+    this.assertInitialized();
+    const collection = this.db!.collection(collectionName);
+    const result = await collection.deleteOne({ id: id });
+    return result.deletedCount > 0;
+  }
+
   private static isObjectId(value: any): value is ObjectId {
     return value instanceof ObjectId;
   }
