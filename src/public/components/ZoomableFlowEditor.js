@@ -127,9 +127,13 @@
             'business_networking': 'conversation_redirect'
         };
 
+        // RAG USAGE INDICATORS (from query.controller.ts)
+        const trainerRagIntents = ['theory_request', 'show_me_how', 'ask_question', 'practice_together', 'test_me', 'summarize_learning', 'what_next'];
+        const networkerRagIntents = ['general_questions', 'solution_presentation'];
+        
         // Get prompt for step
         const getPromptForStep = (step) => {
-            if (!step || !step.id) return { template: null, intent: null, mappedIntent: 'unknown' };
+            if (!step || !step.id) return { template: null, intent: null, mappedIntent: 'unknown', usesRAG: false };
             
             let stepIntent = step.id;
             
@@ -143,10 +147,14 @@
             const intentDefinition = Array.isArray(intentDefinitions) ? 
                 intentDefinitions.find(i => i.name === stepIntent) : null;
             
+            // Determine RAG usage
+            const usesRAG = trainerRagIntents.includes(stepIntent) || networkerRagIntents.includes(stepIntent);
+            
             return {
                 template: promptTemplate,
                 intent: intentDefinition,
-                mappedIntent: stepIntent
+                mappedIntent: stepIntent,
+                usesRAG: usesRAG
             };
         };
 
@@ -225,6 +233,8 @@
                             has_template: !!promptData.template,
                             system_prompt: promptData.template?.system_prompt || '',
                             user_prompt_template: promptData.template?.user_prompt_template || '',
+                            // 🔥 RAG INDICATOR!
+                            usesRAG: promptData.usesRAG || false,
                             conditions: step.conditions || [],
                             memory_operation: step.memory_operation || '',
                             knowledge_source: step.knowledge_source || '',
@@ -327,7 +337,7 @@
             
             // Card Node Type
             cardNode: ({ data, selected }) => {
-                const { step, flow, promptData, isActive } = data;
+                const { step, flow, promptData, isActive, usesRAG } = data;
                 
                 return React.createElement('div', {
                     style: {
@@ -393,11 +403,25 @@
                                 fontSize: '10px', 
                                 display: 'flex', 
                                 alignItems: 'center',
-                                gap: '4px'
+                                gap: '4px',
+                                flexWrap: 'wrap'
                             }
                         }, [
                             React.createElement('span', { key: 'icon' }, data.has_template ? '✅' : '❌'),
-                            React.createElement('span', { key: 'text' }, data.has_template ? 'Template Ready' : 'No Template')
+                            React.createElement('span', { key: 'text' }, data.has_template ? 'Template Ready' : 'No Template'),
+                            // 🔥 RAG INDICATOR!
+                            React.createElement('span', { 
+                                key: 'rag-badge',
+                                style: {
+                                    marginLeft: '8px',
+                                    padding: '2px 4px',
+                                    borderRadius: '3px',
+                                    fontSize: '9px',
+                                    backgroundColor: usesRAG ? '#3b82f6' : '#6b7280',
+                                    color: 'white',
+                                    fontWeight: 'bold'
+                                }
+                            }, usesRAG ? 'RAG🧠' : 'NO-RAG')
                         ]),
                         
                         data.has_template && data.system_prompt && React.createElement('div', {

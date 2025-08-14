@@ -1309,9 +1309,39 @@ class QueryController {
   }
 
   /**
-   * Gets trainer knowledge context from training-avatar-knowledge.json
+   * Gets trainer knowledge context using PROPER EMBEDDINGS (not keyword search!)
    */
   private async getTrainerKnowledgeContext(userMessage: string): Promise<string[]> {
+    try {
+      // 🔥 FIXED: Use proper vector search for trainer!
+      console.log('🧠 [TRAINER RAG] Using vector embeddings search (PROPER!)');
+      
+      // Generate embedding for user query
+      const queryEmbedding = await openaiService.generateEmbeddings(userMessage);
+      
+      // Search in vector database with trainer filter
+      const searchResults = await vectorDatabaseService.queryKnowledgeBase(userMessage);
+      
+      console.log(`[TRAINER RAG] Found ${searchResults.length} relevant chunks via embeddings`);
+      
+      // Fallback to old keyword method ONLY if vector search fails
+      if (searchResults.length === 0) {
+        console.log('⚠️ [TRAINER RAG] Vector search returned no results, falling back to keyword search');
+        return this.getTrainerKnowledgeContextKeyword(userMessage);
+      }
+      
+      return searchResults.slice(0, 3); // Top 3 results
+      
+    } catch (error) {
+      console.error('❌ Error in trainer vector search, falling back to keyword:', error);
+      return this.getTrainerKnowledgeContextKeyword(userMessage);
+    }
+  }
+
+  /**
+   * Fallback keyword method (DEPRECATED - only for emergencies)
+   */
+  private async getTrainerKnowledgeContextKeyword(userMessage: string): Promise<string[]> {
     try {
       const fs = require('fs');
       const path = require('path');
@@ -1327,7 +1357,7 @@ class QueryController {
         const trainerAvatar = knowledgeData.avatars[0]; // Prof. Anna Kowalska
         
         if (trainerAvatar.chunks) {
-          // Simple keyword matching for now (can be improved with embeddings later)
+          // 🚨 DEPRECATED: Simple keyword matching (lamerski approach!)
           const queryLower = userMessage.toLowerCase();
           
           for (const chunk of trainerAvatar.chunks) {
@@ -1345,7 +1375,7 @@ class QueryController {
         }
       }
       
-      console.log(`[TRAINER KB] Found ${contextChunks.length} relevant chunks`);
+      console.log(`[TRAINER KB FALLBACK] Found ${contextChunks.length} relevant chunks via keywords`);
       return contextChunks.slice(0, 3); // Limit to top 3 chunks
       
     } catch (error) {
