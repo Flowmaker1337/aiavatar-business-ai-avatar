@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import FlowManager from '../services/flow-manager.service';
+import fs from 'fs';
+import path from 'path';
 
 class FlowController {
   /**
@@ -69,6 +71,54 @@ class FlowController {
       res.status(500).json({
         status: 'error',
         message: 'Failed to get flow definitions for custom avatar',
+        error: error.message
+      });
+    }
+  }
+
+  /**
+   * Gets all prompt templates
+   */
+  public async getPromptTemplates(req: Request, res: Response): Promise<void> {
+    try {
+      const filePath = path.resolve(__dirname, '../config/prompt-templates.json');
+      const rawData = fs.readFileSync(filePath, 'utf-8');
+      const data = JSON.parse(rawData);
+      
+      res.status(200).json({
+        status: 'success',
+        count: data.templates?.length || 0,
+        templates: data.templates || []
+      });
+    } catch (error: any) {
+      console.error('❌ Error getting prompt templates:', error);
+      res.status(500).json({
+        status: 'error',
+        message: 'Failed to get prompt templates',
+        error: error.message
+      });
+    }
+  }
+
+  /**
+   * Gets all intent definitions
+   */
+  public async getIntentDefinitions(req: Request, res: Response): Promise<void> {
+    try {
+      const filePath = path.resolve(__dirname, '../config/intent-definitions.json');
+      const rawData = fs.readFileSync(filePath, 'utf-8');
+      const data = JSON.parse(rawData);
+      
+      res.status(200).json({
+        status: 'success',
+        count: data.intents?.length || 0,
+        intents: data.intents || []
+      });
+    } catch (error: any) {
+      console.error('❌ Error getting intent definitions:', error);
+      res.status(500).json({
+        status: 'error',
+        message: 'Failed to get intent definitions',
         error: error.message
       });
     }

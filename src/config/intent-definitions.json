@@ -212,6 +212,98 @@
       "requires_flow": false,
       "repeatable": true,
       "priority": 7
+    },
+    {
+      "name": "evaluate_fit",
+      "description": "Ocena dopasowania oferty użytkownika do potrzeb NPC",
+      "keywords": ["ocena", "dopasowanie", "pasuje", "odpowiada", "analiza"],
+      "examples": [
+        "Jak to pasuje do naszych potrzeb?",
+        "Czy to odpowiada naszym wymaganiom?",
+        "Muszę ocenić dopasowanie"
+      ],
+      "requires_flow": false,
+      "repeatable": true,
+      "priority": 8
+    },
+    {
+      "name": "discuss_terms",
+      "description": "Omówienie warunków współpracy i kontraktu",
+      "keywords": ["warunki", "cennik", "kontrakt", "płatność", "terminy"],
+      "examples": [
+        "Jakie są warunki współpracy?",
+        "Omówmy szczegóły kontraktu",
+        "Ile to kosztuje?"
+      ],
+      "requires_flow": false,
+      "repeatable": true,
+      "priority": 8
+    },
+    {
+      "name": "purchase_decision",
+      "description": "Podjęcie decyzji o zakupie lub współpracy",
+      "keywords": ["decyzja", "kupujemy", "zamówienie", "współpraca", "zgoda"],
+      "examples": [
+        "Podejmujemy decyzję o zakupie",
+        "Chcemy to kupić",
+        "Zgadzamy się na współpracę"
+      ],
+      "requires_flow": false,
+      "repeatable": true,
+      "priority": 8
+    },
+    {
+      "name": "meeting_arrangement",
+      "description": "Prośba o kontakt z zespołem lub umówienie spotkania",
+      "keywords": ["spotkanie", "umówmy", "zespół", "kontakt", "spotkajmy"],
+      "examples": [
+        "Umówmy spotkanie z zespołem",
+        "Chciałbym się skontaktować",
+        "Może spotkajmy się?"
+      ],
+      "requires_flow": true,
+      "flow_name": "conversation_redirect_flow",
+      "repeatable": true,
+      "priority": 8
+    },
+    {
+      "name": "meeting_confirmation",
+      "description": "Potwierdzenie otrzymania kontaktu i następnych kroków",
+      "keywords": ["potwierdzam", "otrzymałem", "skontaktujemy", "zespół"],
+      "examples": [
+        "Potwierdzam otrzymanie emaila",
+        "Zespół się skontaktuje",
+        "Dziękuję za kontakt"
+      ],
+      "requires_flow": false,
+      "repeatable": true,
+      "priority": 8
+    },
+    {
+      "name": "express_interest",
+      "description": "Wyrażenie zainteresowania ofertą użytkownika",
+      "keywords": ["zainteresowani", "ciekawe", "mogłoby pomóc", "przydatne"],
+      "examples": [
+        "To brzmi interesująco",
+        "Jesteśmy zainteresowani",
+        "Mogłoby nam to pomóc"
+      ],
+      "requires_flow": false,
+      "repeatable": true,
+      "priority": 8
+    },
+    {
+      "name": "ask_about_offer",
+      "description": "Pytania o szczegóły oferty użytkownika",
+      "keywords": ["jak działa", "szczegóły", "więcej informacji", "opowiedz"],
+      "examples": [
+        "Jak to działa?",
+        "Opowiedz więcej o ofercie",
+        "Jakie są szczegóły?"
+      ],
+      "requires_flow": false,
+      "repeatable": true,
+      "priority": 8
     }
   ]
 } 

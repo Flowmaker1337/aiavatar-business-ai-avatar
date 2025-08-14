@@ -43,6 +43,7 @@
     "mongodb": "^6.16.0",
     "openai": "^4.96.0",
     "pinecone-client": "^2.0.0",
+    "reactflow": "^11.11.4",
     "redis": "^4.7.0",
     "tiktoken": "^1.0.13",
     "uuid": "^11.1.0"

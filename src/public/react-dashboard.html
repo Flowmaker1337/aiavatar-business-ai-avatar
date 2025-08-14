@@ -9,6 +9,24 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/d3@7/dist/d3.min.js"></script>
     <script src="https://unpkg.com/dagre-d3@0.6.4/dist/dagre-d3.min.js"></script>
+    <!-- ReactFlow CDN -->
+    <script src="https://unpkg.com/reactflow@11.11.4/dist/umd/index.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/reactflow@11.11.4/dist/style.css">
+    <script>
+        console.log('🔍 ReactFlow CDN loaded:', !!window.ReactFlow);
+        if (window.ReactFlow) {
+            console.log('🔍 ReactFlow exports:', Object.keys(window.ReactFlow));
+            console.log('🔍 MarkerType available:', !!window.ReactFlow.MarkerType);
+            console.log('🔍 useNodesState available:', !!window.ReactFlow.useNodesState);
+            console.log('🔍 useEdgesState available:', !!window.ReactFlow.useEdgesState);
+        }
+    </script>
+    <!-- FlowGraphEditor Component -->
+    <script src="components/FlowGraphEditor.js?v=1737284400"></script>
+    <!-- FlowCardEditor Component - NOWY CARD LAYOUT -->
+    <script src="components/FlowCardEditor.js?v=1737284500"></script>
+    <!-- ZoomableFlowEditor Component - ZOOMABLE REACTFLOW + CARD NODES -->
+    <script src="components/ZoomableFlowEditor.js?v=1737284600"></script>
     <style>
         * {
             margin: 0;
@@ -35,8 +53,9 @@
 
         .header h1 {
             color: #58a6ff;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-weight: 600;
+            margin: 0;
         }
 
         .header-controls {
@@ -65,8 +84,12 @@
             color: #e6edf3;
             font-size: 0.875rem;
             min-width: 220px;
+            max-width: 300px;
             cursor: pointer;
             transition: all 0.2s ease;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .avatar-dropdown:hover {
@@ -80,11 +103,94 @@
             box-shadow: 0 0 0 2px rgba(88,166,255,0.2);
         }
 
+        .avatar-dropdown option {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 280px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #7d8590;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .nav-link:hover {
+            color: #58a6ff;
+            background-color: #21262d;
+        }
+
+        .nav-link.active {
+            color: #58a6ff;
+            background-color: #21262d;
+            border: 1px solid #30363d;
+        }
+
+        .mindstate-horizontal {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 12px;
+            height: 120px;
+            overflow: hidden;
+        }
+
+        .mindstate-horizontal .panel-title {
+            color: #e6edf3;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+        }
+
+        .mindstate-items-horizontal {
+            display: flex;
+            gap: 16px;
+            height: 80px;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+
+        .mindstate-item-horizontal {
+            flex: 0 0 200px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            padding: 8px;
+            font-size: 0.75rem;
+        }
+
+        .mindstate-item-horizontal .intent-name {
+            color: #58a6ff;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .mindstate-item-horizontal .confidence {
+            color: #7d8590;
+        }
+
+        .mindstate-item-horizontal .timestamp {
+            color: #6e7681;
+            font-size: 0.7rem;
+        }
+
         .main-content {
             display: grid;
-            grid-template-columns: 350px 1fr 300px;
+            grid-template-columns: 1fr 2fr;
             grid-template-rows: 1fr 200px;
-            height: calc(100vh - 80px);
+            height: calc(100vh - 80px - 120px - 24px);
             gap: 12px;
             padding: 12px;
         }
@@ -132,14 +238,12 @@
         }
         
         .chat-panel {
+            grid-column: 1 / 2;
             grid-row: 1 / 2;
         }
         
         .flow-panel {
-            grid-row: 1 / 2;
-        }
-        
-        .mindstate-panel {
+            grid-column: 2 / 3;
             grid-row: 1 / 2;
         }
         
@@ -237,12 +341,15 @@
             justify-content: flex-start;
             align-items: flex-start;
             min-height: 600px;
+            width: 100%;
             padding: 10px;
         }
         
         .flow-graph svg {
             background: #0d1117;
             border-radius: 6px;
+            width: 100%;
+            min-width: 800px;
         }
         
         /* Flow Graph Node Styles */
@@ -291,6 +398,149 @@
             fill: #f0f6fc;
             font-size: 11px;
             font-weight: 500;
+        }
+
+        /* ReactFlow Node Styles */
+        .flow-node {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .flow-node:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3) !important;
+        }
+
+        .flow-node.selected {
+            box-shadow: 0 0 0 2px #fff, 0 0 0 4px #3b82f6 !important;
+        }
+
+        .flow-node-start {
+            background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+        }
+
+        .flow-node-intent {
+            background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+        }
+
+        .flow-node-response {
+            background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+        }
+
+        .flow-node-condition {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important;
+        }
+
+        .flow-node-memory {
+            background: linear-gradient(135deg, #ec4899, #db2777) !important;
+        }
+
+        .flow-node-knowledge {
+            background: linear-gradient(135deg, #eab308, #ca8a04) !important;
+        }
+
+        .flow-node-end {
+            background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+        }
+
+        /* Active step highlighting */
+        .active-step {
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.4) !important;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+            }
+        }
+
+        /* ReactFlow container styling */
+        .react-flow__background {
+            background-color: #0d1117 !important;
+        }
+
+        /* ReactFlow Edge Styles - ENHANCED */
+        .react-flow__edge-path {
+            stroke: #ffffff !important;
+            stroke-width: 4px !important;
+            opacity: 1 !important;
+            fill: none !important;
+        }
+
+        .react-flow__edge.animated .react-flow__edge-path {
+            stroke: #22c55e !important;
+            stroke-width: 5px !important;
+            opacity: 1 !important;
+        }
+
+        .react-flow__edge-path:hover {
+            stroke: #3b82f6 !important;
+            stroke-width: 5px !important;
+            opacity: 1 !important;
+        }
+
+        /* Force all SVG edges to be visible - AGGRESSIVE */
+        .react-flow__edges path,
+        .react-flow__edges .react-flow__edge-path,
+        .react-flow__edge path,
+        .react-flow__edge .react-flow__edge-path,
+        svg path[stroke-width] {
+            stroke: #ffffff !important;
+            stroke-width: 4px !important;
+            opacity: 1 !important;
+            fill: none !important;
+            display: block !important;
+            visibility: visible !important;
+        }
+
+        /* Arrow markers - AGGRESSIVE */
+        .react-flow__arrowhead,
+        marker path,
+        svg marker path {
+            fill: #ffffff !important;
+            stroke: #ffffff !important;
+            opacity: 1 !important;
+            display: block !important;
+            visibility: visible !important;
+        }
+
+        /* Fix edges overlay - MINIMAL CHANGES */
+        .react-flow__edges,
+        .react-flow__edges svg,
+        svg.react-flow__edges {
+            opacity: 1 !important;
+            display: block !important;
+            visibility: visible !important;
+            pointer-events: none !important;  /* Don't block clicks */
+        }
+
+        /* Fix black overlay issues */
+        .react-flow__selection,
+        .react-flow__selectionpane,
+        .react-flow__pane {
+            background: transparent !important;
+            background-color: transparent !important;
+        }
+
+        /* Remove any black rectangles */
+        .react-flow rect[fill="#000000"],
+        .react-flow rect[fill="black"],
+        rect[fill="#000000"],
+        rect[fill="black"] {
+            display: none !important;
+            visibility: hidden !important;
+        }
+
+        /* Keep nodes clickable */
+        .react-flow__node {
+            pointer-events: auto !important;
         }
         
         .flow-graph .type-active text,
@@ -592,6 +842,7 @@
         // Flow Graph Component
         const FlowGraph = ({ sessionId, flows, activeFlow }) => {
             const graphRef = React.useRef(null);
+            const [useReactFlow, setUseReactFlow] = React.useState(true); // ReactFlow nodes + card layout!
             
             useEffect(() => {
                 if (!graphRef.current) return;
@@ -602,7 +853,8 @@
                 // If no flows, show empty state
                 if (!flows || !flows.length) {
                     const svg = d3.select(graphRef.current);
-                    svg.attr("width", 400);
+                    const containerWidth = graphRef.current.parentElement.clientWidth - 20;
+                    svg.attr("width", Math.max(400, containerWidth));
                     svg.attr("height", 100);
                     
                     svg.append("text")
@@ -625,8 +877,12 @@
                 
                 // Calculate dimensions
                 const maxSteps = Math.max(...flows.map(f => f.steps.length));
-                const svgWidth = margin.left + margin.right + (maxSteps * (stepWidth + stepSpacing));
+                const minSvgWidth = margin.left + margin.right + (maxSteps * (stepWidth + stepSpacing));
                 const svgHeight = margin.top + margin.bottom + (flows.length * (flowHeight + flowSpacing));
+                
+                // Use container width or minimum width, whichever is larger
+                const containerWidth = graphRef.current.parentElement.clientWidth - 20; // minus padding
+                const svgWidth = Math.max(minSvgWidth, containerWidth);
                 
                 svg.attr("width", svgWidth);
                 svg.attr("height", svgHeight);
@@ -782,11 +1038,37 @@
                         <h3 className="panel-title">Flow Overview</h3>
                         <div className="status-badge status-online">
                             {flows.length} Flows
+                            <button 
+                                onClick={() => setUseReactFlow(!useReactFlow)}
+                                style={{
+                                    marginLeft: '10px',
+                                    padding: '4px 8px',
+                                    fontSize: '10px',
+                                    backgroundColor: useReactFlow ? '#22c55e' : '#64748b',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                {useReactFlow ? 'Zoomable Cards' : 'D3.js'}
+                            </button>
                         </div>
                     </div>
                     
                     <div className="flow-graph">
-                        <svg ref={graphRef}></svg>
+                        {useReactFlow && window.ZoomableFlowEditor ? (
+                            React.createElement(window.ZoomableFlowEditor, {
+                                flowDefinitions: flows,
+                                activeFlow: activeFlow,
+                                onNodeClick: (node) => {
+                                    console.log('🎯 Node clicked:', node);
+                                },
+                                editable: true // Enable editing mode for testing
+                            })
+                        ) : (
+                            <svg ref={graphRef}></svg>
+                        )}
                     </div>
                     
                     <div style={{ padding: '16px', fontSize: '12px', color: '#8b949e' }}>
@@ -794,33 +1076,31 @@
                         <div><strong>Current Step:</strong> {activeFlow?.current_step || 'Brak aktywnego kroku'}</div>
                         <div><strong>Flow Progress:</strong> {activeFlow?.completed_steps?.length || 0}/{currentFlow?.steps?.length || 0} kroków</div>
                         <div><strong>Flow Status:</strong> {activeFlow?.status || 'Nieaktywny'}</div>
+                        <div><strong>Graph Engine:</strong> {useReactFlow ? 'ReactFlow Professional' : 'D3.js Legacy'}</div>
                     </div>
                 </div>
             );
         };
         
-        // MindState Panel Component
-        const MindStatePanel = ({ sessionId, mindState }) => {
+        // MindState Horizontal Component
+        const MindStateHorizontal = ({ sessionId, mindState }) => {
             return (
-                <div className="panel mindstate-panel">
-                    <div className="panel-header">
-                        <h3 className="panel-title">MindState Monitor</h3>
-                        <div className="status-badge status-online">Tracking</div>
-                    </div>
-                    
-                    <div className="mindstate-list">
+                <div className="mindstate-horizontal">
+                    <h3 className="panel-title">🧠 MindState Monitor</h3>
+                    <div className="mindstate-items-horizontal">
                         {!mindState || !mindState.stack ? (
-                            <div className="loading">
-                                <div className="spinner"></div>
-                                Oczekiwanie na sesję...
+                            <div className="mindstate-item-horizontal">
+                                <div className="intent-name">Oczekiwanie...</div>
+                                <div className="confidence">Brak aktywnej sesji</div>
                             </div>
                         ) : (
-                            mindState.stack.map((item, index) => (
-                                <div key={index} className={`mindstate-item ${mindState.fulfilled_intents[item.intent]?.fulfilled ? 'fulfilled' : ''}`}>
-                                    <div className="mindstate-intent">{item.intent}</div>
-                                    <div className="mindstate-meta">
-                                        Confidence: {(item.confidence * 100).toFixed(1)}% | 
-                                        {mindState.fulfilled_intents[item.intent]?.fulfilled ? ' Fulfilled' : ' Active'} | 
+                            mindState.stack.slice(-5).map((item, index) => (
+                                <div key={index} className="mindstate-item-horizontal">
+                                    <div className="intent-name">{item.intent}</div>
+                                    <div className="confidence">
+                                        {(item.confidence * 100).toFixed(1)}%
+                                    </div>
+                                    <div className="timestamp">
                                         {new Date(item.timestamp).toLocaleTimeString()}
                                     </div>
                                 </div>
@@ -1040,10 +1320,11 @@
             return (
                 <div>
                     <header className="header">
-                        <h1>🤖 AI Avatar Business Dashboard</h1>
-                        <nav className="nav-links" style={{ display: 'flex', gap: '1rem' }}>
-                            <a href="/react-dashboard.html" className="nav-link active" style={{ color: '#58a6ff', textDecoration: 'none', padding: '0.5rem 1rem', borderRadius: '6px', backgroundColor: '#21262d' }}>Dashboard</a>
-                            <a href="/simulation-dashboard.html" className="nav-link" style={{ color: '#7d8590', textDecoration: 'none', padding: '0.5rem 1rem', borderRadius: '6px', transition: 'color 0.2s, background-color 0.2s' }}>🧪 Symulacja</a>
+                        <h1>AI Avatar</h1>
+                        <nav className="nav-links">
+                            <a href="/react-dashboard.html" className="nav-link active">📊 Dashboard</a>
+                            <a href="/simulation-dashboard.html" className="nav-link">🧪 Symulacja</a>
+                            <a href="/avatar-flow-creator.html" className="nav-link">🎨 Creator</a>
                         </nav>
                         <div className="header-controls">
                             <div className="avatar-selector">
@@ -1062,7 +1343,7 @@
                                         <optgroup label="🎭 Custom Avatars">
                                             {customAvatars.map(avatar => (
                                                 <option key={avatar.id} value={avatar.id}>
-                                                    🎯 {avatar.name} ({avatar.specialization})
+                                                    🎯 {avatar.name}
                                                 </option>
                                             ))}
                                         </optgroup>
@@ -1071,6 +1352,10 @@
                             </div>
                         </div>
                     </header>
+                    <MindStateHorizontal 
+                        sessionId={sessionId} 
+                        mindState={sessionState?.mindState}
+                    />
                     <div className="main-content">
                         <ChatPanel 
                             sessionId={sessionId} 
@@ -1083,11 +1368,6 @@
                             flows={flowDefinitions}
                             activeFlow={sessionState?.activeFlow}
                             avatarType={currentAvatar}
-                        />
-                        <MindStatePanel 
-                            sessionId={sessionId} 
-                            mindState={sessionState?.mindState}
-                            avatarConfig={avatarConfig}
                         />
                         <DebugPanel />
                     </div>

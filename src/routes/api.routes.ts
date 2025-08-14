@@ -47,6 +47,12 @@ router.get('/state/:sessionId', sessionController.getSessionState.bind(sessionCo
 // Endpoint for getting all flow definitions
 router.get('/flows', flowController.getFlowDefinitions.bind(flowController));
 
+// Endpoint for getting prompt templates
+router.get('/prompt-templates', flowController.getPromptTemplates.bind(flowController));
+
+// Endpoint for getting intent definitions
+router.get('/intent-definitions', flowController.getIntentDefinitions.bind(flowController));
+
 // ============ TEXT-TO-SPEECH ENDPOINTS ============
 
 // Endpoint for checking TTS service health
