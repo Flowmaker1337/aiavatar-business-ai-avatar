@@ -10,146 +10,97 @@
         const [intentDefinitions, setIntentDefinitions] = React.useState([]);
 
         React.useEffect(() => {
-            // Load templates
-            fetch('/api/prompt-templates')
-                .then(response => response.json())
-                .then(data => {
-                    console.log('🔧 ZoomableFlowEditor: Raw prompt templates response:', data);
-                    const templates = Array.isArray(data) ? data : (data?.templates || []);
-                    console.log('🔧 ZoomableFlowEditor: Loaded prompt templates:', templates.length);
-                    setPromptTemplates(templates);
-                })
-                .catch(error => {
-                    console.error('Failed to load prompt templates:', error);
-                    setPromptTemplates([]);
-                });
-
-            // Load intent definitions
-            fetch('/api/intent-definitions')
-                .then(response => response.json())
-                .then(data => {
-                    console.log('🔧 ZoomableFlowEditor: Raw intent definitions response:', data);
-                    const definitions = Array.isArray(data) ? data : (data?.definitions || []);
-                    console.log('🔧 ZoomableFlowEditor: Loaded intent definitions:', definitions.length);
-                    setIntentDefinitions(definitions);
-                })
-                .catch(error => {
-                    console.error('Failed to load intent definitions:', error);
-                    setIntentDefinitions([]);
-                });
+            Promise.all([
+                fetch('/api/prompt-templates').then(res => res.json()),
+                fetch('/api/intent-definitions').then(res => res.json())
+            ]).then(([templatesResponse, intentsResponse]) => {
+                console.log('📥 API Response - Templates:', templatesResponse);
+                console.log('📥 API Response - Intents:', intentsResponse);
+                setPromptTemplates(templatesResponse.templates || templatesResponse);
+                setIntentDefinitions(intentsResponse.intents || intentsResponse);
+            }).catch(error => {
+                console.error('❌ Error fetching templates or intents:', error);
+            });
         }, []);
 
-        // Smart mapping for step IDs to intents (same as FlowCardEditor)
-        const stepToIntentMap = {
-            // Business Flow mappings
-            'initial_greeting': 'greeting',
-            'company_introduction': 'ask_about_npc_firm',
-            'conversation_opener': 'greeting',
-            'company_overview': 'ask_about_npc_firm',
-            'services_presentation': 'solution_presentation',
-            'value_proposition': 'solution_presentation',
-            'examples_cases': 'solution_presentation',
-            'user_background': 'user_firm_info',
-            'business_challenges': 'user_needs',
-            'goals_expectations': 'user_expectations',
-            'deep_questions': 'user_questions',
-            'solution_overview': 'solution_presentation',
-            'detailed_proposal': 'solution_presentation',
-            'implementation_plan': 'solution_presentation',
-            'acknowledge_redirect': 'conversation_redirect',
-            'contact_collection': 'conversation_redirect',
-            'next_steps': 'conversation_redirect',
-            'basic_company_info': 'user_firm_info',
-            'business_model': 'user_firm_info',
-            'target_market': 'user_firm_info',
-            'current_challenges': 'user_needs',
-            'pain_points': 'user_needs',
-            'impact_assessment': 'user_needs',
-            'solution_attempts': 'user_needs',
-            'success_metrics': 'user_expectations',
-            'cooperation_style': 'user_expectations',
-            'timeline_expectations': 'user_expectations',
-            'communication_preferences': 'user_expectations',
-            'success_criteria': 'user_expectations',
-            'context_clarification': 'user_questions',
-            'next_steps_proposal': 'conversation_redirect',
-            'deep_dive': 'user_questions',
-            'implications': 'user_expectations',
-            'action_items': 'conversation_redirect',
-
-            // Training Flow mappings
-            'concept_introduction': 'explain_concept',
-            'detailed_explanation': 'explain_concept',
-            'key_principles': 'theory_request',
-            'theory_summary': 'summarize',
-            'practice_design': 'show_me_how',
-            'task_assignment': 'practice_alone',
-            'guidance_provision': 'guide_me',
-            'question_identification': 'ask_question',
-            'understanding_check': 'check_understanding',
-            'clarification_request': 'clarify',
-            'exercise_creation': 'exercise',
-            'solo_practice_setup': 'practice_alone',
-            'self_attempt_support': 'try_myself',
-            'knowledge_testing': 'test_me',
-            'knowledge_verification': 'check_knowledge',
-            'competency_assessment': 'assessment',
-            'content_summarization': 'summarize',
-            'learning_reflection': 'reflect',
-            'achievement_review': 'what_learned',
-            'progression_planning': 'what_next',
-            'learning_continuation': 'continue_learning',
-            'topic_transition': 'next_topic',
-            'answer_formulation': 'ask_question',
-            'assessment_preparation': 'assessment',
-            'comprehension_check': 'check_understanding',
-            'content_recap': 'summarize',
-            'feedback_delivery': 'assessment',
-            'feedback_loop': 'check_understanding',
-            'key_insights': 'reflect',
-            'knowledge_retrieval': 'ask_question',
-            'practice_completion': 'practice_together',
-            'practice_setup': 'practice_together',
-            'progress_monitoring': 'assessment',
-            'question_identification': 'ask_question',
-            'reflection_questions': 'reflect',
-            'resource_provision': 'continue_learning',
-            'result_analysis': 'assessment',
-            'result_evaluation': 'check_knowledge',
-            'step_by_step_guidance': 'guide_me',
-            'path_recommendation': 'next_topic',
-            'resource_recommendation': 'next_topic',
-
-            // Custom Avatar mappings
-            'strategic_greeting': 'greeting',
-            'vision_sharing': 'solution_presentation',
-            'leadership_guidance': 'user_expectations',
-            'business_networking': 'conversation_redirect'
-        };
-
-        // RAG USAGE INDICATORS (from query.controller.ts)
+        // Hardcoded list of intents that use RAG for each avatar type
         const trainerRagIntents = ['theory_request', 'show_me_how', 'ask_question', 'practice_together', 'test_me', 'summarize_learning', 'what_next'];
         const networkerRagIntents = ['general_questions', 'solution_presentation'];
-        
-        // Get prompt for step
-        const getPromptForStep = (step) => {
-            if (!step || !step.id) return { template: null, intent: null, mappedIntent: 'unknown', usesRAG: false };
+
+        // Get prompt template and intent definition for a flow step
+        const getPromptForStep = (step, flow) => {
+            console.log('🔍 [getPromptForStep] Looking for step:', step, 'in flow:', flow.name);
             
-            let stepIntent = step.id;
+            if (!promptTemplates.length || !intentDefinitions.length) {
+                console.log('⚠️ Templates or intents not loaded yet');
+                return { template: null, intent: null, mappedIntent: 'loading...', usesRAG: false };
+            }
+
+            // Smart mapping: Use flow entry_intents to determine RAG usage
+            let stepIntent = step.intent_name;
+            let flowUsesRAG = false;
             
-            // Use smart mapping
-            if (stepToIntentMap[step.id]) {
-                stepIntent = stepToIntentMap[step.id];
+            // Check if flow entry_intents include RAG intents
+            if (flow.entry_intents && flow.entry_intents.length > 0) {
+                flowUsesRAG = flow.entry_intents.some(intent => 
+                    trainerRagIntents.includes(intent) || networkerRagIntents.includes(intent)
+                );
+                // Use first entry_intent as primary intent for templates
+                stepIntent = stepIntent || flow.entry_intents[0];
+                console.log(`🎯 [FLOW RAG] ${flow.name} → entry_intents: ${flow.entry_intents.join(', ')} → RAG: ${flowUsesRAG}`);
             }
             
-            const promptTemplate = Array.isArray(promptTemplates) ? 
-                promptTemplates.find(t => t.intent === stepIntent) : null;
-            const intentDefinition = Array.isArray(intentDefinitions) ? 
-                intentDefinitions.find(i => i.name === stepIntent) : null;
+            if (!stepIntent) {
+                // Fallback mapping based on step.id patterns
+                const stepId = step.id;
+                if (stepId.includes('greeting')) stepIntent = 'greeting';
+                else if (stepId.includes('company_questions') || stepId.includes('general')) stepIntent = 'general_questions';
+                else if (stepId.includes('solution_presentation') || stepId.includes('solution')) stepIntent = 'solution_presentation';
+                else if (stepId.includes('expectation_management')) stepIntent = 'user_expectations';
+                else if (stepId.includes('conversation_redirect')) stepIntent = 'conversation_redirect';
+                else if (stepId.includes('offer_assessment')) stepIntent = 'offer_assessment';
+                else if (stepId.includes('cooperation_closing')) stepIntent = 'cooperation_closing';
+                else if (stepId.includes('offer_questions')) stepIntent = 'offer_questions';
+                else if (stepId.includes('cooperation_decision')) stepIntent = 'cooperation_decision';
+                else if (stepId.includes('interest_in_user_offer')) stepIntent = 'interest_in_user_offer';
+                // Training-specific mappings
+                else if (stepId.includes('theory') || stepId.includes('concept')) stepIntent = 'theory_request';
+                else if (stepId.includes('show') || stepId.includes('example')) stepIntent = 'show_me_how';
+                else if (stepId.includes('question')) stepIntent = 'ask_question';
+                else if (stepId.includes('practice')) stepIntent = 'practice_together';
+                else if (stepId.includes('test')) stepIntent = 'test_me';
+                else if (stepId.includes('summary')) stepIntent = 'summarize_learning';
+                else if (stepId.includes('next')) stepIntent = 'what_next';
+                else stepIntent = stepId; // fallback to step.id
+                
+                console.log(`🎯 [STEP MAPPING] ${stepId} → ${stepIntent}`);
+            }
+
+            // Try exact match first, then with _template suffix
+            let promptTemplate = promptTemplates.find(t => t.id === stepIntent);
+            if (!promptTemplate) {
+                promptTemplate = promptTemplates.find(t => t.id === `${stepIntent}_template`);
+            }
             
-            // Determine RAG usage
-            const usesRAG = trainerRagIntents.includes(stepIntent) || networkerRagIntents.includes(stepIntent);
+            // For intent definitions, try both with and without suffix
+            let intentDefinition = intentDefinitions.find(i => i.id === stepIntent);
+            if (!intentDefinition) {
+                intentDefinition = intentDefinitions.find(i => i.name === stepIntent);
+            }
             
+            // Use flow-level RAG detection or intent-level fallback
+            const usesRAG = flowUsesRAG || trainerRagIntents.includes(stepIntent) || networkerRagIntents.includes(stepIntent);
+
+            console.log('📝 [getPromptForStep] Found:', { 
+                stepIntent, 
+                hasTemplate: !!promptTemplate, 
+                templateId: promptTemplate?.id || 'none',
+                hasIntent: !!intentDefinition,
+                intentId: intentDefinition?.id || intentDefinition?.name || 'none',
+                flowUsesRAG: flowUsesRAG,
+                usesRAG: usesRAG
+            });
+
             return {
                 template: promptTemplate,
                 intent: intentDefinition,
@@ -158,31 +109,32 @@
             };
         };
 
-        // Create ReactFlow nodes from flow definitions
+        // Handle node click
+        const handleNodeClick = React.useCallback((event, node) => {
+            console.log('🎯 Node clicked:', node);
+            setSelectedNode(node.data);
+            setShowNodeDialog(true);
+            if (onNodeClick) onNodeClick(node.data);
+        }, [onNodeClick]);
+
+        // Generate nodes for ReactFlow
         React.useEffect(() => {
-            if (!flowDefinitions || flowDefinitions.length === 0) {
+            if (!flowDefinitions.length) {
+                console.log('⚠️ No flow definitions available');
                 setNodes([]);
-                setEdges([]);
                 return;
             }
 
-            console.log('🔧 ZoomableFlowEditor: Creating nodes for', flowDefinitions.length, 'flows');
+            console.log('🔥 [ZoomableFlowEditor] Processing flows:', flowDefinitions.length);
 
             const flowNodes = [];
-            let yOffset = 0;
+            let yOffset = 20;
 
             flowDefinitions.forEach((flow, flowIndex) => {
-                console.log(`🔧 Processing flow: ${flow.name} (${(flow.steps || []).length} steps)`);
-                
-                // Calculate flow width based on steps
-                const stepsPerRow = Math.min((flow.steps || []).length, 5); // 5 steps per row for unified canvas
-                const nodeWidth = 300;
-                const nodeSpacing = 30;
                 const isActiveFlow = activeFlow === flow.id;
                 
-                // Add flow header spacing
-                if (flowIndex > 0) yOffset += 120; // Gap between flows
-                
+                console.log(`📋 Processing flow: ${flow.name} (${flow.id}) - Active: ${isActiveFlow}`);
+
                 // CREATE FLOW HEADER NODE
                 const flowHeaderNode = {
                     id: `flow-header-${flow.id}`,
@@ -199,31 +151,28 @@
                     selectable: false
                 };
                 flowNodes.push(flowHeaderNode);
-                
-                // Add spacing after header
-                yOffset += 80;
-                
-                (flow.steps || []).forEach((step, stepIndex) => {
-                    const promptData = getPromptForStep(step);
-                    const isActive = activeFlow === flow.id && step.id === activeFlow;
-                    
-                    // Calculate position in unified canvas
-                    const col = stepIndex % stepsPerRow;
-                    const row = Math.floor(stepIndex / stepsPerRow);
-                    const x = col * (nodeWidth + nodeSpacing) + 50; // 50px left margin
-                    const y = yOffset + (row * 280) + 50; // Flow-specific Y offset + row spacing
-                    
+                yOffset += 80; // Add spacing after header
+
+                // CREATE STEP NODES
+                const steps = flow.steps || [];
+                let xOffset = 20;
+
+                steps.forEach((step, stepIndex) => {
+                    const promptData = getPromptForStep(step, flow); // Pass flow object
+                    const nodeId = `${flow.id}-${step.id}`;
+
                     const node = {
-                        id: `${flow.id}-${step.id}`,
-                        type: 'cardNode', // Custom node type
-                        position: { x, y },
+                        id: nodeId,
+                        type: 'cardNode',
+                        position: { x: xOffset, y: yOffset },
                         data: {
-                            // Step data
                             step: step,
                             flow: flow,
                             promptData: promptData,
-                            isActive: isActive,
-                            // Enhanced data
+                            isActive: isActiveFlow,
+                            usesRAG: promptData.usesRAG || false, // 🔥 RAG INDICATOR!
+
+                            // Enhanced data for dialog
                             title: step.title || step.name || step.id,
                             description: step.description || '',
                             required: step.required || false,
@@ -233,47 +182,34 @@
                             has_template: !!promptData.template,
                             system_prompt: promptData.template?.system_prompt || '',
                             user_prompt_template: promptData.template?.user_prompt_template || '',
-                            // 🔥 RAG INDICATOR!
-                            usesRAG: promptData.usesRAG || false,
+                            // Additional properties from working commit
                             conditions: step.conditions || [],
                             memory_operation: step.memory_operation || '',
                             knowledge_source: step.knowledge_source || '',
-                            vector_search: step.vector_search || false
+                            vector_search: step.vector_search || false,
+                            // Store complete promptData for debugging
+                            promptData: promptData
                         },
-                        draggable: editable
+                        draggable: true,
+                        selectable: true
                     };
-                    
+
                     flowNodes.push(node);
+                    xOffset += 280; // 260px width + 20px gap
                 });
-                
-                // Update yOffset for next flow
-                const flowRows = Math.ceil((flow.steps || []).length / stepsPerRow);
-                yOffset += (flowRows * 280) + 80; // Height of this flow + gap
+
+                yOffset += 200; // Add vertical spacing between flows
             });
 
-            console.log('🔧 ZoomableFlowEditor: Created', flowNodes.length, 'nodes');
+            console.log(`✅ [ZoomableFlowEditor] Generated ${flowNodes.length} nodes for ReactFlow`);
             setNodes(flowNodes);
-            setEdges([]); // No edges for now
-        }, [flowDefinitions, promptTemplates, intentDefinitions, activeFlow]);
 
-        // Node click handler
-        const handleNodeClick = React.useCallback((event, node) => {
-            console.log('🎯 ZoomableFlowEditor: Node clicked:', node.data.step, 'in flow:', node.data.flow.name);
-            setSelectedNode(node.data);
-            
-            if (editable) {
-                setShowNodeDialog(true);
-            }
-            
-            onNodeClick({ step: node.data.step, flow: node.data.flow });
-        }, [editable, onNodeClick]);
+        }, [flowDefinitions, activeFlow, promptTemplates, intentDefinitions]);
 
-        // Define custom node types
+        // Custom node types
         const nodeTypes = React.useMemo(() => ({
-            // Flow Header Node Type
             flowHeader: ({ data }) => {
                 const { flow, isActive, title, stepCount, description } = data;
-                
                 return React.createElement('div', {
                     style: {
                         padding: '12px 20px',
@@ -289,182 +225,125 @@
                 }, [
                     React.createElement('div', {
                         key: 'header-content',
-                        style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' }
+                        style: { display: 'flex', alignItems: 'center', gap: '12px' }
                     }, [
                         React.createElement('div', {
-                            key: 'left-content',
-                            style: { display: 'flex', alignItems: 'center', gap: '12px' }
-                        }, [
-                            React.createElement('div', {
-                                key: 'flow-dot',
-                                style: {
-                                    width: '12px',
-                                    height: '12px',
-                                    borderRadius: '50%',
-                                    backgroundColor: isActive ? '#ffffff' : '#9ca3af'
-                                }
-                            }),
-                            React.createElement('h3', {
-                                key: 'flow-title',
-                                style: {
-                                    fontSize: '18px',
-                                    fontWeight: 'bold',
-                                    margin: 0
-                                }
-                            }, title),
-                            React.createElement('span', {
-                                key: 'step-count',
-                                style: {
-                                    fontSize: '14px',
-                                    opacity: 0.8
-                                }
-                            }, `(${stepCount} steps)`)
-                        ]),
-                        
-                        isActive && React.createElement('div', {
+                            key: 'dot',
+                            style: {
+                                width: '12px',
+                                height: '12px',
+                                borderRadius: '50%',
+                                backgroundColor: isActive ? '#16a34a' : '#6b7280'
+                            }
+                        }),
+                        React.createElement('h3', {
+                            key: 'title',
+                            style: { margin: 0, fontSize: '16px', fontWeight: 'bold' }
+                        }, title),
+                        React.createElement('span', {
+                            key: 'count',
+                            style: {
+                                padding: '2px 8px',
+                                borderRadius: '12px',
+                                backgroundColor: 'rgba(255,255,255,0.2)',
+                                fontSize: '12px'
+                            }
+                        }, `${stepCount} steps`),
+                        isActive && React.createElement('span', {
                             key: 'active-badge',
                             style: {
-                                padding: '4px 12px',
-                                backgroundColor: 'rgba(255,255,255,0.2)',
-                                borderRadius: '20px',
+                                padding: '2px 8px',
+                                borderRadius: '12px',
+                                backgroundColor: '#16a34a',
                                 fontSize: '12px',
                                 fontWeight: 'bold'
                             }
-                        }, 'ACTIVE FLOW')
+                        }, 'ACTIVE')
                     ])
                 ]);
             },
-            
-            // Card Node Type
             cardNode: ({ data, selected }) => {
-                const { step, flow, promptData, isActive, usesRAG } = data;
-                
+                const { step, flow, promptData, isActive, usesRAG } = data; // Destructure usesRAG
                 return React.createElement('div', {
                     style: {
-                        padding: '12px 16px',
-                        borderRadius: '12px',
-                        backgroundColor: data.has_template ? '#1e40af' : '#dc2626',
-                        color: 'white',
-                        minWidth: '260px',
-                        maxWidth: '280px',
-                        minHeight: '200px', // ADDED: Ensure minimum height for content
-                        border: selected || isActive ? '3px solid #22c55e' : '1px solid rgba(255,255,255,0.2)',
-                        boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
+                        width: '260px',
+                        minHeight: '120px',
+                        backgroundColor: isActive ? '#1e3a8a' : '#1f2937',
+                        border: selected ? '2px solid #3b82f6' : (isActive ? '2px solid #1e40af' : '1px solid #374151'),
+                        borderRadius: '8px',
+                        padding: '16px',
                         cursor: 'pointer',
-                        overflow: 'visible' // ADDED: Ensure content is visible
+                        boxShadow: selected ? '0 0 0 3px rgba(59, 130, 246, 0.5)' : '0 2px 4px rgba(0,0,0,0.3)',
+                        transition: 'all 0.2s ease'
                     }
                 }, [
-                    // Header: Title + Status Badge
                     React.createElement('div', {
                         key: 'header',
-                        style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }
+                        style: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }
                     }, [
-                        React.createElement('div', {
+                        React.createElement('h4', {
                             key: 'title',
-                            style: { fontWeight: 'bold', fontSize: '14px' }
-                        }, data.title),
-                        
-                        React.createElement('div', {
+                            style: {
+                                color: isActive ? '#dbeafe' : '#ffffff',
+                                fontSize: '14px',
+                                fontWeight: 'bold',
+                                margin: 0,
+                                flex: 1
+                            }
+                        }, step.name || step.id),
+                        React.createElement('span', {
                             key: 'required-badge',
                             style: {
-                                fontSize: '9px',
                                 padding: '2px 6px',
-                                borderRadius: '10px',
-                                backgroundColor: data.required ? '#16a34a' : '#6b7280',
-                                color: 'white'
+                                borderRadius: '4px',
+                                fontSize: '10px',
+                                backgroundColor: step.required ? '#dc2626' : '#6b7280',
+                                color: 'white',
+                                fontWeight: 'bold'
                             }
-                        }, data.required ? 'REQ' : 'OPT')
-                    ]),
-                    
-                    // Intent Info
-                    React.createElement('div', {
-                        key: 'intent-section',
-                        style: { marginBottom: '8px' }
-                    }, [
-                        React.createElement('div', {
-                            key: 'intent-name',
-                            style: { fontSize: '11px', opacity: 0.9, fontWeight: '500' }
-                        }, `Intent: ${data.intent_name}`),
-                        
-                        data.intent_description && React.createElement('div', {
-                            key: 'intent-desc',
-                            style: { fontSize: '9px', opacity: 0.7, marginTop: '2px' }
-                        }, data.intent_description)
-                    ]),
-                    
-                    // Prompt Info
-                    React.createElement('div', {
-                        key: 'prompt-section',
-                        style: { marginBottom: '8px' }
-                    }, [
-                        React.createElement('div', {
-                            key: 'template-status',
-                            style: { 
-                                fontSize: '10px', 
-                                display: 'flex', 
-                                alignItems: 'center',
-                                gap: '4px',
-                                flexWrap: 'wrap'
+                        }, step.required ? 'REQ' : 'OPT'),
+                        React.createElement('span', {
+                            key: 'rag-badge',
+                            style: {
+                                marginLeft: '8px',
+                                padding: '2px 4px',
+                                borderRadius: '3px',
+                                fontSize: '9px',
+                                backgroundColor: usesRAG ? '#3b82f6' : '#6b7280',
+                                color: 'white',
+                                fontWeight: 'bold'
                             }
-                        }, [
-                            React.createElement('span', { key: 'icon' }, data.has_template ? '✅' : '❌'),
-                            React.createElement('span', { key: 'text' }, data.has_template ? 'Template Ready' : 'No Template'),
-                            // 🔥 RAG INDICATOR!
-                            React.createElement('span', { 
-                                key: 'rag-badge',
-                                style: {
-                                    marginLeft: '8px',
-                                    padding: '2px 4px',
-                                    borderRadius: '3px',
-                                    fontSize: '9px',
-                                    backgroundColor: usesRAG ? '#3b82f6' : '#6b7280',
-                                    color: 'white',
-                                    fontWeight: 'bold'
-                                }
-                            }, usesRAG ? 'RAG🧠' : 'NO-RAG')
-                        ]),
-                        
-                        data.has_template && data.system_prompt && React.createElement('div', {
-                            key: 'system-prompt',
-                            style: { 
-                                fontSize: '9px', 
-                                opacity: 0.8, 
-                                marginTop: '4px',
-                                maxHeight: '30px',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis'
-                            }
-                        }, `System: ${data.system_prompt.substring(0, 60)}...`)
+                        }, usesRAG ? 'RAG🧠' : 'NO-RAG')
                     ]),
-                    
-                    // Advanced info (conditions, memory, etc.)
-                    (data.conditions?.length > 0 || data.memory_operation || data.knowledge_source || data.vector_search) && React.createElement('div', {
-                        key: 'advanced-section',
-                        style: { 
-                            fontSize: '9px', 
-                            opacity: 0.7,
-                            borderTop: '1px solid rgba(255,255,255,0.2)',
-                            paddingTop: '6px',
-                            marginTop: '6px'
+                    React.createElement('p', {
+                        key: 'description',
+                        style: {
+                            color: isActive ? '#93c5fd' : '#d1d5db',
+                            fontSize: '12px',
+                            margin: '8px 0',
+                            lineHeight: '1.4'
                         }
+                    }, step.description || 'No description'),
+                    React.createElement('div', {
+                        key: 'intent',
+                        style: { marginTop: '8px' }
                     }, [
-                        data.conditions?.length > 0 && React.createElement('div', { key: 'cond' }, `Conditions: ${data.conditions.length}`),
-                        data.memory_operation && React.createElement('div', { key: 'mem' }, `Memory: ${data.memory_operation}`),
-                        data.knowledge_source && React.createElement('div', { key: 'know' }, `Knowledge: ${data.knowledge_source}`),
-                        data.vector_search && React.createElement('div', { key: 'vec', style: { color: '#fbbf24' } }, '🔍 Vector Search')
-                    ]),
-                    
-                    // Next steps
-                    data.next_steps?.length > 0 && React.createElement('div', {
-                        key: 'next-steps',
-                        style: { 
-                            fontSize: '9px', 
-                            opacity: 0.8,
-                            borderTop: '1px solid rgba(255,255,255,0.2)',
-                            paddingTop: '6px',
-                            marginTop: '6px'
-                        }
-                    }, `Next: ${data.next_steps.join(', ')}`)
+                        React.createElement('span', {
+                            key: 'intent-label',
+                            style: {
+                                color: isActive ? '#60a5fa' : '#9ca3af',
+                                fontSize: '11px',
+                                fontWeight: 'bold'
+                            }
+                        }, 'Intent: '),
+                        React.createElement('span', {
+                            key: 'intent-value',
+                            style: {
+                                color: isActive ? '#dbeafe' : '#e5e7eb',
+                                fontSize: '11px'
+                            }
+                        }, promptData?.mappedIntent || 'none')
+                    ])
                 ]);
             }
         }), []);
@@ -472,85 +351,17 @@
         return React.createElement('div', {
             style: { 
                 width: '100%', 
-                height: '600px',
-                display: 'flex'
+                height: '600px'
             }
         }, [
-            // Left sidebar: Flow indicators
-            React.createElement('div', {
-                key: 'flow-indicators',
-                style: {
-                    width: '250px',
-                    backgroundColor: '#1f2937',
-                    padding: '16px',
-                    borderRadius: '8px 0 0 8px',
-                    overflowY: 'auto'
-                }
-            }, [
-                React.createElement('h3', {
-                    key: 'sidebar-title',
-                    style: { color: '#ffffff', marginBottom: '16px', fontSize: '16px' }
-                }, 'Flow Overview'),
-                
-                ...flowDefinitions.map((flow, flowIndex) => {
-                    const isActiveFlow = activeFlow === flow.id;
-                    return React.createElement('div', {
-                        key: flow.id,
-                        style: {
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '12px',
-                            padding: '8px 12px',
-                            marginBottom: '8px',
-                            borderRadius: '8px',
-                            backgroundColor: isActiveFlow ? '#22c55e20' : '#374151',
-                            border: isActiveFlow ? '2px solid #22c55e' : '1px solid #4b5563',
-                            cursor: 'pointer'
-                        }
-                    }, [
-                        // Flow indicator dot
-                        React.createElement('div', {
-                            key: 'dot',
-                            style: {
-                                width: '10px',
-                                height: '10px',
-                                borderRadius: '50%',
-                                backgroundColor: isActiveFlow ? '#22c55e' : '#6b7280'
-                            }
-                        }),
-                        
-                        // Flow name and info
-                        React.createElement('div', {
-                            key: 'info',
-                            style: { flex: 1 }
-                        }, [
-                            React.createElement('div', {
-                                key: 'name',
-                                style: {
-                                    color: isActiveFlow ? '#22c55e' : '#ffffff',
-                                    fontSize: '13px',
-                                    fontWeight: 'bold'
-                                }
-                            }, flow.name),
-                            React.createElement('div', {
-                                key: 'count',
-                                style: {
-                                    color: '#9ca3af',
-                                    fontSize: '11px'
-                                }
-                            }, `${(flow.steps || []).length} steps`)
-                        ])
-                    ]);
-                })
-            ]),
-            
-            // Main canvas: Single ReactFlow with all nodes
+            // Clean ReactFlow canvas
             React.createElement('div', {
                 key: 'main-canvas',
                 style: {
-                    flex: 1,
+                    width: '100%',
+                    height: '100%',
                     backgroundColor: '#0d1117',
-                    borderRadius: '0 8px 8px 0'
+                    borderRadius: '8px'
                 }
             }, React.createElement(window.ReactFlow.default, {
                 key: 'unified-reactflow',
@@ -559,12 +370,11 @@
                 onNodesChange: onNodesChange,
                 onEdgesChange: onEdgesChange,
                 onNodeClick: handleNodeClick,
-                nodeTypes: nodeTypes, // Updated to use nodeTypes instead of cardNodeType
-                fitView: true,
-                fitViewOptions: { padding: 0.1 },
+                nodeTypes: nodeTypes,
+                fitView: false, // Don't auto-fit, use our defaultViewport
                 minZoom: 0.1,
-                maxZoom: 2,
-                defaultViewport: { x: 0, y: 0, zoom: 0.6 },
+                maxZoom: 3,
+                defaultViewport: { x: 0, y: 0, zoom: 1.3 }, // Balanced zoom level
                 style: { backgroundColor: '#0d1117' },
                 panOnDrag: true,
                 zoomOnScroll: true,
@@ -584,27 +394,54 @@
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    zIndex: 1000
+                    zIndex: 9999
                 },
-                onClick: () => setShowNodeDialog(false)
+                onClick: (e) => {
+                    if (e.target === e.currentTarget) {
+                        setShowNodeDialog(false);
+                        setSelectedNode(null);
+                    }
+                }
             }, [
                 React.createElement('div', {
-                    key: 'dialog',
+                    key: 'dialog-content',
                     style: {
                         backgroundColor: '#1f2937',
                         padding: '24px',
                         borderRadius: '12px',
-                        maxWidth: '700px',
-                        maxHeight: '80vh',
+                        maxWidth: '900px',
+                        maxHeight: '85vh',
                         color: 'white',
                         overflow: 'auto'
                     },
                     onClick: (e) => e.stopPropagation()
                 }, [
-                    React.createElement('h3', { 
-                        key: 'title',
-                        style: { marginBottom: '16px', color: '#22c55e' }
-                    }, `Node Details: ${selectedNode.title}`),
+                    // Header with close button
+                    React.createElement('div', {
+                        key: 'dialog-header',
+                        style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }
+                    }, [
+                        React.createElement('h3', { 
+                            key: 'title',
+                            style: { marginBottom: 0, color: '#22c55e', fontSize: '20px' }
+                        }, `Node Details: ${selectedNode?.title || selectedNode?.step?.name || 'Unknown'}`),
+                        
+                        React.createElement('button', {
+                            key: 'close',
+                            onClick: () => {
+                                setShowNodeDialog(false);
+                                setSelectedNode(null);
+                            },
+                            style: {
+                                background: 'none',
+                                border: 'none',
+                                color: '#8b949e',
+                                fontSize: '24px',
+                                cursor: 'pointer',
+                                padding: '4px'
+                            }
+                        }, '✕')
+                    ]),
                     
                     // Flow Info
                     React.createElement('div', {
@@ -612,8 +449,9 @@
                         style: { marginBottom: '16px', padding: '12px', backgroundColor: '#374151', borderRadius: '8px' }
                     }, [
                         React.createElement('h4', { key: 'flow-title', style: { color: '#60a5fa', marginBottom: '8px' } }, 'Flow Information'),
-                        React.createElement('p', { key: 'flow-name' }, `Flow: ${selectedNode.flow.name}`),
-                        React.createElement('p', { key: 'flow-id' }, `Flow ID: ${selectedNode.flow.id}`)
+                        React.createElement('p', { key: 'flow-name', style: { margin: '4px 0', color: '#e5e7eb' } }, `Flow: ${selectedNode?.flow?.name || 'Unknown'}`),
+                        React.createElement('p', { key: 'flow-id', style: { margin: '4px 0', color: '#9ca3af' } }, `Flow ID: ${selectedNode?.flow?.id || 'Unknown'}`),
+                        selectedNode?.flow?.description && React.createElement('p', { key: 'flow-desc', style: { margin: '4px 0', color: '#d1d5db', fontSize: '14px' } }, selectedNode.flow.description)
                     ]),
                     
                     // Step Properties
@@ -622,14 +460,14 @@
                         style: { marginBottom: '16px', padding: '12px', backgroundColor: '#374151', borderRadius: '8px' }
                     }, [
                         React.createElement('h4', { key: 'step-title', style: { color: '#60a5fa', marginBottom: '8px' } }, 'Step Properties'),
-                        React.createElement('p', { key: 'id' }, `ID: ${selectedNode.step.id}`),
-                        React.createElement('p', { key: 'desc' }, `Description: ${selectedNode.description || 'No description'}`),
-                        React.createElement('p', { key: 'req' }, `Required: ${selectedNode.required ? 'Yes' : 'No'}`),
-                        selectedNode.next_steps?.length > 0 && React.createElement('p', { key: 'next' }, `Next Steps: ${selectedNode.next_steps.join(', ')}`),
-                        selectedNode.conditions?.length > 0 && React.createElement('p', { key: 'cond' }, `Conditions: ${selectedNode.conditions.length} defined`),
-                        selectedNode.memory_operation && React.createElement('p', { key: 'mem' }, `Memory Operation: ${selectedNode.memory_operation}`),
-                        selectedNode.knowledge_source && React.createElement('p', { key: 'know' }, `Knowledge Source: ${selectedNode.knowledge_source}`),
-                        selectedNode.vector_search && React.createElement('p', { key: 'vec' }, 'Vector Search: Enabled')
+                        React.createElement('p', { key: 'id', style: { margin: '4px 0', color: '#e5e7eb' } }, `ID: ${selectedNode?.step?.id || 'Unknown'}`),
+                        React.createElement('p', { key: 'desc', style: { margin: '4px 0', color: '#d1d5db' } }, `Description: ${selectedNode?.description || 'No description'}`),
+                        React.createElement('p', { key: 'req', style: { margin: '4px 0', color: selectedNode?.required ? '#22c55e' : '#ef4444' } }, `Required: ${selectedNode?.required ? 'Yes' : 'No'}`),
+                        selectedNode?.next_steps?.length > 0 && React.createElement('p', { key: 'next', style: { margin: '4px 0', color: '#93c5fd' } }, `Next Steps: ${selectedNode.next_steps.join(', ')}`),
+                        selectedNode?.step?.conditions?.length > 0 && React.createElement('p', { key: 'cond', style: { margin: '4px 0', color: '#fbbf24' } }, `Conditions: ${selectedNode.step.conditions.length} defined`),
+                        selectedNode?.step?.memory_operation && React.createElement('p', { key: 'mem', style: { margin: '4px 0', color: '#a78bfa' } }, `Memory Operation: ${selectedNode.step.memory_operation}`),
+                        selectedNode?.step?.knowledge_source && React.createElement('p', { key: 'know', style: { margin: '4px 0', color: '#34d399' } }, `Knowledge Source: ${selectedNode.step.knowledge_source}`),
+                        selectedNode?.step?.vector_search && React.createElement('p', { key: 'vec', style: { margin: '4px 0', color: '#06b6d4' } }, 'Vector Search: Enabled')
                     ]),
                     
                     // Intent Info
@@ -638,60 +476,89 @@
                         style: { marginBottom: '16px', padding: '12px', backgroundColor: '#374151', borderRadius: '8px' }
                     }, [
                         React.createElement('h4', { key: 'intent-title', style: { color: '#60a5fa', marginBottom: '8px' } }, 'Intent Information'),
-                        React.createElement('p', { key: 'intent-mapped' }, `Mapped Intent: ${selectedNode.intent_name}`),
-                        selectedNode.intent_description && React.createElement('p', { key: 'intent-desc' }, `Description: ${selectedNode.intent_description}`)
+                        React.createElement('p', { key: 'intent-mapped', style: { margin: '4px 0', color: '#e5e7eb' } }, `Mapped Intent: ${selectedNode?.intent_name || 'None'}`),
+                        selectedNode?.intent_description && React.createElement('p', { key: 'intent-desc', style: { margin: '4px 0', color: '#d1d5db', fontSize: '14px' } }, `Description: ${selectedNode.intent_description}`)
                     ]),
                     
-                    // Prompt Template Info
-                    selectedNode.has_template && React.createElement('div', {
+                    // RAG Indicator
+                    React.createElement('div', {
+                        key: 'rag-info',
+                        style: { marginBottom: '16px', padding: '12px', backgroundColor: selectedNode?.usesRAG ? '#1e3a8a' : '#374151', borderRadius: '8px' }
+                    }, [
+                        React.createElement('h4', { key: 'rag-title', style: { color: '#60a5fa', marginBottom: '8px' } }, 'Knowledge Base (RAG)'),
+                        React.createElement('div', { key: 'rag-status', style: { display: 'flex', alignItems: 'center', gap: '8px' } }, [
+                            React.createElement('span', { key: 'rag-icon', style: { fontSize: '18px' } }, selectedNode?.usesRAG ? '🧠' : '🚫'),
+                            React.createElement('span', { key: 'rag-text', style: { color: '#e6edf3', fontWeight: 'bold' } }, 
+                                selectedNode?.usesRAG ? 'Uses RAG Knowledge Base' : 'No RAG Integration'),
+                            React.createElement('span', { 
+                                key: 'rag-badge',
+                                style: {
+                                    marginLeft: '8px',
+                                    padding: '2px 6px',
+                                    borderRadius: '4px',
+                                    fontSize: '10px',
+                                    backgroundColor: selectedNode?.usesRAG ? '#3b82f6' : '#6b7280',
+                                    color: 'white',
+                                    fontWeight: 'bold'
+                                }
+                            }, selectedNode?.usesRAG ? 'RAG🧠' : 'NO-RAG')
+                        ])
+                    ]),
+                    
+                    // Prompt Template Info (ALWAYS SHOW FOR DEBUG)
+                    React.createElement('div', {
                         key: 'prompt-info',
                         style: { marginBottom: '16px', padding: '12px', backgroundColor: '#374151', borderRadius: '8px' }
                     }, [
-                        React.createElement('h4', { key: 'prompt-title', style: { color: '#60a5fa', marginBottom: '8px' } }, 'Prompt Template'),
-                        React.createElement('div', { key: 'sys-prompt', style: { marginBottom: '8px' } }, [
-                            React.createElement('strong', { key: 'sys-label' }, 'System Prompt: '),
+                        React.createElement('h4', { key: 'prompt-title', style: { color: '#60a5fa', marginBottom: '8px' } }, 
+                            `Prompt Template (has_template: ${selectedNode?.has_template}, template: ${!!selectedNode?.promptData?.template})`),
+                        
+                        // Debug info
+                        React.createElement('div', { key: 'debug-info', style: { marginBottom: '8px', fontSize: '10px', color: '#fbbf24' } }, 
+                            `Debug: mappedIntent="${selectedNode?.intent_name}", templates loaded: ${promptTemplates.length}, intents loaded: ${intentDefinitions.length}`),
+                        
+                        React.createElement('div', { key: 'debug-prompts', style: { marginBottom: '8px', fontSize: '10px', color: '#06b6d4' } }, 
+                            `Prompt Debug: system_prompt length: ${(selectedNode?.system_prompt || '').length}, user_prompt length: ${(selectedNode?.user_prompt_template || '').length}`),
+                            
+                        React.createElement('div', { key: 'debug-template', style: { marginBottom: '8px', fontSize: '10px', color: '#ec4899' } }, 
+                            `Template Debug: template found: ${!!selectedNode?.promptData?.template}, template id: ${selectedNode?.promptData?.template?.id || 'none'}`),
+                        React.createElement('div', { key: 'sys-prompt', style: { marginBottom: '12px' } }, [
+                            React.createElement('strong', { key: 'sys-label', style: { color: '#fbbf24' } }, 'System Prompt: '),
                             React.createElement('pre', { 
                                 key: 'sys-text',
                                 style: { 
                                     fontSize: '11px', 
                                     backgroundColor: '#111827', 
-                                    padding: '8px', 
-                                    borderRadius: '4px',
+                                    padding: '12px', 
+                                    borderRadius: '6px',
                                     whiteSpace: 'pre-wrap',
-                                    maxHeight: '120px',
-                                    overflow: 'auto'
+                                    maxHeight: '150px',
+                                    overflow: 'auto',
+                                    color: '#d1d5db',
+                                    border: '1px solid #374151',
+                                    marginTop: '4px'
                                 }
-                            }, selectedNode.system_prompt || 'No system prompt')
+                            }, selectedNode?.system_prompt || 'No system prompt')
                         ]),
                         React.createElement('div', { key: 'user-prompt', style: { marginBottom: '8px' } }, [
-                            React.createElement('strong', { key: 'user-label' }, 'User Prompt Template: '),
+                            React.createElement('strong', { key: 'user-label', style: { color: '#34d399' } }, 'User Prompt Template: '),
                             React.createElement('pre', { 
                                 key: 'user-text',
                                 style: { 
                                     fontSize: '11px', 
                                     backgroundColor: '#111827', 
-                                    padding: '8px', 
-                                    borderRadius: '4px',
+                                    padding: '12px', 
+                                    borderRadius: '6px',
                                     whiteSpace: 'pre-wrap',
-                                    maxHeight: '100px',
-                                    overflow: 'auto'
+                                    maxHeight: '150px',
+                                    overflow: 'auto',
+                                    color: '#d1d5db',
+                                    border: '1px solid #374151',
+                                    marginTop: '4px'
                                 }
-                            }, selectedNode.user_prompt_template || 'No user prompt template')
+                            }, selectedNode?.user_prompt_template || 'No user prompt template')
                         ])
-                    ]),
-                    React.createElement('button', {
-                        key: 'close',
-                        onClick: () => setShowNodeDialog(false),
-                        style: {
-                            marginTop: '16px',
-                            padding: '10px 20px',
-                            backgroundColor: '#3b82f6',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '6px',
-                            cursor: 'pointer'
-                        }
-                    }, 'Close')
+                    ])
                 ])
             ])
         ]);

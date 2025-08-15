@@ -26,7 +26,7 @@
     <!-- FlowCardEditor Component - NOWY CARD LAYOUT -->
     <script src="components/FlowCardEditor.js?v=1737284500"></script>
     <!-- ZoomableFlowEditor Component - ZOOMABLE REACTFLOW + CARD NODES -->
-    <script src="components/ZoomableFlowEditor.js?v=1737284600"></script>
+    <script src="components/ZoomableFlowEditor.js?v=1737285700"></script>
     <style>
         * {
             margin: 0;
@@ -62,6 +62,31 @@
             display: flex;
             gap: 1rem;
             align-items: center;
+        }
+
+        .mindstate-toggle {
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #e6edf3;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .mindstate-toggle:hover {
+            background: #30363d;
+            border-color: #58a6ff;
+        }
+
+        .mindstate-toggle.active {
+            background: #58a6ff;
+            border-color: #58a6ff;
+            color: #ffffff;
         }
 
         .avatar-selector {
@@ -145,6 +170,15 @@
             margin: 12px;
             height: 120px;
             overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .mindstate-horizontal.collapsed {
+            height: 0;
+            padding: 0 12px;
+            margin: 0 12px;
+            border: none;
+            opacity: 0;
         }
 
         .mindstate-horizontal .panel-title {
@@ -188,11 +222,32 @@
 
         .main-content {
             display: grid;
-            grid-template-columns: 1fr 2fr;
+            grid-template-columns: 300px 1fr; /* Narrow chat (300px) + Wide flow (rest) */
             grid-template-rows: 1fr 200px;
             height: calc(100vh - 80px - 120px - 24px);
             gap: 12px;
             padding: 12px;
+            position: relative; /* For absolute positioned sidebar */
+        }
+
+        .flows-right-sidebar {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 280px;
+            height: 100%;
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 8px 0 0 8px;
+            padding: 16px;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            transform: translateX(100%); /* Hidden by default */
+        }
+
+        .flows-right-sidebar.visible {
+            transform: translateX(0); /* Slide in when visible */
         }
         
         .panel {
@@ -839,8 +894,95 @@
             );
         };
         
+        // Flows Right Sidebar Component
+        const FlowsRightSidebar = ({ flows, activeFlow, isVisible }) => {
+            return React.createElement('div', {
+                className: `flows-right-sidebar ${isVisible ? 'visible' : ''}`
+            }, [
+                React.createElement('h3', {
+                    key: 'sidebar-title',
+                    style: { 
+                        color: '#ffffff', 
+                        marginBottom: '16px', 
+                        fontSize: '16px',
+                        borderBottom: '1px solid #374151',
+                        paddingBottom: '8px'
+                    }
+                }, '📋 Flow List'),
+                
+                React.createElement('div', {
+                    key: 'flows-list'
+                }, flows && flows.length > 0 ? flows.map(flow => {
+                    const isActiveFlow = activeFlow?.flow_id === flow.id;
+                    
+                    return React.createElement('div', {
+                        key: flow.id,
+                        style: {
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                            padding: '12px',
+                            marginBottom: '8px',
+                            borderRadius: '8px',
+                            backgroundColor: isActiveFlow ? '#22c55e20' : '#374151',
+                            border: isActiveFlow ? '2px solid #22c55e' : '1px solid #4b5563',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease'
+                        },
+                        onClick: () => {
+                            console.log('🎯 Flow clicked:', flow.name);
+                        }
+                    }, [
+                        // Flow indicator dot
+                        React.createElement('div', {
+                            key: 'dot',
+                            style: {
+                                width: '10px',
+                                height: '10px',
+                                borderRadius: '50%',
+                                backgroundColor: isActiveFlow ? '#22c55e' : '#6b7280'
+                            }
+                        }),
+                        
+                        // Flow name and info
+                        React.createElement('div', {
+                            key: 'info',
+                            style: { flex: 1 }
+                        }, [
+                            React.createElement('div', {
+                                key: 'name',
+                                style: {
+                                    color: isActiveFlow ? '#22c55e' : '#ffffff',
+                                    fontSize: '13px',
+                                    fontWeight: 'bold'
+                                }
+                            }, flow.name),
+                            React.createElement('div', {
+                                key: 'steps',
+                                style: {
+                                    color: isActiveFlow ? '#16a34a' : '#9ca3af',
+                                    fontSize: '11px',
+                                    marginTop: '4px'
+                                }
+                            }, `${(flow.steps || []).length} steps`)
+                        ])
+                    ]);
+                }) : [
+                    React.createElement('div', {
+                        key: 'empty-state',
+                        style: {
+                            color: '#6b7280',
+                            fontSize: '14px',
+                            textAlign: 'center',
+                            padding: '20px'
+                        }
+                    }, 'No flows available')
+                ])
+            ]);
+        };
+
         // Flow Graph Component
-        const FlowGraph = ({ sessionId, flows, activeFlow }) => {
+        const FlowGraph = ({ sessionId, flows, activeFlow, flowSidebarVisible }) => {
             const graphRef = React.useRef(null);
             const [useReactFlow, setUseReactFlow] = React.useState(true); // ReactFlow nodes + card layout!
             
@@ -1057,6 +1199,7 @@
                     </div>
                     
                     <div className="flow-graph">
+                        {console.log('🔍 DEBUG useReactFlow:', useReactFlow, 'ZoomableFlowEditor available:', !!window.ZoomableFlowEditor)}
                         {useReactFlow && window.ZoomableFlowEditor ? (
                             React.createElement(window.ZoomableFlowEditor, {
                                 flowDefinitions: flows,
@@ -1083,9 +1226,9 @@
         };
         
         // MindState Horizontal Component
-        const MindStateHorizontal = ({ sessionId, mindState }) => {
+        const MindStateHorizontal = ({ sessionId, mindState, isVisible = true }) => {
             return (
-                <div className="mindstate-horizontal">
+                <div className={`mindstate-horizontal ${!isVisible ? 'collapsed' : ''}`}>
                     <h3 className="panel-title">🧠 MindState Monitor</h3>
                     <div className="mindstate-items-horizontal">
                         {!mindState || !mindState.stack ? (
@@ -1161,6 +1304,8 @@
             const [flowDefinitions, setFlowDefinitions] = useState([]);
             const [currentAvatar, setCurrentAvatar] = useState('networker');
             const [customAvatars, setCustomAvatars] = useState([]);
+            const [mindStateVisible, setMindStateVisible] = useState(false); // MindState Monitor collapsed by default
+            const [flowSidebarVisible, setFlowSidebarVisible] = useState(false); // Flow sidebar collapsed by default
             
             const fetchSessionState = useCallback(async () => {
                 if (!sessionId) return;
@@ -1327,6 +1472,20 @@
                             <a href="/avatar-flow-creator.html" className="nav-link">🎨 Creator</a>
                         </nav>
                         <div className="header-controls">
+                            <button 
+                                className={`mindstate-toggle ${mindStateVisible ? 'active' : ''}`}
+                                onClick={() => setMindStateVisible(!mindStateVisible)}
+                                title={mindStateVisible ? 'Zwiń MindState Monitor' : 'Rozwiń MindState Monitor'}
+                            >
+                                🧠 MindState {mindStateVisible ? '⬆️' : '⬇️'}
+                            </button>
+                            <button 
+                                className={`mindstate-toggle ${flowSidebarVisible ? 'active' : ''}`}
+                                onClick={() => setFlowSidebarVisible(!flowSidebarVisible)}
+                                title={flowSidebarVisible ? 'Zwiń Flow Lista' : 'Rozwiń Flow Lista'}
+                            >
+                                📋 Flows {flowSidebarVisible ? '⬆️' : '⬇️'}
+                            </button>
                             <div className="avatar-selector">
                                 <label htmlFor="avatar-type">👤 Avatar:</label>
                                 <select 
@@ -1355,6 +1514,7 @@
                     <MindStateHorizontal 
                         sessionId={sessionId} 
                         mindState={sessionState?.mindState}
+                        isVisible={mindStateVisible}
                     />
                     <div className="main-content">
                         <ChatPanel 
@@ -1368,8 +1528,16 @@
                             flows={flowDefinitions}
                             activeFlow={sessionState?.activeFlow}
                             avatarType={currentAvatar}
+                            flowSidebarVisible={flowSidebarVisible}
                         />
                         <DebugPanel />
+                        
+                        {/* Right Sidebar for Flow List */}
+                        <FlowsRightSidebar 
+                            flows={flowDefinitions}
+                            activeFlow={sessionState?.activeFlow}
+                            isVisible={flowSidebarVisible}
+                        />
                     </div>
                 </div>
             );
