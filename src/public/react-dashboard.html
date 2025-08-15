@@ -26,7 +26,7 @@
     <!-- FlowCardEditor Component - NOWY CARD LAYOUT -->
     <script src="components/FlowCardEditor.js?v=1737284500"></script>
     <!-- ZoomableFlowEditor Component - ZOOMABLE REACTFLOW + CARD NODES -->
-    <script src="components/ZoomableFlowEditor.js?v=1737285700"></script>
+    <script src="components/ZoomableFlowEditor.js?v=1737286000"></script>
     <style>
         * {
             margin: 0;
@@ -223,11 +223,25 @@
         .main-content {
             display: grid;
             grid-template-columns: 300px 1fr; /* Narrow chat (300px) + Wide flow (rest) */
-            grid-template-rows: 1fr 200px;
+            grid-template-rows: 1fr 200px; /* Default: with debug console */
             height: calc(100vh - 80px - 120px - 24px);
             gap: 12px;
             padding: 12px;
             position: relative; /* For absolute positioned sidebar */
+        }
+        
+        .main-content.debug-hidden {
+            grid-template-rows: 1fr; /* Full height when debug hidden */
+        }
+        
+        .debug-panel.collapsed {
+            height: 0;
+            overflow: hidden;
+            padding: 0;
+            margin: 0;
+            border: none;
+            opacity: 0;
+            transition: all 0.3s ease;
         }
 
         .flows-right-sidebar {
@@ -982,7 +996,7 @@
         };
 
         // Flow Graph Component
-        const FlowGraph = ({ sessionId, flows, activeFlow, flowSidebarVisible }) => {
+        const FlowGraph = ({ sessionId, flows, activeFlow, flowSidebarVisible, sessionState }) => {
             const graphRef = React.useRef(null);
             const [useReactFlow, setUseReactFlow] = React.useState(true); // ReactFlow nodes + card layout!
             
@@ -1200,10 +1214,13 @@
                     
                     <div className="flow-graph">
                         {console.log('🔍 DEBUG useReactFlow:', useReactFlow, 'ZoomableFlowEditor available:', !!window.ZoomableFlowEditor)}
+                        {console.log('🎯 [DASHBOARD] sessionState:', sessionState)}
+                        {console.log('🎯 [DASHBOARD] current_step:', sessionState?.activeFlow?.current_step)}
                         {useReactFlow && window.ZoomableFlowEditor ? (
                             React.createElement(window.ZoomableFlowEditor, {
                                 flowDefinitions: flows,
                                 activeFlow: activeFlow,
+                                currentStep: sessionState?.activeFlow?.current_step, // Pass current step for highlighting
                                 onNodeClick: (node) => {
                                     console.log('🎯 Node clicked:', node);
                                 },
@@ -1255,9 +1272,8 @@
         };
         
         // Debug Panel Component
-        const DebugPanel = () => {
+        const DebugPanel = ({ isVisible = true }) => {
             const [logs, setLogs] = useState([]);
-            const [isVisible, setIsVisible] = useState(true);
             
             useEffect(() => {
                 // Mock debug logs
@@ -1272,15 +1288,10 @@
             }, []);
             
             return (
-                <div className="panel debug-panel">
+                <div className={`panel debug-panel ${!isVisible ? 'collapsed' : ''}`}>
                     <div className="panel-header">
                         <h3 className="panel-title">Debug Console</h3>
-                        <button 
-                            className="btn btn-secondary"
-                            onClick={() => setIsVisible(!isVisible)}
-                        >
-                            {isVisible ? 'Hide' : 'Show'}
-                        </button>
+
                     </div>
                     
                     {isVisible && (
@@ -1306,6 +1317,7 @@
             const [customAvatars, setCustomAvatars] = useState([]);
             const [mindStateVisible, setMindStateVisible] = useState(false); // MindState Monitor collapsed by default
             const [flowSidebarVisible, setFlowSidebarVisible] = useState(false); // Flow sidebar collapsed by default
+            const [debugVisible, setDebugVisible] = useState(false); // Debug console collapsed by default
             
             const fetchSessionState = useCallback(async () => {
                 if (!sessionId) return;
@@ -1479,13 +1491,21 @@
                             >
                                 🧠 MindState {mindStateVisible ? '⬆️' : '⬇️'}
                             </button>
-                            <button 
-                                className={`mindstate-toggle ${flowSidebarVisible ? 'active' : ''}`}
-                                onClick={() => setFlowSidebarVisible(!flowSidebarVisible)}
-                                title={flowSidebarVisible ? 'Zwiń Flow Lista' : 'Rozwiń Flow Lista'}
-                            >
-                                📋 Flows {flowSidebarVisible ? '⬆️' : '⬇️'}
-                            </button>
+                                                    <button
+                            className={`mindstate-toggle ${flowSidebarVisible ? 'active' : ''}`}
+                            onClick={() => setFlowSidebarVisible(!flowSidebarVisible)}
+                            title={flowSidebarVisible ? 'Zwiń Flow Lista' : 'Rozwiń Flow Lista'}
+                        >
+                            📋 Flows {flowSidebarVisible ? '⬆️' : '⬇️'}
+                        </button>
+                        
+                        <button
+                            className={`mindstate-toggle ${debugVisible ? 'active' : ''}`}
+                            onClick={() => setDebugVisible(!debugVisible)}
+                            title={debugVisible ? 'Zwiń Debug Console' : 'Rozwiń Debug Console'}
+                        >
+                            🐛 Debug {debugVisible ? '⬆️' : '⬇️'}
+                        </button>
                             <div className="avatar-selector">
                                 <label htmlFor="avatar-type">👤 Avatar:</label>
                                 <select 
@@ -1516,7 +1536,7 @@
                         mindState={sessionState?.mindState}
                         isVisible={mindStateVisible}
                     />
-                    <div className="main-content">
+                    <div className={`main-content ${!debugVisible ? 'debug-hidden' : ''}`}>
                         <ChatPanel 
                             sessionId={sessionId} 
                             onSessionChange={handleSessionChange}
@@ -1529,8 +1549,9 @@
                             activeFlow={sessionState?.activeFlow}
                             avatarType={currentAvatar}
                             flowSidebarVisible={flowSidebarVisible}
+                            sessionState={sessionState}
                         />
-                        <DebugPanel />
+                        <DebugPanel isVisible={debugVisible} />
                         
                         {/* Right Sidebar for Flow List */}
                         <FlowsRightSidebar 

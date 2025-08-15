@@ -1,5 +1,5 @@
     // ZoomableFlowEditor - ReactFlow container + custom card nodes (bez edges)
-    const ZoomableFlowEditor = ({ flowDefinitions = [], activeFlow = null, onNodeClick = () => {}, editable = false }) => {
+    const ZoomableFlowEditor = ({ flowDefinitions = [], activeFlow = null, currentStep = null, onNodeClick = () => {}, editable = false }) => {
         const [nodes, setNodes, onNodesChange] = window.ReactFlow.useNodesState([]);
         const [edges, setEdges, onEdgesChange] = window.ReactFlow.useEdgesState([]);
         const [selectedNode, setSelectedNode] = React.useState(null);
@@ -126,6 +126,7 @@
             }
 
             console.log('🔥 [ZoomableFlowEditor] Processing flows:', flowDefinitions.length);
+            console.log('🎯 [CURRENT STEP]:', currentStep);
 
             const flowNodes = [];
             let yOffset = 20;
@@ -160,6 +161,7 @@
                 steps.forEach((step, stepIndex) => {
                     const promptData = getPromptForStep(step, flow); // Pass flow object
                     const nodeId = `${flow.id}-${step.id}`;
+                    const isCurrentStep = currentStep === step.id; // Check if this is the current step
 
                     const node = {
                         id: nodeId,
@@ -170,6 +172,7 @@
                             flow: flow,
                             promptData: promptData,
                             isActive: isActiveFlow,
+                            isCurrentStep: isCurrentStep, // 🎯 CURRENT STEP INDICATOR!
                             usesRAG: promptData.usesRAG || false, // 🔥 RAG INDICATOR!
 
                             // Enhanced data for dialog
@@ -263,17 +266,17 @@
                 ]);
             },
             cardNode: ({ data, selected }) => {
-                const { step, flow, promptData, isActive, usesRAG } = data; // Destructure usesRAG
+                const { step, flow, promptData, isActive, isCurrentStep, usesRAG } = data; // Destructure isCurrentStep + usesRAG
                 return React.createElement('div', {
                     style: {
                         width: '260px',
                         minHeight: '120px',
-                        backgroundColor: isActive ? '#1e3a8a' : '#1f2937',
-                        border: selected ? '2px solid #3b82f6' : (isActive ? '2px solid #1e40af' : '1px solid #374151'),
+                        backgroundColor: isCurrentStep ? '#16a34a' : (isActive ? '#1e3a8a' : '#1f2937'), // Green for current step
+                        border: selected ? '2px solid #3b82f6' : (isCurrentStep ? '3px solid #22c55e' : (isActive ? '2px solid #1e40af' : '1px solid #374151')),
                         borderRadius: '8px',
                         padding: '16px',
                         cursor: 'pointer',
-                        boxShadow: selected ? '0 0 0 3px rgba(59, 130, 246, 0.5)' : '0 2px 4px rgba(0,0,0,0.3)',
+                        boxShadow: selected ? '0 0 0 3px rgba(59, 130, 246, 0.5)' : (isCurrentStep ? '0 0 0 3px rgba(34, 197, 94, 0.5)' : '0 2px 4px rgba(0,0,0,0.3)'),
                         transition: 'all 0.2s ease'
                     }
                 }, [
@@ -313,7 +316,21 @@
                                 color: 'white',
                                 fontWeight: 'bold'
                             }
-                        }, usesRAG ? 'RAG🧠' : 'NO-RAG')
+                        }, usesRAG ? 'RAG🧠' : 'NO-RAG'),
+                        
+                        isCurrentStep && React.createElement('span', {
+                            key: 'current-badge',
+                            style: {
+                                marginLeft: '8px',
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                fontSize: '10px',
+                                backgroundColor: '#16a34a',
+                                color: 'white',
+                                fontWeight: 'bold',
+                                border: '1px solid #ffffff'
+                            }
+                        }, '✅ CURRENT')
                     ]),
                     React.createElement('p', {
                         key: 'description',
