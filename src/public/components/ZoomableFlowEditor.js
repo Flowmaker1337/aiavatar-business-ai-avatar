@@ -8,6 +8,8 @@
         // Get prompt templates and intent definitions  
         const [promptTemplates, setPromptTemplates] = React.useState([]);
         const [intentDefinitions, setIntentDefinitions] = React.useState([]);
+        const reactFlowInstance = React.useRef(null);
+        const previousCurrentStep = React.useRef(null);
 
         React.useEffect(() => {
             Promise.all([
@@ -206,8 +208,36 @@
 
             console.log(`✅ [ZoomableFlowEditor] Generated ${flowNodes.length} nodes for ReactFlow`);
             setNodes(flowNodes);
+            
+            // Auto-focus after nodes are set (if currentStep changed)
+            if (currentStep && reactFlowInstance.current && previousCurrentStep.current !== currentStep) {
+                console.log('🎯 [AUTO-FOCUS CALLBACK] Current step CHANGED, searching in new nodes...');
+                
+                // Find current step node in the NEW flowNodes array
+                const currentStepNode = flowNodes.find(node => 
+                    node.data && node.data.isCurrentStep === true
+                );
+                
+                if (currentStepNode) {
+                    console.log('🎯 [AUTO-FOCUS CALLBACK] Found FRESH current step node:', currentStepNode.id, 'at position:', currentStepNode.position);
+                    
+                    // Update previous step reference
+                    previousCurrentStep.current = currentStep;
+                    
+                    // Center view on the current step node with less aggressive zoom
+                    setTimeout(() => {
+                        reactFlowInstance.current?.fitView({
+                            nodes: [currentStepNode],
+                            duration: 800,
+                            padding: 0.6
+                        });
+                    }, 300); // Shorter delay since nodes are fresh
+                } else {
+                    console.log('⚠️ [AUTO-FOCUS CALLBACK] FRESH current step node not found. Available nodes:', flowNodes.map(n => ({id: n.id, isCurrentStep: n.data?.isCurrentStep, stepId: n.data?.step?.id})));
+                }
+            }
 
-        }, [flowDefinitions, activeFlow, promptTemplates, intentDefinitions]);
+        }, [flowDefinitions, activeFlow, promptTemplates, intentDefinitions, currentStep]);
 
         // Custom node types
         const nodeTypes = React.useMemo(() => ({
@@ -388,6 +418,10 @@
                 onEdgesChange: onEdgesChange,
                 onNodeClick: handleNodeClick,
                 nodeTypes: nodeTypes,
+                onInit: (reactFlowInstanceParam) => {
+                    reactFlowInstance.current = reactFlowInstanceParam;
+                    console.log('🎯 [REACTFLOW] Instance initialized for auto-focus');
+                },
                 fitView: false, // Don't auto-fit, use our defaultViewport
                 minZoom: 0.1,
                 maxZoom: 3,
