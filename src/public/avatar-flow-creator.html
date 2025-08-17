@@ -7,6 +7,12 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- ReactFlow for live preview -->
+    <script src="https://cdn.jsdelivr.net/npm/reactflow@11.10.1/dist/umd/index.js"></script>
+    
+    <!-- ZoomableFlowEditor Component for live preview -->
+    <script src="components/ZoomableFlowEditor.js?v=1737286300"></script>
     <style>
         * {
             margin: 0;
@@ -81,16 +87,238 @@
         .form-panel {
             flex: 1;
             padding: 30px;
-            background: #2a2a2a;
             overflow-y: auto;
-            border-right: 2px solid #3a3a3a;
         }
 
+        /* NEW: ReactFlow Preview Panel */
         .preview-panel {
-            width: 500px;
-            background: #1e1e1e;
-            padding: 30px;
-            overflow-y: auto;
+            flex: 1;
+            background: #0d1117;
+            border-left: 2px solid #3a3a3a;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .preview-header {
+            background: #2a2a2a;
+            padding: 15px 20px;
+            border-bottom: 1px solid #3a3a3a;
+            font-size: 16px;
+            font-weight: 600;
+            color: #58a6ff;
+        }
+
+        .preview-content {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Avatar Selection Styles */
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .avatar-card {
+            background: #2a2a2a;
+            border: 2px solid #3a3a3a;
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .avatar-card:hover {
+            border-color: #58a6ff;
+            background: #333;
+        }
+
+        .avatar-card.selected {
+            border-color: #28a745;
+            background: #1a4a2a;
+        }
+
+        .avatar-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #58a6ff;
+            margin-bottom: 8px;
+        }
+
+        .avatar-desc {
+            font-size: 14px;
+            color: #d1d5db;
+            margin-bottom: 8px;
+        }
+
+        .avatar-specialization {
+            font-size: 12px;
+            color: #8b949e;
+            font-style: italic;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 32px 0;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #3a3a3a;
+        }
+
+        .divider span {
+            background: #1a1a1a;
+            padding: 0 16px;
+            color: #8b949e;
+            font-weight: 600;
+        }
+
+        .loading-state, .empty-state {
+            text-align: center;
+            padding: 32px;
+            color: #8b949e;
+            font-style: italic;
+        }
+
+        /* Warning Section */
+        .warning-section {
+            background: #2a1f1f;
+            border: 2px solid #d73a49;
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .warning-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .warning-text h3 {
+            color: #f85149;
+            margin-bottom: 8px;
+            font-size: 20px;
+        }
+
+        .warning-text p {
+            color: #d1d5db;
+            font-size: 14px;
+        }
+
+        /* Selected Avatar Info */
+        .selected-avatar-info {
+            background: #1a2e1a;
+            border: 2px solid #28a745;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .selected-avatar-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #40c463;
+            margin-bottom: 8px;
+        }
+
+        .selected-avatar-desc {
+            font-size: 14px;
+            color: #d1d5db;
+        }
+
+        /* Flows Manager Styles */
+        .flows-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .flow-item {
+            background: #2a2a2a;
+            border: 2px solid #3a3a3a;
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .flow-item:hover {
+            border-color: #58a6ff;
+            background: #333;
+        }
+
+        .flow-item.selected {
+            border-color: #28a745;
+            background: #1a4a2a;
+        }
+
+        .flow-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .flow-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #58a6ff;
+        }
+
+        .flow-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 4px 8px;
+            font-size: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-edit {
+            background: #4285f4;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #3367d6;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .flow-description {
+            font-size: 14px;
+            color: #d1d5db;
+            margin-bottom: 8px;
+        }
+
+        .flow-stats {
+            font-size: 12px;
+            color: #8b949e;
+            font-style: italic;
         }
 
         .form-section {
@@ -678,6 +906,16 @@ Twoja odpowiedź:`
             const [currentStep, setCurrentStep] = useState(1);
             const [isGenerating, setIsGenerating] = useState(false);
             const [message, setMessage] = useState('');
+            
+            // Avatar Selection State
+            const [selectedAvatar, setSelectedAvatar] = useState(null);
+            const [existingAvatars, setExistingAvatars] = useState([]);
+            const [isLoadingAvatars, setIsLoadingAvatars] = useState(false);
+            const [showIntentModal, setShowIntentModal] = useState(false);
+            
+            // Flows Manager State
+            const [selectedFlow, setSelectedFlow] = useState(null);
+            const [editingFlow, setEditingFlow] = useState(null);
 
             // Avatar Creator State
             const [avatarData, setAvatarData] = useState({
@@ -715,6 +953,28 @@ Twoja odpowiedź:`
             const [newExample, setNewExample] = useState('');
             const [newStepName, setNewStepName] = useState('');
             const [newStepDescription, setNewStepDescription] = useState('');
+
+            // Load existing avatars on component mount
+            React.useEffect(() => {
+                loadExistingAvatars();
+            }, []);
+
+            const loadExistingAvatars = async () => {
+                setIsLoadingAvatars(true);
+                try {
+                    const response = await fetch('/api/avatars');
+                    if (response.ok) {
+                        const result = await response.json();
+                        console.log('🔍 [AVATAR API] Response:', result);
+                        setExistingAvatars(result.data || result);
+                    }
+                } catch (error) {
+                    console.error('Error loading avatars:', error);
+                    setMessage('❌ Błąd ładowania avatarów');
+                } finally {
+                    setIsLoadingAvatars(false);
+                }
+            };
 
             // Generate specific Avatar field with AI
             const generateAvatarField = async (fieldName) => {
@@ -959,15 +1219,15 @@ Twoja odpowiedź:`
                         React.createElement('button', {
                             className: `tab-btn ${activeTab === 'avatar' ? 'active' : ''}`,
                             onClick: () => setActiveTab('avatar')
-                        }, '👤 Avatar Creator'),
+                        }, '👤 Avatar Selection'),
+                        React.createElement('button', {
+                            className: `tab-btn ${activeTab === 'flows' ? 'active' : ''}`,
+                            onClick: () => setActiveTab('flows')
+                        }, '🔄 Flows Manager'),
                         React.createElement('button', {
                             className: `tab-btn ${activeTab === 'flow' ? 'active' : ''}`,
                             onClick: () => setActiveTab('flow')
-                        }, '🔄 Flow Creator'),
-                        React.createElement('button', {
-                            className: `tab-btn ${activeTab === 'intent' ? 'active' : ''}`,
-                            onClick: () => setActiveTab('intent')
-                        }, '🎯 Intent Creator')
+                        }, '🆕 Flow Creator')
                         )
                     )
                 ),
@@ -981,8 +1241,37 @@ Twoja odpowiedź:`
                             className: `alert ${message.includes('✅') ? 'alert-success' : 'alert-error'}` 
                         }, message),
 
-                        // Avatar Creator Tab
+                        // Avatar Selection Tab
                         activeTab === 'avatar' && React.createElement('div', null,
+                            // Existing Avatars Section
+                            React.createElement('div', { className: 'form-section' },
+                                React.createElement('h3', { className: 'section-title' }, '📋 Wybierz Istniejący Avatar'),
+                                
+                                isLoadingAvatars ? 
+                                    React.createElement('div', { className: 'loading-state' }, 'Ładowanie avatarów...') :
+                                    React.createElement('div', { className: 'avatar-grid' },
+                                        existingAvatars.length === 0 ? 
+                                            React.createElement('div', { className: 'empty-state' }, 'Brak zapisanych avatarów') :
+                                            existingAvatars.map(avatar => 
+                                                React.createElement('div', { 
+                                                    key: avatar._id,
+                                                    className: `avatar-card ${selectedAvatar?._id === avatar._id ? 'selected' : ''}`,
+                                                    onClick: () => setSelectedAvatar(avatar)
+                                                },
+                                                    React.createElement('div', { className: 'avatar-name' }, avatar.name),
+                                                    React.createElement('div', { className: 'avatar-desc' }, avatar.description),
+                                                    React.createElement('div', { className: 'avatar-specialization' }, avatar.specialization)
+                                                )
+                                            )
+                                    )
+                            ),
+
+                            // OR Divider
+                            React.createElement('div', { className: 'divider' },
+                                React.createElement('span', null, 'LUB')
+                            ),
+
+                            // Create New Avatar Section
                             // Base Description Section
                             React.createElement('div', { className: 'form-section' },
                                 React.createElement('div', { className: 'section-header' },
@@ -1182,8 +1471,102 @@ Twoja odpowiedź:`
                             )
                         ),
 
+                        // Flows Manager Tab
+                        activeTab === 'flows' && React.createElement('div', null,
+                            !selectedAvatar && React.createElement('div', { className: 'warning-section' },
+                                React.createElement('div', { className: 'warning-icon' }, '⚠️'),
+                                React.createElement('div', { className: 'warning-text' }, 
+                                    React.createElement('h3', null, 'Wybierz Avatar'),
+                                    React.createElement('p', null, 'Przed zarządzaniem flows musisz wybrać avatar z zakładki "Avatar Selection"')
+                                )
+                            ),
+
+                            selectedAvatar && React.createElement('div', null,
+                                // Selected Avatar Info
+                                React.createElement('div', { className: 'selected-avatar-info' },
+                                    React.createElement('div', { className: 'selected-avatar-name' }, 
+                                        `🎭 ${selectedAvatar.name} - Flows Manager`
+                                    ),
+                                    React.createElement('div', { className: 'selected-avatar-desc' }, 
+                                        `Zarządzaj flows dla: ${selectedAvatar.description}`
+                                    )
+                                ),
+
+                                // Existing Flows List
+                                React.createElement('div', { className: 'form-section' },
+                                    React.createElement('h3', { className: 'section-title' }, '🔄 Existing Flows'),
+                                    
+                                    selectedAvatar.flows && selectedAvatar.flows.length === 0 ? 
+                                        React.createElement('div', { className: 'empty-state' }, 
+                                            'Brak flows dla tego avatara. Przejdź do "Flow Creator" żeby stworzyć nowy.'
+                                        ) :
+                                        React.createElement('div', { className: 'flows-list' },
+                                            selectedAvatar.flows && selectedAvatar.flows.map((flow, index) => 
+                                                React.createElement('div', { 
+                                                    key: flow.id,
+                                                    className: `flow-item ${selectedFlow?.id === flow.id ? 'selected' : ''}`,
+                                                    onClick: () => setSelectedFlow(flow)
+                                                },
+                                                    React.createElement('div', { className: 'flow-header' },
+                                                        React.createElement('div', { className: 'flow-name' }, flow.name),
+                                                        React.createElement('div', { className: 'flow-actions' },
+                                                            React.createElement('button', {
+                                                                className: 'btn-small btn-edit',
+                                                                onClick: (e) => {
+                                                                    e.stopPropagation();
+                                                                    setEditingFlow(flow);
+                                                                }
+                                                            }, '✏️ Edit'),
+                                                            React.createElement('button', {
+                                                                className: 'btn-small btn-danger',
+                                                                onClick: (e) => {
+                                                                    e.stopPropagation();
+                                                                    if (confirm(`Czy na pewno usunąć flow "${flow.name}"?`)) {
+                                                                        console.log('Delete flow:', flow.id);
+                                                                    }
+                                                                }
+                                                            }, '🗑️ Delete')
+                                                        )
+                                                    ),
+                                                    React.createElement('div', { className: 'flow-description' }, flow.description),
+                                                    React.createElement('div', { className: 'flow-stats' },
+                                                        `Steps: ${flow.steps?.length || 0} | Intents: ${flow.entry_intents?.length || 0} | Priority: ${flow.priority || 5}`
+                                                    )
+                                                )
+                                            )
+                                        )
+                                ),
+
+                                // Create New Flow Button
+                                React.createElement('div', { className: 'form-section' },
+                                    React.createElement('button', {
+                                        className: 'btn btn-primary btn-large',
+                                        onClick: () => setActiveTab('flow')
+                                    }, '🆕 Stwórz Nowy Flow')
+                                )
+                            )
+                        ),
+
                         // Flow Creator Tab
                         activeTab === 'flow' && React.createElement('div', null,
+                            !selectedAvatar && React.createElement('div', { className: 'warning-section' },
+                                React.createElement('div', { className: 'warning-icon' }, '⚠️'),
+                                React.createElement('div', { className: 'warning-text' }, 
+                                    React.createElement('h3', null, 'Wybierz Avatar'),
+                                    React.createElement('p', null, 'Przed stworzeniem flow musisz wybrać avatar z zakładki "Avatar Selection"')
+                                )
+                            ),
+
+                            selectedAvatar && React.createElement('div', null,
+                                // Selected Avatar Info
+                                React.createElement('div', { className: 'selected-avatar-info' },
+                                    React.createElement('div', { className: 'selected-avatar-name' }, 
+                                        `🎭 ${selectedAvatar.name}`
+                                    ),
+                                    React.createElement('div', { className: 'selected-avatar-desc' }, 
+                                        selectedAvatar.description
+                                    )
+                                ),
                             // Flow Name Section
                             React.createElement('div', { className: 'form-section' },
                                 React.createElement('div', { className: 'section-header' },
@@ -1314,236 +1697,97 @@ Twoja odpowiedź:`
                                     onClick: addManualStep
                                 }, '➕ Dodaj krok')
                             )
-                        ),
-
-                        // Intent Creator Tab
-                        activeTab === 'intent' && React.createElement('div', null,
-                            // Intent Name Section
-                            React.createElement('div', { className: 'form-section' },
-                                React.createElement('div', { className: 'section-header' },
-                                    React.createElement('h3', { className: 'section-title' }, '🎯 Nazwa Intencji'),
-                                    React.createElement('button', {
-                                        className: 'ai-generate-btn',
-                                        onClick: () => generateIntentField('name'),
-                                        disabled: isGenerating
-                                    }, isGenerating ? 
-                                        React.createElement('span', { className: 'loading' }) : '✨ Generuj nazwę'
-                                    )
-                                ),
-
-                                React.createElement('div', { className: 'form-group' },
-                                    React.createElement('input', {
-                                        type: 'text',
-                                        className: 'form-input',
-                                        value: intentData.name,
-                                        onChange: (e) => setIntentData({ ...intentData, name: e.target.value }),
-                                        placeholder: 'np. strategic_vision'
-                                    })
-                                )
-                            ),
-
-                            // Keywords Section
-                            React.createElement('div', { className: 'form-section' },
-                                React.createElement('div', { className: 'section-header' },
-                                    React.createElement('h3', { className: 'section-title' }, '🔍 Słowa kluczowe'),
-                                    React.createElement('button', {
-                                        className: 'ai-generate-btn',
-                                        onClick: () => generateIntentField('keywords'),
-                                        disabled: isGenerating
-                                    }, isGenerating ? 
-                                        React.createElement('span', { className: 'loading' }) : '✨ Generuj keywords'
-                                    )
-                                ),
-
-                                React.createElement('div', { className: 'form-group' },
-                                    React.createElement('div', { className: 'keyword-input-container' },
-                                        React.createElement('input', {
-                                            type: 'text',
-                                            className: 'form-input',
-                                            value: newKeyword,
-                                            onChange: (e) => setNewKeyword(e.target.value),
-                                            onKeyPress: (e) => e.key === 'Enter' && addKeyword(),
-                                            placeholder: 'Dodaj słowo kluczowe...'
-                                        }),
-                                        React.createElement('button', {
-                                            className: 'btn',
-                                            onClick: addKeyword
-                                        }, 'Dodaj')
-                                    ),
-                                    React.createElement('div', { className: 'keywords-container' },
-                                        intentData.keywords.map((keyword, index) =>
-                                            React.createElement('span', {
-                                                key: index,
-                                                className: 'keyword-tag',
-                                                onClick: () => removeKeyword(keyword)
-                                            }, keyword + ' ×')
-                                        )
-                                    )
-                                )
-                            ),
-
-                            // Examples Section
-                            React.createElement('div', { className: 'form-section' },
-                                React.createElement('div', { className: 'section-header' },
-                                    React.createElement('h3', { className: 'section-title' }, '💬 Przykłady wypowiedzi'),
-                                    React.createElement('button', {
-                                        className: 'ai-generate-btn',
-                                        onClick: () => generateIntentField('examples'),
-                                        disabled: isGenerating
-                                    }, isGenerating ? 
-                                        React.createElement('span', { className: 'loading' }) : '✨ Generuj przykłady'
-                                    )
-                                ),
-
-                                React.createElement('div', { className: 'form-group' },
-                                    React.createElement('div', { className: 'keyword-input-container' },
-                                        React.createElement('input', {
-                                            type: 'text',
-                                            className: 'form-input',
-                                            value: newExample,
-                                            onChange: (e) => setNewExample(e.target.value),
-                                            onKeyPress: (e) => e.key === 'Enter' && addExample(),
-                                            placeholder: 'Dodaj przykład wypowiedzi...'
-                                        }),
-                                        React.createElement('button', {
-                                            className: 'btn',
-                                            onClick: addExample
-                                        }, 'Dodaj')
-                                    ),
-                                    React.createElement('div', { className: 'keywords-container' },
-                                        intentData.examples.map((example, index) =>
-                                            React.createElement('span', {
-                                                key: index,
-                                                className: 'keyword-tag',
-                                                onClick: () => removeExample(example)
-                                            }, example + ' ×')
-                                        )
-                                    )
-                                )
-                            ),
-
-                            // System Prompt Section
-                            React.createElement('div', { className: 'form-section' },
-                                React.createElement('div', { className: 'section-header' },
-                                    React.createElement('h3', { className: 'section-title' }, '🤖 System Prompt'),
-                                    React.createElement('button', {
-                                        className: 'ai-generate-btn',
-                                        onClick: () => generateIntentField('system_prompt'),
-                                        disabled: isGenerating
-                                    }, isGenerating ? 
-                                        React.createElement('span', { className: 'loading' }) : '✨ Generuj prompt'
-                                    )
-                                ),
-
-                                React.createElement('div', { className: 'form-group' },
-                                    React.createElement('textarea', {
-                                        className: 'form-input form-textarea',
-                                        value: intentData.system_prompt,
-                                        onChange: (e) => setIntentData({ ...intentData, system_prompt: e.target.value }),
-                                        placeholder: 'System prompt dla tej intencji...',
-                                        style: { minHeight: '120px' }
-                                    })
-                                )
-                            ),
-
-                            // User Prompt Template Section
-                            React.createElement('div', { className: 'form-section' },
-                                React.createElement('div', { className: 'section-header' },
-                                    React.createElement('h3', { className: 'section-title' }, '👤 User Prompt Template'),
-                                    React.createElement('button', {
-                                        className: 'ai-generate-btn',
-                                        onClick: () => generateIntentField('user_prompt_template'),
-                                        disabled: isGenerating
-                                    }, isGenerating ? 
-                                        React.createElement('span', { className: 'loading' }) : '✨ Generuj template'
-                                    )
-                                ),
-
-                                React.createElement('div', { className: 'form-group' },
-                                    React.createElement('textarea', {
-                                        className: 'form-input form-textarea',
-                                        value: intentData.user_prompt_template,
-                                        onChange: (e) => setIntentData({ ...intentData, user_prompt_template: e.target.value }),
-                                        placeholder: 'Template dla user prompt...',
-                                        style: { minHeight: '150px' }
-                                    })
-                                )
-                            )
                         )
-                    ),
+                    )
 
-                    // Preview Panel
+                    // Intent Creation moved to modal within Flow Creator
+                ),
+
+                    // NEW: Preview Panel with ReactFlow
                     React.createElement('div', { className: 'preview-panel' },
-                        React.createElement('h3', { 
-                            style: { 
-                                color: '#58a6ff', 
-                                marginBottom: '25px', 
-                                fontSize: '20px',
-                                textAlign: 'center'
-                            } 
-                        }, '👁️ Live Preview'),
-
-                        // Avatar Preview
-                        activeTab === 'avatar' && React.createElement('div', null,
-                            avatarData.name && React.createElement('div', { className: 'preview-section' },
-                                React.createElement('div', { className: 'preview-title' }, '👤 Avatar'),
-                                React.createElement('div', { className: 'preview-content' },
-                                    `Nazwa: ${avatarData.name}\n` +
-                                    `Specjalizacja: ${avatarData.specialization}\n` +
-                                    `Osobowość: ${avatarData.personality}\n` +
-                                    `Styl: ${avatarData.communication_style}`
-                                )
-                            ),
-
-                            avatarData.background && React.createElement('div', { className: 'preview-section' },
-                                React.createElement('div', { className: 'preview-title' }, '📖 Background'),
-                                React.createElement('div', { className: 'preview-content' }, avatarData.background)
-                            ),
-
-                            avatarData.knowledge_files.length > 0 && React.createElement('div', { className: 'preview-section' },
-                                React.createElement('div', { className: 'preview-title' }, '📚 Knowledge Files'),
-                                React.createElement('div', { className: 'preview-content' },
-                                    avatarData.knowledge_files.map(file => 
-                                        `${getFileIcon(file.name)} ${file.name} (${formatFileSize(file.size)})`
-                                    ).join('\n')
-                                )
-                            )
+                        React.createElement('div', { className: 'preview-header' },
+                            '🎯 Live Flow Preview'
                         ),
-
-                        // Flow Preview
-                        activeTab === 'flow' && React.createElement('div', null,
-                            flowData.name && React.createElement('div', { className: 'preview-section' },
-                                React.createElement('div', { className: 'preview-title' }, '🔄 Flow Definition'),
-                                React.createElement('div', { className: 'preview-content' },
-                                    JSON.stringify({
-                                        id: flowData.id,
-                                        name: flowData.name,
-                                        description: flowData.description,
-                                        priority: flowData.priority,
-                                        steps: flowData.steps
-                                    }, null, 2)
-                                )
-                            )
-                        ),
-
-                        // Intent Preview
-                        activeTab === 'intent' && React.createElement('div', null,
-                            intentData.system_prompt && React.createElement('div', { className: 'preview-section' },
-                                React.createElement('div', { className: 'preview-title' }, '🤖 System Prompt'),
-                                React.createElement('div', { className: 'preview-content' }, intentData.system_prompt)
-                            ),
-
-                            intentData.user_prompt_template && React.createElement('div', { className: 'preview-section' },
-                                React.createElement('div', { className: 'preview-title' }, '👤 User Prompt Template'),
-                                React.createElement('div', { className: 'preview-content' }, intentData.user_prompt_template)
-                            ),
-
-                            intentData.keywords.length > 0 && React.createElement('div', { className: 'preview-section' },
-                                React.createElement('div', { className: 'preview-title' }, '🔍 Keywords & Examples'),
-                                React.createElement('div', { className: 'preview-content' },
-                                    `Keywords: ${intentData.keywords.join(', ')}\n\n` +
-                                    `Examples:\n${intentData.examples.map(e => `- ${e}`).join('\n')}`
-                                )
+                        React.createElement('div', { className: 'preview-content' },
+                            // ReactFlow Preview
+                            React.createElement('div', {
+                                style: {
+                                    width: '100%',
+                                    height: '100%',
+                                    background: '#0d1117'
+                                }
+                            },
+                                (activeTab === 'flow' && selectedAvatar && window.ZoomableFlowEditor && flowData.steps.length > 0) ||
+                                (activeTab === 'flows' && selectedAvatar && selectedFlow && window.ZoomableFlowEditor) ? 
+                                    React.createElement(window.ZoomableFlowEditor, {
+                                        flowDefinitions: activeTab === 'flows' && selectedFlow ? 
+                                            [selectedFlow] : // Show selected flow from Flows Manager
+                                            [{ // Show flow being created in Flow Creator
+                                                ...flowData,
+                                                id: flowData.id || 'preview_flow',
+                                                name: flowData.name || 'Preview Flow',
+                                                description: flowData.description || 'Live preview of your flow',
+                                                avatar_type: selectedAvatar.name
+                                            }],
+                                        activeFlow: activeTab === 'flows' && selectedFlow ? selectedFlow.id : (flowData.id || 'preview_flow'),
+                                        currentStep: null, // No active step in preview mode
+                                        onNodeClick: (node) => {
+                                            console.log('🎯 Preview node clicked:', node);
+                                        },
+                                        editable: activeTab === 'flows' ? true : false, // Editable in Flows Manager
+                                        avatar: selectedAvatar // Pass avatar for custom intents
+                                    }) :
+                                    React.createElement('div', {
+                                        style: {
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            height: '100%',
+                                            color: '#8b949e',
+                                            fontSize: '18px',
+                                            textAlign: 'center'
+                                        }
+                                    }, 
+                                        React.createElement('div', null,
+                                            activeTab === 'avatar' ? [
+                                                React.createElement('div', { key: 'icon', style: { fontSize: '48px', marginBottom: '16px' } }, '👤'),
+                                                React.createElement('div', { key: 'title' }, 'Avatar Selection'),
+                                                React.createElement('div', { key: 'desc', style: { fontSize: '14px', marginTop: '8px' } }, 
+                                                    'Wybierz lub stwórz avatar'
+                                                )
+                                            ] : activeTab === 'flow' && !selectedAvatar ? [
+                                                React.createElement('div', { key: 'icon', style: { fontSize: '48px', marginBottom: '16px' } }, '⚠️'),
+                                                React.createElement('div', { key: 'title' }, 'Select Avatar First'),
+                                                React.createElement('div', { key: 'desc', style: { fontSize: '14px', marginTop: '8px' } }, 
+                                                    'Wybierz avatar żeby zacząć tworzyć flow'
+                                                )
+                                            ] : activeTab === 'flows' && !selectedAvatar ? [
+                                                React.createElement('div', { key: 'icon', style: { fontSize: '48px', marginBottom: '16px' } }, '⚠️'),
+                                                React.createElement('div', { key: 'title' }, 'Select Avatar First'),
+                                                React.createElement('div', { key: 'desc', style: { fontSize: '14px', marginTop: '8px' } }, 
+                                                    'Wybierz avatar żeby zobaczyć jego flows'
+                                                )
+                                            ] : activeTab === 'flows' && selectedAvatar && !selectedFlow ? [
+                                                React.createElement('div', { key: 'icon', style: { fontSize: '48px', marginBottom: '16px' } }, '🔄'),
+                                                React.createElement('div', { key: 'title' }, 'Flows Manager'),
+                                                React.createElement('div', { key: 'desc', style: { fontSize: '14px', marginTop: '8px' } }, 
+                                                    'Wybierz flow z listy żeby zobaczyć preview'
+                                                )
+                                            ] : activeTab === 'flow' && selectedAvatar && flowData.steps.length === 0 ? [
+                                                React.createElement('div', { key: 'icon', style: { fontSize: '48px', marginBottom: '16px' } }, '🔄'),
+                                                React.createElement('div', { key: 'title' }, 'Flow Preview'),
+                                                React.createElement('div', { key: 'desc', style: { fontSize: '14px', marginTop: '8px' } }, 
+                                                    'Dodaj kroki żeby zobaczyć live preview'
+                                                )
+                                            ] : [
+                                                React.createElement('div', { key: 'icon', style: { fontSize: '48px', marginBottom: '16px' } }, '🎯'),
+                                                React.createElement('div', { key: 'title' }, 'Creator Mode'),
+                                                React.createElement('div', { key: 'desc', style: { fontSize: '14px', marginTop: '8px' } }, 
+                                                    'Preview dostępny w Flow Creator'
+                                                )
+                                            ]
+                                        )
+                                    )
                             )
                         )
                     )

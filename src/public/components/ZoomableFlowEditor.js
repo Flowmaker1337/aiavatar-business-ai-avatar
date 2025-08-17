@@ -1,5 +1,5 @@
     // ZoomableFlowEditor - ReactFlow container + custom card nodes (bez edges)
-    const ZoomableFlowEditor = ({ flowDefinitions = [], activeFlow = null, currentStep = null, onNodeClick = () => {}, editable = false }) => {
+    const ZoomableFlowEditor = ({ flowDefinitions = [], activeFlow = null, currentStep = null, onNodeClick = () => {}, editable = false, avatar = null }) => {
         const [nodes, setNodes, onNodesChange] = window.ReactFlow.useNodesState([]);
         const [edges, setEdges, onEdgesChange] = window.ReactFlow.useEdgesState([]);
         const [selectedNode, setSelectedNode] = React.useState(null);
@@ -88,6 +88,12 @@
             let intentDefinition = intentDefinitions.find(i => i.id === stepIntent);
             if (!intentDefinition) {
                 intentDefinition = intentDefinitions.find(i => i.name === stepIntent);
+            }
+            
+            // 🔥 FOR CUSTOM AVATARS: Use avatar's own intents first!
+            if (!intentDefinition && avatar && avatar.intents) {
+                intentDefinition = avatar.intents.find(i => i.name === stepIntent);
+                console.log(`🎯 [CUSTOM INTENT] Found "${stepIntent}" in avatar intents:`, intentDefinition);
             }
             
             // Use flow-level RAG detection or intent-level fallback
@@ -185,8 +191,8 @@
                             intent_name: promptData.mappedIntent,
                             intent_description: promptData.intent?.description || '',
                             has_template: !!promptData.template,
-                            system_prompt: promptData.template?.system_prompt || '',
-                            user_prompt_template: promptData.template?.user_prompt_template || '',
+                            system_prompt: promptData.template?.system_prompt || promptData.intent?.system_prompt || '',
+                            user_prompt_template: promptData.template?.user_prompt_template || promptData.intent?.user_prompt_template || '',
                             // Additional properties from working commit
                             conditions: step.conditions || [],
                             memory_operation: step.memory_operation || '',
