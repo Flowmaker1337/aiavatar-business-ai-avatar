@@ -10,6 +10,8 @@ import SimulationController from '../controllers/simulation.controller';
 import PersonaController from '../controllers/persona.controller';
 import FlowWizardController from '../controllers/flow-wizard.controller';
 import CustomAvatarController from '../controllers/custom-avatar.controller';
+import { ReactiveAvatarController } from '../controllers/reactive-avatar.controller';
+import CompanyProfileController from '../controllers/company-profile.controller';
 
 const router = Router();
 
@@ -18,6 +20,8 @@ const simulationController = new SimulationController();
 const personaController = new PersonaController();
 const flowWizardController = new FlowWizardController();
 const customAvatarController = new CustomAvatarController();
+const reactiveAvatarController = new ReactiveAvatarController();
+const companyProfileController = new CompanyProfileController();
 
 // Endpoint for processing queries
 router.post('/query', queryController.handleQuery.bind(queryController));
@@ -115,6 +119,17 @@ router.get('/simulation/templates/personas', simulationController.getPersonaTemp
 // Export simulation
 router.post('/simulation/export/:id', simulationController.exportSimulation.bind(simulationController));
 
+// ============ SIMULATION CHAT MODE ENDPOINTS ============
+
+// Start simulation chat session
+router.post('/simulation/start', simulationController.startChatSimulation.bind(simulationController));
+
+// Send message in simulation chat
+router.post('/simulation/message', simulationController.sendChatMessage.bind(simulationController));
+
+// Get simulation chat session
+router.get('/simulation/session/:sessionId', simulationController.getChatSession.bind(simulationController));
+
 // ============ PERSONA ENDPOINTS ============
 
 // Generate new persona
@@ -205,5 +220,28 @@ router.post('/avatar/:avatarId/process-knowledge', customAvatarController.proces
 
 // Upload knowledge file to avatar
 router.post('/avatar/:avatarId/upload-knowledge', customAvatarController.uploadKnowledgeFile.bind(customAvatarController));
+
+// Simulation avatars endpoint
+router.get('/simulation-avatars', (req, res) => {
+    try {
+        const simulationAvatars = require('../config/simulation-avatars.json');
+        res.json(simulationAvatars);
+    } catch (error) {
+        console.error('Error loading simulation avatars:', error);
+        res.status(500).json({ error: 'Failed to load simulation avatars' });
+    }
+});
+
+// Reactive avatar prompts endpoints
+router.post('/reactive-avatars/:avatarId/prompts', reactiveAvatarController.savePrompts.bind(reactiveAvatarController));
+router.get('/reactive-avatars/:avatarId/prompts', reactiveAvatarController.getPrompts.bind(reactiveAvatarController));
+router.get('/reactive-avatars/prompts', reactiveAvatarController.getAllPrompts.bind(reactiveAvatarController));
+
+// ============ COMPANY PROFILES ENDPOINTS ============
+
+// Company profile endpoints
+router.post('/company-profiles/:companyId', companyProfileController.saveProfile.bind(companyProfileController));
+router.get('/company-profiles/:companyId', companyProfileController.getProfile.bind(companyProfileController));
+router.get('/company-profiles', companyProfileController.getAllProfiles.bind(companyProfileController));
 
 export default router; 

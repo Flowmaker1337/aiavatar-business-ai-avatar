@@ -15,6 +15,7 @@ import IntentClassifier from './intent-classifier.service';
 import FlowManager from './flow-manager.service';
 import { ConversationAnalyzerService } from './conversation-analyzer.service';
 import { ExecutionTimerService } from './execution-timer.service';
+import DatabaseService from './database.service';
 
 /**
  * SimulationManager - zarządza symulacjami konwersacji między AI Avatarami
@@ -28,11 +29,13 @@ export class SimulationManager {
     private intentClassifier: IntentClassifier;
     private flowManager: FlowManager;
     private conversationAnalyzer: ConversationAnalyzerService;
+    private databaseService: DatabaseService;
 
     private constructor() {
         this.intentClassifier = IntentClassifier.getInstance();
         this.flowManager = FlowManager.getInstance();
         this.conversationAnalyzer = new ConversationAnalyzerService();
+        this.databaseService = DatabaseService.getInstance();
     }
 
     public static getInstance(): SimulationManager {
@@ -636,6 +639,296 @@ HISTORIA ROZMOWY:`;
      */
     private sleep(ms: number): Promise<void> {
         return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // ============ SIMULATION CHAT MODE METHODS ============
+
+    /**
+     * Generuje odpowiedź reactive avatar w trybie chat simulation
+     */
+    public async generateReactiveResponse(
+        avatarId: 'client' | 'student',
+        userMessage: string,
+        userRole: 'trainer' | 'seller',
+        conversationHistory: any[],
+        userCompany: string = 'aureus'
+    ): Promise<string> {
+        const timer = new ExecutionTimerService('SimulationManager.generateReactiveResponse');
+        timer.start();
+
+        try {
+            // Load simulation avatars config
+            const simulationAvatarsConfig = await this.loadSimulationAvatarsConfig();
+            const avatarData = simulationAvatarsConfig.simulation_avatars[avatarId];
+            
+            if (!avatarData) {
+                throw new Error(`Avatar ${avatarId} not found in simulation config`);
+            }
+
+            // Check for custom prompts from reactive avatar editor
+            const customPrompts = await this.loadCustomReactivePrompts(avatarId);
+
+            // Load company profile data
+            const companyProfile = await this.loadCompanyProfile(userCompany);
+
+            // Build conversation context
+            const conversationContext = this.buildChatConversationHistory(conversationHistory);
+
+            // Build role-specific system prompt
+            const systemPrompt = customPrompts?.system_prompt || this.buildDefaultReactiveSystemPrompt(
+                avatarData, 
+                avatarId, 
+                userRole,
+                userCompany,
+                companyProfile
+            );
+
+            // Build user prompt template
+            const userPromptTemplate = customPrompts?.user_prompt_template || this.buildDefaultReactiveUserPrompt(
+                avatarData,
+                avatarId,
+                userRole,
+                userCompany,
+                companyProfile
+            );
+
+            // Replace placeholders in user prompt
+            const finalUserPrompt = userPromptTemplate
+                .replace(/\{\{user_message\}\}/g, userMessage)
+                .replace(/\{\{conversation_history\}\}/g, conversationContext)
+                .replace(/\{\{avatar_name\}\}/g, `${avatarData.firstName} ${avatarData.lastName}`)
+                .replace(/\{\{user_role\}\}/g, userRole === 'trainer' ? 'TRENER' : 'SPRZEDAWCA');
+
+            // Generate response using OpenAI
+            const openAIMessages = [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: finalUserPrompt }
+            ];
+
+            const response = await this.openAIService.generateResponse({
+                role: 'user',
+                content: JSON.stringify(openAIMessages)
+            });
+
+            timer.stop();
+            console.log(`🤖 Generated reactive response for ${avatarId} (${userRole} mode)`);
+
+            return response.trim();
+
+        } catch (error) {
+            timer.stop();
+            console.error('❌ Error generating reactive response:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Load simulation avatars configuration
+     */
+    private async loadSimulationAvatarsConfig(): Promise<any> {
+        try {
+            const fs = require('fs');
+            const path = require('path');
+            const configPath = path.join(__dirname, '../config/simulation-avatars.json');
+            const configData = fs.readFileSync(configPath, 'utf8');
+            return JSON.parse(configData);
+        } catch (error) {
+            console.error('Error loading simulation avatars config:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Load custom reactive prompts from database
+     */
+    private async loadCustomReactivePrompts(avatarId: string): Promise<any> {
+        try {
+            // This would normally fetch from database via ReactiveAvatarController
+            // For now, return null to use defaults
+            return null;
+        } catch (error) {
+            console.error('Error loading custom reactive prompts:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Load company profile from database
+     */
+    private async loadCompanyProfile(companyId: string): Promise<any> {
+        try {
+            const collectionName = 'company_profiles';
+            const allProfiles = await this.databaseService.findAll(collectionName);
+            const profile = allProfiles.find((p: any) => p.company_id === companyId);
+            return profile || null;
+        } catch (error) {
+            console.error('Error loading company profile:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Build chat conversation history for context
+     */
+    private buildChatConversationHistory(messages: any[]): string {
+        if (!messages || messages.length === 0) {
+            return 'To jest początek konwersacji.';
+        }
+
+        return messages
+            .slice(-10) // Last 10 messages
+            .map(msg => `${msg.sender}: ${msg.content}`)
+            .join('\n');
+    }
+
+    /**
+     * Build default system prompt for reactive avatar
+     */
+    private buildDefaultReactiveSystemPrompt(
+        avatarData: any, 
+        avatarId: 'client' | 'student', 
+        userRole: 'trainer' | 'seller',
+        userCompany: string = 'aureus',
+        companyProfile: any = null
+    ): string {
+        // Get company info for context
+        const companyInfo = this.getCompanyInfo(userCompany);
+        
+        // Build company context from profile or defaults
+        let companyContext = companyProfile?.company_context || companyInfo.services.join(', ');
+        let roleDescription = companyProfile?.your_role_description || `${userRole === 'trainer' ? 'Trener' : 'Sprzedawca'} z firmy ${companyInfo.name}`;
+        let currentSituation = companyProfile?.current_situation || 'Prezentacja rozwiązań biznesowych';
+        let goalsObjectives = companyProfile?.goals_objectives || 'Znalezienie najlepszego rozwiązania dla klienta';
+        let keyChallenges = companyProfile?.key_challenges || 'Budżet i czas implementacji';
+        
+        const basePrompt = `Jesteś ${avatarData.firstName} ${avatarData.lastName}, ${avatarData.position} w firmie ${avatarData.company.name}.
+
+ROZMAWASZ Z: ${roleDescription}
+BRANŻA ROZMÓWCY: ${companyInfo.industry}
+KONTEKST FIRMY ROZMÓWCY: ${companyContext}
+
+SYTUACJA ROZMOWY: ${currentSituation}
+CELE ROZMÓWCY: ${goalsObjectives}  
+WYZWANIA ROZMÓWCY: ${keyChallenges}
+
+TWOJA ROLA: ${avatarId === 'client' ? 'buyer (klient)' : 'learner (uczeń)'}
+OSOBOWOŚĆ: ${avatarData.personality.style}
+BRANŻA: ${avatarData.company.industry}
+${avatarId === 'client' ? `WIELKOŚĆ FIRMY: ${avatarData.company.size}` : `DOŚWIADCZENIE: ${avatarData.experience_years} lat`}`;
+
+        if (avatarId === 'client') {
+            return basePrompt + `
+
+TWOJE CELE W ROZMOWIE:
+- Znaleźć rozwiązanie problemów swojej firmy
+- Upewnić się o wartości dla biznesu
+- Sprawdzić czy to opłacalne rozwiązanie
+- Zminimalizować ryzyko biznesowe
+
+TWOJE WYZWANIA:
+- Ograniczony budżet
+- Potrzeba uzasadnienia decyzji przed kierownictwem
+- Skeptycyzm wobec nowych rozwiązań
+- Presja czasu na podejmowanie decyzji
+
+JAKO BUYER:
+- Zadawaj pytania o produkty/usługi
+- Wyrażaj wątpliwości i obawy
+- Negocjuj warunki
+- Bądź skeptyczny ale konstruktywny
+- Żądaj konkretnych przykładów i dowodów
+
+Odpowiadaj w charakterze dla tej osoby, używając jej stylu komunikacji: ${avatarData.personality.communication_style}`;
+        } else {
+            return basePrompt + `
+
+TWOJE CELE W ROZMOWIE:
+- Nauczyć się nowych umiejętności menedżerskich
+- Zdobyć praktyczne narzędzia do pracy
+- Rozwinąć kompetencje przywódcze
+- Rozwiązać konkretne problemy w zespole
+
+TWOJE WYZWANIA:
+- Brak doświadczenia w zarządzaniu
+- Niepewność w podejmowaniu decyzji
+- Potrzeba budowania autorytetu w zespole
+- Balansowanie między zadaniami technicznymi a menedżerskimi
+
+JAKO LEARNER:
+- Zadawaj pytania o wiedzę i umiejętności
+- Proś o konkretne przykłady
+- Dziel się swoimi wyzwaniami
+- Bądź chętny do nauki
+- Proś o feedback i wskazówki
+
+Odpowiadaj w charakterze dla tej osoby, używając jej stylu komunikacji: ${avatarData.personality.communication_style}`;
+        }
+    }
+
+    /**
+     * Build default user prompt template for reactive avatar
+     */
+    private buildDefaultReactiveUserPrompt(
+        avatarData: any,
+        avatarId: 'client' | 'student',
+        userRole: 'trainer' | 'seller',
+        userCompany: string = 'aureus',
+        companyProfile: any = null
+    ): string {
+        // Add company profile context if available
+        let additionalContext = '';
+        if (companyProfile) {
+            additionalContext = `
+KONTEKST ROZMOWY:
+- Sytuacja: ${companyProfile.current_situation || 'Standardowa prezentacja'}
+- Cele rozmówcy: ${companyProfile.goals_objectives || 'Znalezienie rozwiązania'}
+- Wyzwania: ${companyProfile.key_challenges || 'Budżet i czas'}`;
+        }
+
+        return `Rozmówca napisał: "{{user_message}}"
+
+Twoje zadanie jako ${avatarId === 'client' ? 'KLIENT (buyer)' : 'UCZEŃ (learner)'}:
+1. Odpowiedz w charakterze ${avatarData.firstName} ${avatarData.lastName}
+2. ${avatarId === 'client' ? 'Zachowuj się jak potencjalny klient szukający rozwiązań biznesowych' : 'Zachowuj się jak chętny do nauki menedżer z ograniczonym doświadczeniem'}
+3. ${avatarId === 'client' ? 'Zadawaj pytania o korzyści, koszty, implementation' : 'Zadawaj pytania o praktyczne zastosowania i przykłady'}
+4. Używaj stylu: ${avatarData.personality.communication_style}
+5. Reaguj zgodnie z osobowością: ${avatarData.personality.style}
+${additionalContext}
+
+HISTORIA KONWERSACJI:
+{{conversation_history}}
+
+PAMIĘTAJ: Jesteś ${avatarId === 'client' ? 'skeptycznym ale zainteresowanym klientem' : 'ambitnym ale niepewnym uczniem'}.`;
+    }
+
+    /**
+     * Get company configuration based on userCompany
+     */
+    private getCompanyInfo(userCompany: string): any {
+        const companyConfigs: Record<string, any> = {
+            aureus: {
+                name: 'Aureus',
+                industry: 'Leasing maszyn',
+                services: ['Leasing operacyjny', 'Leasing finansowy', 'Wynajem długoterminowy', 'Doradztwo finansowe']
+            },
+            techflow: {
+                name: 'TechFlow',
+                industry: 'Rozwiązania IT',
+                services: ['Rozwój oprogramowania', 'Cloud migration', 'IT consulting', 'Cybersecurity', 'Transformacja cyfrowa']
+            },
+            consultpro: {
+                name: 'ConsultPro',
+                industry: 'Konsulting biznesowy',
+                services: ['Strategia biznesowa', 'Optymalizacja procesów', 'Change management', 'Leadership training', 'Coaching']
+            },
+            custom: {
+                name: 'Firma rozmówcy',
+                industry: 'Różne branże',
+                services: ['Usługi dostosowane do branży']
+            }
+        };
+
+        return companyConfigs[userCompany] || companyConfigs.aureus;
     }
 }
 

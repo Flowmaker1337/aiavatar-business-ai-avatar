@@ -726,6 +726,72 @@
             background: #218838;
             transform: translateY(-1px);
         }
+
+        /* Reactive Avatars Styles */
+        .prompt-editor-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .prompt-editor-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .prompt-textarea {
+            min-height: 200px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            resize: vertical;
+        }
+
+        .avatar-meta {
+            margin: 8px 0;
+            font-size: 12px;
+            color: #8b949e;
+        }
+
+        .avatar-position {
+            font-weight: 500;
+            color: #58a6ff;
+        }
+
+        .avatar-company {
+            margin-top: 2px;
+        }
+
+        .avatar-personality {
+            margin-top: 8px;
+            font-size: 11px;
+            color: #7c3aed;
+            font-style: italic;
+        }
+
+        .avatar-status {
+            margin-top: 8px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .save-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .save-btn:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
     </style>
 </head>
 <body>
@@ -916,6 +982,25 @@ Twoja odpowiedź:`
             // Flows Manager State
             const [selectedFlow, setSelectedFlow] = useState(null);
             const [editingFlow, setEditingFlow] = useState(null);
+            
+            // Reactive Avatars State
+            const [reactiveAvatars, setReactiveAvatars] = useState([]);
+            const [selectedReactiveAvatar, setSelectedReactiveAvatar] = useState(null);
+            const [editingReactivePrompts, setEditingReactivePrompts] = useState({
+                system_prompt: '',
+                user_prompt_template: ''
+            });
+            
+            // Company Profiles state
+            const [companyProfiles, setCompanyProfiles] = useState({});
+            const [selectedCompany, setSelectedCompany] = useState('aureus');
+            const [editingCompanyProfile, setEditingCompanyProfile] = useState({
+                company_context: '',
+                your_role_description: '',
+                current_situation: '',
+                goals_objectives: '',
+                key_challenges: ''
+            });
 
             // Avatar Creator State
             const [avatarData, setAvatarData] = useState({
@@ -957,6 +1042,7 @@ Twoja odpowiedź:`
             // Load existing avatars on component mount
             React.useEffect(() => {
                 loadExistingAvatars();
+                loadReactiveAvatars();
             }, []);
 
             const loadExistingAvatars = async () => {
@@ -973,6 +1059,120 @@ Twoja odpowiedź:`
                     setMessage('❌ Błąd ładowania avatarów');
                 } finally {
                     setIsLoadingAvatars(false);
+                }
+            };
+
+            const getDefaultSystemPrompt = (type, result) => {
+                if (type === 'client') {
+                    return `Jesteś ${result.simulation_avatars[type].firstName} ${result.simulation_avatars[type].lastName}, ${result.simulation_avatars[type].position} w firmie ${result.simulation_avatars[type].company.name}.
+
+TWOJA ROLA: buyer (klient)
+OSOBOWOŚĆ: ${result.simulation_avatars[type].personality.style}
+BRANŻA: ${result.simulation_avatars[type].company.industry}
+WIELKOŚĆ FIRMY: ${result.simulation_avatars[type].company.size}
+
+TWOJE CELE W ROZMOWIE:
+- Znaleźć rozwiązanie problemów swojej firmy
+- Upewnić się o wartości dla biznesu
+- Sprawdzić czy to opłacalne rozwiązanie
+- Zminimalizować ryzyko biznesowe
+
+TWOJE WYZWANIA:
+- Ograniczony budżet
+- Potrzeba uzasadnienia decyzji przed kierownictwem
+- Skeptycyzm wobec nowych rozwiązań
+- Presja czasu na podejmowanie decyzji
+
+JAKO BUYER:
+- Zadawaj pytania o produkty/usługi
+- Wyrażaj wątpliwości i obawy
+- Negocjuj warunki
+- Bądź skeptyczny ale konstruktywny
+- Żądaj konkretnych przykładów i dowodów
+
+Odpowiadaj w charakterze dla tej osoby, używając jej stylu komunikacji: ${result.simulation_avatars[type].personality.communication_style}`;
+                } else {
+                    return `Jesteś ${result.simulation_avatars[type].firstName} ${result.simulation_avatars[type].lastName}, ${result.simulation_avatars[type].position} w firmie ${result.simulation_avatars[type].company.name}.
+
+TWOJA ROLA: learner (uczeń)
+OSOBOWOŚĆ: ${result.simulation_avatars[type].personality.style}
+BRANŻA: ${result.simulation_avatars[type].company.industry}
+POZIOM DOŚWIADCZENIA: ${result.simulation_avatars[type].experience_years} lat
+
+TWOJE CELE W ROZMOWIE:
+- Nauczyć się nowych umiejętności menedżerskich
+- Zdobyć praktyczne narzędzia do pracy
+- Rozwinąć kompetencje przywódcze
+- Rozwiązać konkretne problemy w zespole
+
+TWOJE WYZWANIA:
+- Brak doświadczenia w zarządzaniu
+- Niepewność w podejmowaniu decyzji
+- Potrzeba budowania autorytetu w zespole
+- Balansowanie między zadaniami technicznymi a menedżerskimi
+
+JAKO LEARNER:
+- Zadawaj pytania o wiedzę i umiejętności
+- Proś o konkretne przykłady
+- Dziel się swoimi wyzwaniami
+- Bądź chętny do nauki
+- Proś o feedback i wskazówki
+
+Odpowiadaj w charakterze dla tej osoby, używając jej stylu komunikacji: ${result.simulation_avatars[type].personality.communication_style}`;
+                }
+            };
+
+            const getDefaultUserPrompt = (type, result) => {
+                return `Rozmówca napisał: "{{user_message}}"
+
+Twoje zadanie jako ${type === 'client' ? 'KLIENT (buyer)' : 'UCZEŃ (learner)'}:
+1. Odpowiedz w charakterze ${result.simulation_avatars[type].firstName} ${result.simulation_avatars[type].lastName}
+2. ${type === 'client' ? 'Zachowuj się jak potencjalny klient szukający rozwiązań biznesowych' : 'Zachowuj się jak chętny do nauki menedżer z ograniczonym doświadczeniem'}
+3. ${type === 'client' ? 'Zadawaj pytania o korzyści, koszty, implementation' : 'Zadawaj pytania o praktyczne zastosowania i przykłady'}
+4. Używaj stylu: ${result.simulation_avatars[type].personality.communication_style}
+5. Reaguj zgodnie z osobowością: ${result.simulation_avatars[type].personality.style}
+
+PAMIĘTAJ: Jesteś ${type === 'client' ? 'skeptycznym ale zainteresowanym klientem' : 'ambitnym ale niepewnym uczniem'}.`;
+            };
+
+            const loadReactiveAvatars = async () => {
+                try {
+                    // Load static reactive avatars from configuration
+                    const [avatarsResponse, promptsResponse] = await Promise.all([
+                        fetch('/api/simulation-avatars'),
+                        fetch('/api/reactive-avatars/prompts')
+                    ]);
+                    
+                    if (avatarsResponse.ok) {
+                        const result = await avatarsResponse.json();
+                        const savedPrompts = promptsResponse.ok ? 
+                            (await promptsResponse.json()).data || [] : [];
+                        
+                        console.log('📝 Loaded saved prompts:', savedPrompts);
+                        
+                        const reactiveTypes = ['client', 'student'];
+                        const avatars = reactiveTypes.map(type => {
+                            const savedPrompt = savedPrompts.find(p => p.avatar_id === type);
+                            
+                            return {
+                            id: type,
+                            type: type,
+                            name: result.simulation_avatars[type].firstName + ' ' + result.simulation_avatars[type].lastName,
+                            position: result.simulation_avatars[type].position,
+                            company: result.simulation_avatars[type].company.name,
+                            personality: result.simulation_avatars[type].personality,
+                            // Custom prompts (editable) with defaults
+                            custom_prompts: {
+                                system_prompt: savedPrompt?.system_prompt || getDefaultSystemPrompt(type, result),
+                                user_prompt_template: savedPrompt?.user_prompt_template || getDefaultUserPrompt(type, result)
+                            }
+                        }
+                        });
+                        setReactiveAvatars(avatars);
+                    }
+                } catch (error) {
+                    console.error('Error loading reactive avatars:', error);
+                    setMessage('❌ Błąd ładowania reaktywnych avatarów');
                 }
             };
 
@@ -1199,10 +1399,131 @@ Twoja odpowiedź:`
                 }
             };
 
+            // ============ COMPANY PROFILES FUNCTIONS ============
+
+            const loadCompanyProfiles = async () => {
+                try {
+                    const response = await fetch('/api/company-profiles');
+                    if (response.ok) {
+                        const result = await response.json();
+                        setCompanyProfiles(result.data || {});
+                        console.log('🏢 Loaded company profiles:', result.data);
+                    }
+                } catch (error) {
+                    console.error('Error loading company profiles:', error);
+                }
+            };
+
+            const saveCompanyProfile = async () => {
+                if (!selectedCompany || !editingCompanyProfile.company_context.trim()) {
+                    setMessage('⚠️ Wypełnij kontekst firmy');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/api/company-profiles/${selectedCompany}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(editingCompanyProfile)
+                    });
+
+                    if (response.ok) {
+                        setMessage('✅ Zapisano profil firmy');
+                        await loadCompanyProfiles();
+                    } else {
+                        setMessage('❌ Błąd podczas zapisu profilu firmy');
+                    }
+                } catch (error) {
+                    console.error('Error saving company profile:', error);
+                    setMessage('❌ Błąd podczas zapisu profilu firmy');
+                }
+            };
+
+            const selectCompanyForEdit = (companyId) => {
+                setSelectedCompany(companyId);
+                const savedProfile = companyProfiles[companyId];
+                if (savedProfile) {
+                    setEditingCompanyProfile({
+                        company_context: savedProfile.company_context || '',
+                        your_role_description: savedProfile.your_role_description || '',
+                        current_situation: savedProfile.current_situation || '',
+                        goals_objectives: savedProfile.goals_objectives || '',
+                        key_challenges: savedProfile.key_challenges || ''
+                    });
+                } else {
+                    setEditingCompanyProfile({
+                        company_context: getDefaultCompanyContext(companyId),
+                        your_role_description: getDefaultRoleDescription(companyId),
+                        current_situation: '',
+                        goals_objectives: '',
+                        key_challenges: ''
+                    });
+                }
+            };
+
+            const getDefaultCompanyContext = (companyId) => {
+                const defaults = {
+                    aureus: 'Aureus to wiodąca firma leasingowa specjalizująca się w finansowaniu maszyn i sprzętu dla przedsiębiorstw. Oferujemy elastyczne rozwiązania finansowe dostosowane do potrzeb różnych branż.',
+                    techflow: 'TechFlow to innowacyjna firma IT specjalizująca się w transformacji cyfrowej. Pomagamy firmom modernizować procesy poprzez zaawansowane rozwiązania technologiczne.',
+                    consultpro: 'ConsultPro to renomowana firma consultingowa oferująca kompleksowe doradztwo biznesowe. Specjalizujemy się w strategii, zarządzaniu zmianą i rozwoju organizacyjnym.',
+                    custom: 'Opisz swoją firmę, branżę i specjalizację...'
+                };
+                return defaults[companyId] || '';
+            };
+
+            const getDefaultRoleDescription = (companyId) => {
+                const defaults = {
+                    aureus: 'Jako doradca leasingowy pomagam firmom znaleźć optymalne rozwiązania finansowania sprzętu. Analizuję potrzeby klienta i proponuję najlepsze opcje leasingowe.',
+                    techflow: 'Jako konsultant IT pomagam firmom w cyfrowej transformacji. Analizuję obecne systemy i proponuję nowoczesne rozwiązania technologiczne.',
+                    consultpro: 'Jako konsultant biznesowy wspieram firmy w optymalizacji procesów i rozwoju strategicznym. Pomagam w implementacji zmian organizacyjnych.',
+                    custom: 'Opisz swoją rolę w firmie i odpowiedzialności...'
+                };
+                return defaults[companyId] || '';
+            };
+
+            // Load company profiles on mount
+            useEffect(() => {
+                loadCompanyProfiles();
+                // Set default company and load its profile
+                selectCompanyForEdit('aureus');
+            }, []);
+
             return React.createElement('div', { className: 'creator-container' },
                 // Header
                 React.createElement('div', { className: 'creator-header' },
-                    React.createElement('div', { className: 'creator-title' }, '🧙‍♂️ Avatar & Flow Creator'),
+                    React.createElement('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' } },
+                        React.createElement('div', { className: 'creator-title' }, '🧙‍♂️ Avatar & Flow Creator'),
+                        React.createElement('div', { style: { display: 'flex', gap: '12px' } },
+                            React.createElement('button', {
+                                className: 'nav-btn',
+                                onClick: () => window.location.href = '/simulation-chat.html',
+                                style: { 
+                                    padding: '8px 16px',
+                                    background: 'linear-gradient(135deg, #667eea, #764ba2)',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '6px',
+                                    cursor: 'pointer',
+                                    fontSize: '14px',
+                                    fontWeight: '500'
+                                }
+                            }, '🎭 Symulacja'),
+                            React.createElement('button', {
+                                className: 'nav-btn',
+                                onClick: () => window.location.href = '/react-dashboard.html',
+                                style: { 
+                                    padding: '8px 16px',
+                                    background: '#2ea043',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '6px',
+                                    cursor: 'pointer',
+                                    fontSize: '14px',
+                                    fontWeight: '500'
+                                }
+                            }, '📊 Dashboard')
+                        )
+                    ),
                     React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: '20px' } },
                         React.createElement('button', {
                             className: 'btn btn-success btn-large',
@@ -1227,7 +1548,16 @@ Twoja odpowiedź:`
                         React.createElement('button', {
                             className: `tab-btn ${activeTab === 'flow' ? 'active' : ''}`,
                             onClick: () => setActiveTab('flow')
-                        }, '🆕 Flow Creator')
+                        }, '🆕 Flow Creator'),
+                        React.createElement('button', {
+                            className: `tab-btn ${activeTab === 'reactive' ? 'active' : ''}`,
+                            onClick: () => setActiveTab('reactive')
+                        }, '🎭 Reactive Avatars'),
+                        
+                        React.createElement('button', {
+                            className: `tab-btn ${activeTab === 'companies' ? 'active' : ''}`,
+                            onClick: () => setActiveTab('companies')
+                        }, '🏢 Company Profiles')
                         )
                     )
                 ),
@@ -1702,6 +2032,271 @@ Twoja odpowiedź:`
 
                     // Intent Creation moved to modal within Flow Creator
                 ),
+
+                        // Reactive Avatars Tab
+                        activeTab === 'reactive' && React.createElement('div', null,
+                            React.createElement('div', { className: 'form-section' },
+                                React.createElement('h3', { className: 'section-title' }, '🎭 Reactive Avatars Editor'),
+                                React.createElement('p', { className: 'section-description' }, 
+                                    'Edytuj system prompts i user prompts dla reaktywnych avatarów (client, student) używanych w symulacjach'
+                                ),
+                                
+                                // Reactive Avatars Grid
+                                React.createElement('div', { className: 'avatar-grid' },
+                                    reactiveAvatars.length === 0 ? 
+                                        React.createElement('div', { className: 'loading-state' }, 'Ładowanie reaktywnych avatarów...') :
+                                        reactiveAvatars.map(avatar => 
+                                            React.createElement('div', { 
+                                                key: avatar.id,
+                                                className: `avatar-card ${selectedReactiveAvatar?.id === avatar.id ? 'selected' : ''}`,
+                                                onClick: () => {
+                                                    setSelectedReactiveAvatar(avatar);
+                                                    setEditingReactivePrompts({
+                                                        system_prompt: avatar.custom_prompts.system_prompt || '',
+                                                        user_prompt_template: avatar.custom_prompts.user_prompt_template || ''
+                                                    });
+                                                }
+                                            },
+                                                React.createElement('div', { className: 'avatar-header' },
+                                                    React.createElement('div', { className: 'avatar-icon' }, avatar.type === 'client' ? '🏢' : '🎓'),
+                                                    React.createElement('div', { className: 'avatar-title' }, avatar.name)
+                                                ),
+                                                React.createElement('div', { className: 'avatar-meta' },
+                                                    React.createElement('div', { className: 'avatar-position' }, avatar.position),
+                                                    React.createElement('div', { className: 'avatar-company' }, avatar.company)
+                                                ),
+                                                React.createElement('div', { className: 'avatar-personality' }, 
+                                                    avatar.personality.style || 'Reactive Avatar'
+                                                ),
+                                                React.createElement('div', { className: 'avatar-status' },
+                                                    avatar.custom_prompts.system_prompt ? '✅ Custom Prompts' : '🔧 Default Prompts'
+                                                )
+                                            )
+                                        )
+                                )
+                            ),
+
+                            // Prompt Editor Section
+                            selectedReactiveAvatar && React.createElement('div', { className: 'form-section' },
+                                React.createElement('h3', { className: 'section-title' }, 
+                                    `✏️ Edycja Promptów - ${selectedReactiveAvatar.name}`
+                                ),
+                                
+                                React.createElement('div', { className: 'prompt-editor-grid' },
+                                    // System Prompt
+                                    React.createElement('div', { className: 'prompt-editor-section' },
+                                        React.createElement('label', { className: 'form-label' }, 'System Prompt'),
+                                        React.createElement('textarea', {
+                                            className: 'form-input form-textarea prompt-textarea',
+                                            value: editingReactivePrompts.system_prompt,
+                                            onChange: (e) => setEditingReactivePrompts({
+                                                ...editingReactivePrompts,
+                                                system_prompt: e.target.value
+                                            }),
+                                            placeholder: `Stwórz system prompt dla ${selectedReactiveAvatar.name} w roli ${selectedReactiveAvatar.type}a...`,
+                                            rows: 8
+                                        })
+                                    ),
+                                    
+                                    // User Prompt Template
+                                    React.createElement('div', { className: 'prompt-editor-section' },
+                                        React.createElement('label', { className: 'form-label' }, 'User Prompt Template'),
+                                        React.createElement('textarea', {
+                                            className: 'form-input form-textarea prompt-textarea',
+                                            value: editingReactivePrompts.user_prompt_template,
+                                            onChange: (e) => setEditingReactivePrompts({
+                                                ...editingReactivePrompts,
+                                                user_prompt_template: e.target.value
+                                            }),
+                                            placeholder: 'Rozmówca napisał: "{{user_message}}"\n\nTwoje zadanie jako ${selectedReactiveAvatar.type}:\n1. ...\n2. ...',
+                                            rows: 8
+                                        })
+                                    )
+                                ),
+                                
+                                // Save Button
+                                React.createElement('div', { className: 'form-actions' },
+                                    React.createElement('button', {
+                                        className: 'save-btn',
+                                        onClick: async () => {
+                                            try {
+                                                setIsGenerating(true);
+                                                
+                                                const response = await fetch(`/api/reactive-avatars/${selectedReactiveAvatar.id}/prompts`, {
+                                                    method: 'POST',
+                                                    headers: {
+                                                        'Content-Type': 'application/json'
+                                                    },
+                                                    body: JSON.stringify(editingReactivePrompts)
+                                                });
+
+                                                if (response.ok) {
+                                                    // Update local state
+                                                    const updatedAvatars = reactiveAvatars.map(avatar => 
+                                                        avatar.id === selectedReactiveAvatar.id ? 
+                                                        { ...avatar, custom_prompts: editingReactivePrompts } :
+                                                        avatar
+                                                    );
+                                                    setReactiveAvatars(updatedAvatars);
+                                                    setSelectedReactiveAvatar({ ...selectedReactiveAvatar, custom_prompts: editingReactivePrompts });
+                                                    
+                                                    setMessage('✅ Zapisano prompty dla ' + selectedReactiveAvatar.name);
+                                                } else {
+                                                    setMessage('❌ Błąd podczas zapisywania promptów');
+                                                }
+                                            } catch (error) {
+                                                console.error('Error saving prompts:', error);
+                                                setMessage('❌ Błąd podczas zapisywania promptów');
+                                            } finally {
+                                                setIsGenerating(false);
+                                            }
+                                        }
+                                    }, '💾 Zapisz Prompty')
+                                )
+                            )
+                        ),
+
+                        // ============ COMPANY PROFILES TAB ============
+                        activeTab === 'companies' && React.createElement('div', null,
+                            React.createElement('h2', { style: { marginBottom: '20px', color: '#58a6ff' } }, '🏢 Company Profiles Editor'),
+                            React.createElement('p', { style: { marginBottom: '20px', color: '#8b949e' } }, 
+                                'Edytuj profile firm do używania w symulacji. Te informacje będą przekazywane reaktywnym avatarom.'
+                            ),
+
+                            // Company Selection
+                            React.createElement('div', { className: 'avatar-grid', style: { marginBottom: '30px' } },
+                                ['aureus', 'techflow', 'consultpro', 'custom'].map(companyId => {
+                                    const companyNames = {
+                                        aureus: 'Aureus (Leasing)',
+                                        techflow: 'TechFlow (IT)',
+                                        consultpro: 'ConsultPro (Consulting)',
+                                        custom: 'Custom (Własna)'
+                                    };
+                                    
+                                    return React.createElement('div', {
+                                        key: companyId,
+                                        className: `avatar-card ${selectedCompany === companyId ? 'selected' : ''}`,
+                                        onClick: () => selectCompanyForEdit(companyId),
+                                        style: { cursor: 'pointer' }
+                                    },
+                                        React.createElement('div', { className: 'avatar-name' }, companyNames[companyId]),
+                                        React.createElement('div', { className: 'avatar-status' }, 
+                                            companyProfiles[companyId] ? '✅ Skonfigurowany' : '⚠️ Domyślny'
+                                        )
+                                    );
+                                })
+                            ),
+
+                            // Company Profile Editor
+                            selectedCompany && React.createElement('div', { className: 'prompt-editor-grid' },
+                                // Company Context
+                                React.createElement('div', { className: 'prompt-editor-section' },
+                                    React.createElement('h3', null, '🏢 Kontekst Firmy'),
+                                    React.createElement('p', { style: { fontSize: '14px', color: '#8b949e', marginBottom: '10px' } },
+                                        'Opisz swoją firmę, branżę, ofertę i pozycję na rynku'
+                                    ),
+                                    React.createElement('textarea', {
+                                        className: 'prompt-textarea',
+                                        value: editingCompanyProfile.company_context,
+                                        onChange: (e) => setEditingCompanyProfile({ 
+                                            ...editingCompanyProfile, 
+                                            company_context: e.target.value 
+                                        }),
+                                        placeholder: 'Opisz swoją firmę, jej misję, główne usługi...',
+                                        rows: 6
+                                    })
+                                ),
+
+                                // Your Role Description  
+                                React.createElement('div', { className: 'prompt-editor-section' },
+                                    React.createElement('h3', null, '👤 Twoja Rola'),
+                                    React.createElement('p', { style: { fontSize: '14px', color: '#8b949e', marginBottom: '10px' } },
+                                        'Opisz swoją rolę, odpowiedzialności i kompetencje'
+                                    ),
+                                    React.createElement('textarea', {
+                                        className: 'prompt-textarea',
+                                        value: editingCompanyProfile.your_role_description,
+                                        onChange: (e) => setEditingCompanyProfile({ 
+                                            ...editingCompanyProfile, 
+                                            your_role_description: e.target.value 
+                                        }),
+                                        placeholder: 'Jako [twoje stanowisko] odpowiadam za...',
+                                        rows: 4
+                                    })
+                                ),
+
+                                // Current Situation
+                                React.createElement('div', { className: 'prompt-editor-section' },
+                                    React.createElement('h3', null, '📊 Aktualna Sytuacja'),
+                                    React.createElement('p', { style: { fontSize: '14px', color: '#8b949e', marginBottom: '10px' } },
+                                        'Opisz kontekst tej konkretnej rozmowy/spotkania'
+                                    ),
+                                    React.createElement('textarea', {
+                                        className: 'prompt-textarea',
+                                        value: editingCompanyProfile.current_situation,
+                                        onChange: (e) => setEditingCompanyProfile({ 
+                                            ...editingCompanyProfile, 
+                                            current_situation: e.target.value 
+                                        }),
+                                        placeholder: 'W tej rozmowie chcę... / Spotkanie dotyczy...',
+                                        rows: 3
+                                    })
+                                ),
+
+                                // Goals & Objectives
+                                React.createElement('div', { className: 'prompt-editor-section' },
+                                    React.createElement('h3', null, '🎯 Cele i Zadania'),
+                                    React.createElement('p', { style: { fontSize: '14px', color: '#8b949e', marginBottom: '10px' } },
+                                        'Jakie cele chcesz osiągnąć w tej rozmowie?'
+                                    ),
+                                    React.createElement('textarea', {
+                                        className: 'prompt-textarea',
+                                        value: editingCompanyProfile.goals_objectives,
+                                        onChange: (e) => setEditingCompanyProfile({ 
+                                            ...editingCompanyProfile, 
+                                            goals_objectives: e.target.value 
+                                        }),
+                                        placeholder: 'Moje cele: 1) ... 2) ... 3) ...',
+                                        rows: 3
+                                    })
+                                ),
+
+                                // Key Challenges
+                                React.createElement('div', { className: 'prompt-editor-section' },
+                                    React.createElement('h3', null, '⚠️ Kluczowe Wyzwania'),
+                                    React.createElement('p', { style: { fontSize: '14px', color: '#8b949e', marginBottom: '10px' } },
+                                        'Jakie wyzwania/obawy możesz napotkać?'
+                                    ),
+                                    React.createElement('textarea', {
+                                        className: 'prompt-textarea',
+                                        value: editingCompanyProfile.key_challenges,
+                                        onChange: (e) => setEditingCompanyProfile({ 
+                                            ...editingCompanyProfile, 
+                                            key_challenges: e.target.value 
+                                        }),
+                                        placeholder: 'Potencjalne wyzwania: budżet, czas, skeptycyzm...',
+                                        rows: 3
+                                    })
+                                ),
+
+                                // Save Button
+                                React.createElement('div', { 
+                                    className: 'prompt-editor-section',
+                                    style: { gridColumn: '1 / -1', display: 'flex', justifyContent: 'center' }
+                                },
+                                    React.createElement('button', {
+                                        className: 'save-btn',
+                                        onClick: saveCompanyProfile,
+                                        disabled: isGenerating,
+                                        style: { 
+                                            padding: '12px 24px',
+                                            fontSize: '16px',
+                                            fontWeight: 'bold'
+                                        }
+                                    }, isGenerating ? '💾 Zapisywanie...' : '💾 Zapisz Profil Firmy')
+                                )
+                            )
+                        ),
 
                     // NEW: Preview Panel with ReactFlow
                     React.createElement('div', { className: 'preview-panel' },

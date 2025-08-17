@@ -18,6 +18,7 @@ import { ExecutionTimerService } from '../services/execution-timer.service';
  */
 export class SimulationController {
     private simulationManager: SimulationManager;
+    private chatSessions: Map<string, any> = new Map(); // Store chat sessions
 
     constructor() {
         this.simulationManager = SimulationManager.getInstance();
@@ -624,6 +625,206 @@ export class SimulationController {
                 decision_making_style: 'Powolny, analityczny'
             }
         ];
+    }
+
+    // ============ SIMULATION CHAT MODE ENDPOINTS ============
+
+    /**
+     * POST /api/simulation/start
+     * Rozpoczyna sesję chat simulation z reactive avatar
+     */
+    public async startChatSimulation(req: Request, res: Response): Promise<void> {
+        const timer = new ExecutionTimerService('SimulationController.startChatSimulation');
+        timer.start();
+
+        try {
+            const { avatar_id, user_role, user_company } = req.body;
+
+            if (!avatar_id || !user_role) {
+                res.status(400).json({
+                    success: false,
+                    error: 'Missing required parameters: avatar_id, user_role'
+                });
+                timer.stop();
+                return;
+            }
+
+            // Validate avatar_id
+            if (!['client', 'student'].includes(avatar_id)) {
+                res.status(400).json({
+                    success: false,
+                    error: 'Invalid avatar_id. Must be "client" or "student"'
+                });
+                timer.stop();
+                return;
+            }
+
+            // Validate user_role  
+            if (!['trainer', 'seller'].includes(user_role)) {
+                res.status(400).json({
+                    success: false,
+                    error: 'Invalid user_role. Must be "trainer" or "seller"'
+                });
+                timer.stop();
+                return;
+            }
+
+            // Generate session ID
+            const sessionId = `sim_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+            // Store session data
+            const sessionData = {
+                session_id: sessionId,
+                avatar_id,
+                user_role,
+                user_company: user_company || 'aureus',
+                started_at: new Date(),
+                messages: [],
+                status: 'active'
+            };
+
+            this.chatSessions.set(sessionId, sessionData);
+
+            timer.stop();
+            console.log(`🎮 Started chat simulation: ${sessionId} (${user_role} vs ${avatar_id})`);
+
+            res.json({
+                success: true,
+                session_id: sessionId,
+                avatar_id,
+                user_role,
+                message: 'Simulation chat session started successfully'
+            });
+
+        } catch (error) {
+            timer.stop();
+            console.error('❌ Error starting chat simulation:', error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to start simulation session'
+            });
+        }
+    }
+
+    /**
+     * POST /api/simulation/message
+     * Wysyła wiadomość do reactive avatar i otrzymuje odpowiedź
+     */
+    public async sendChatMessage(req: Request, res: Response): Promise<void> {
+        const timer = new ExecutionTimerService('SimulationController.sendChatMessage');
+        timer.start();
+
+        try {
+            const { session_id, message } = req.body;
+
+            if (!session_id || !message) {
+                res.status(400).json({
+                    success: false,
+                    error: 'Missing required parameters: session_id, message'
+                });
+                timer.stop();
+                return;
+            }
+
+            // Get session data
+            const sessionData = this.chatSessions.get(session_id);
+            if (!sessionData) {
+                res.status(404).json({
+                    success: false,
+                    error: 'Session not found'
+                });
+                timer.stop();
+                return;
+            }
+
+            // Store user message
+            const userMessage = {
+                id: `msg_${Date.now()}_user`,
+                sender: sessionData.user_role,
+                content: message,
+                timestamp: new Date(),
+                is_user: true
+            };
+            sessionData.messages.push(userMessage);
+
+            // Generate AI response using SimulationManager
+            const avatarResponse = await this.simulationManager.generateReactiveResponse(
+                sessionData.avatar_id,
+                message,
+                sessionData.user_role,
+                sessionData.messages,
+                sessionData.user_company
+            );
+
+            // Store avatar response
+            const avatarMessage = {
+                id: `msg_${Date.now()}_avatar`,
+                sender: sessionData.avatar_id,
+                content: avatarResponse,
+                timestamp: new Date(),
+                is_user: false
+            };
+            sessionData.messages.push(avatarMessage);
+
+            // Update session
+            this.chatSessions.set(session_id, sessionData);
+
+            timer.stop();
+            console.log(`💬 Processed message in session: ${session_id}`);
+
+            res.json({
+                success: true,
+                response: avatarResponse,
+                message_id: avatarMessage.id,
+                session_id
+            });
+
+        } catch (error) {
+            timer.stop();
+            console.error('❌ Error processing chat message:', error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to process message'
+            });
+        }
+    }
+
+    /**
+     * GET /api/simulation/session/:sessionId
+     * Pobiera dane sesji chat simulation
+     */
+    public async getChatSession(req: Request, res: Response): Promise<void> {
+        const timer = new ExecutionTimerService('SimulationController.getChatSession');
+        timer.start();
+
+        try {
+            const { sessionId } = req.params;
+            
+            const sessionData = this.chatSessions.get(sessionId);
+            if (!sessionData) {
+                res.status(404).json({
+                    success: false,
+                    error: 'Session not found'
+                });
+                timer.stop();
+                return;
+            }
+
+            timer.stop();
+
+            res.json({
+                success: true,
+                session: sessionData
+            });
+
+        } catch (error) {
+            timer.stop();
+            console.error('❌ Error getting chat session:', error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to get session data'
+            });
+        }
     }
 }
 
