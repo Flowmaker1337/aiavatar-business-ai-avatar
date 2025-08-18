@@ -242,8 +242,22 @@ class DatabaseService {
   public async findById<T>(collectionName: string, id: string): Promise<T | null> {
     this.assertInitialized();
     const collection = this.db!.collection(collectionName);
-    // Use 'id' field instead of '_id' for custom collections
-    const result = await collection.findOne({ id: id });
+    
+    // Try to find by _id first (MongoDB ObjectId)
+    let result = null;
+    try {
+      if (ObjectId.isValid(id)) {
+        result = await collection.findOne({ _id: new ObjectId(id) });
+      }
+    } catch (error) {
+      // If ObjectId conversion fails, continue to UUID search
+    }
+    
+    // If not found by _id, try by 'id' field (UUID)
+    if (!result) {
+      result = await collection.findOne({ id: id });
+    }
+    
     return result as T | null;
   }
 
@@ -267,7 +281,22 @@ class DatabaseService {
   public async delete(collectionName: string, id: string): Promise<boolean> {
     this.assertInitialized();
     const collection = this.db!.collection(collectionName);
-    const result = await collection.deleteOne({ id: id });
+    
+    // Try to delete by _id first (MongoDB ObjectId)
+    let result = null;
+    try {
+      if (ObjectId.isValid(id)) {
+        result = await collection.deleteOne({ _id: new ObjectId(id) });
+        if (result.deletedCount > 0) {
+          return true;
+        }
+      }
+    } catch (error) {
+      // If ObjectId conversion fails, continue to UUID deletion
+    }
+    
+    // If not deleted by _id, try by 'id' field (UUID)
+    result = await collection.deleteOne({ id: id });
     return result.deletedCount > 0;
   }
 

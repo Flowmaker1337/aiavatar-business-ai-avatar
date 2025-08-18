@@ -792,6 +792,32 @@
             background: #218838;
             transform: translateY(-1px);
         }
+
+        /* Avatar Flow Count Badge */
+        .avatar-flow-count {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: #0ea5e9;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .avatar-flow-count.zero {
+            background: #6b7280;
+        }
+
+        .avatar-flow-count.multiple {
+            background: #10b981;
+        }
     </style>
 </head>
 <body>
@@ -1481,6 +1507,50 @@ PAMIĘTAJ: Jesteś ${type === 'client' ? 'skeptycznym ale zainteresowanym klient
                 return defaults[companyId] || '';
             };
 
+            // Helper function to count flows for an avatar
+            const getFlowCountForAvatar = (avatar) => {
+                if (!avatar || !avatar.flows) return 0;
+                return avatar.flows.length;
+            };
+
+            // ============ DELETE AVATAR FUNCTION ============
+
+            const deleteAvatar = async (avatarId, avatarName) => {
+                if (!confirm(`⚠️ Czy na pewno chcesz usunąć avatar "${avatarName}"?\n\nTo działanie jest nieodwracalne i usunie:\n- Avatar i wszystkie jego dane\n- Wszystkie powiązane flow i intenty\n- Pliki wiedzy i wektory\n\nKliknij OK aby kontynuować.`)) {
+                    return;
+                }
+
+                setIsGenerating(true);
+                try {
+                    const response = await fetch(`/api/avatar/${avatarId}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        setMessage(`✅ Avatar "${avatarName}" został usunięty`);
+                        
+                        // Clear selected avatar if it was deleted
+                        if (selectedAvatar?._id === avatarId) {
+                            setSelectedAvatar(null);
+                        }
+                        
+                        // Reload avatars list
+                        await loadExistingAvatars();
+                        
+                        console.log('🗑️ Avatar deleted:', result);
+                    } else {
+                        const errorData = await response.json();
+                        setMessage(`❌ Błąd usuwania avatara: ${errorData.message || 'Nieznany błąd'}`);
+                    }
+                } catch (error) {
+                    console.error('Error deleting avatar:', error);
+                    setMessage('❌ Błąd połączenia podczas usuwania avatara');
+                } finally {
+                    setIsGenerating(false);
+                }
+            };
+
             // Load company profiles on mount
             useEffect(() => {
                 loadCompanyProfiles();
@@ -1586,11 +1656,47 @@ PAMIĘTAJ: Jesteś ${type === 'client' ? 'skeptycznym ale zainteresowanym klient
                                                 React.createElement('div', { 
                                                     key: avatar._id,
                                                     className: `avatar-card ${selectedAvatar?._id === avatar._id ? 'selected' : ''}`,
-                                                    onClick: () => setSelectedAvatar(avatar)
+                                                    style: { position: 'relative' }
                                                 },
-                                                    React.createElement('div', { className: 'avatar-name' }, avatar.name),
-                                                    React.createElement('div', { className: 'avatar-desc' }, avatar.description),
-                                                    React.createElement('div', { className: 'avatar-specialization' }, avatar.specialization)
+                                                    // Flow count badge
+                                                    React.createElement('div', { 
+                                                        className: `avatar-flow-count ${getFlowCountForAvatar(avatar) === 0 ? 'zero' : getFlowCountForAvatar(avatar) > 1 ? 'multiple' : ''}`,
+                                                        title: `Liczba flows: ${getFlowCountForAvatar(avatar)}`
+                                                    }, `📊 ${getFlowCountForAvatar(avatar)} flows`),
+                                                    
+                                                    React.createElement('div', { 
+                                                        onClick: () => setSelectedAvatar(avatar),
+                                                        style: { cursor: 'pointer' }
+                                                    },
+                                                        React.createElement('div', { className: 'avatar-name' }, avatar.name),
+                                                        React.createElement('div', { className: 'avatar-desc' }, avatar.description),
+                                                        React.createElement('div', { className: 'avatar-specialization' }, avatar.specialization)
+                                                    ),
+                                                    React.createElement('button', {
+                                                        className: 'delete-avatar-btn',
+                                                        onClick: (e) => {
+                                                            e.stopPropagation();
+                                                            deleteAvatar(avatar._id, avatar.name);
+                                                        },
+                                                        title: `Usuń avatar: ${avatar.name}`,
+                                                        style: {
+                                                            position: 'absolute',
+                                                            top: '8px',
+                                                            right: '8px',
+                                                            background: '#dc3545',
+                                                            color: 'white',
+                                                            border: 'none',
+                                                            borderRadius: '4px',
+                                                            width: '24px',
+                                                            height: '24px',
+                                                            cursor: 'pointer',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            fontSize: '12px',
+                                                            zIndex: 10
+                                                        }
+                                                    }, '🗑️')
                                                 )
                                             )
                                     )

@@ -169,28 +169,61 @@ export class CustomAvatarController {
      * Usuwa custom avatara
      */
     public async deleteAvatar(req: Request, res: Response): Promise<void> {
+        const timer = new ExecutionTimerService('CustomAvatarController.deleteAvatar');
+        timer.start();
+
         try {
             const { id } = req.params;
-            const deleted = await this.customAvatarService.deleteCustomAvatar(id);
 
-            if (!deleted) {
-                res.status(404).json({
+            if (!id) {
+                res.status(400).json({
                     success: false,
-                    error: 'Custom avatar not found'
+                    message: 'Avatar ID is required'
                 });
+                timer.stop();
                 return;
             }
 
-            res.json({
-                success: true,
-                message: 'Custom avatar deleted successfully'
-            });
+            // Get avatar data first for response
+            const avatar = await this.customAvatarService.getCustomAvatarById(id);
+            if (!avatar) {
+                res.status(404).json({
+                    success: false,
+                    message: 'Avatar not found'
+                });
+                timer.stop();
+                return;
+            }
 
-        } catch (error) {
+            // Delete avatar using enhanced method
+            const result = await this.customAvatarService.deleteCustomAvatar(id);
+
+            if (result.success) {
+                res.status(200).json({
+                    success: true,
+                    message: `Avatar "${avatar.name}" deleted successfully`,
+                    data: {
+                        deleted_avatar_id: id,
+                        deleted_vectors: result.deletedVectors || 0
+                    }
+                });
+            } else {
+                res.status(400).json({
+                    success: false,
+                    message: result.error || 'Failed to delete avatar'
+                });
+            }
+
+            timer.stop();
+            console.log(`🗑️ Deleted avatar via API: ${avatar.name} (${id})`);
+
+        } catch (error: any) {
+            timer.stop();
             console.error('❌ Error deleting custom avatar:', error);
             res.status(500).json({
                 success: false,
-                error: 'Internal server error while deleting avatar'
+                message: 'Internal server error',
+                error: error.message
             });
         }
     }
@@ -412,6 +445,8 @@ export class CustomAvatarController {
             });
         }
     }
+
+    // deleteCustomAvatar method consolidated with deleteAvatar above
 }
 
 export default CustomAvatarController;
