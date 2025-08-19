@@ -104,19 +104,17 @@
 
         .creator-body {
             flex: 1;
-            overflow: hidden;
+            overflow-y: auto;
         }
 
         .form-panel {
             width: 100%;
-            padding: 30px;
-            overflow-y: auto;
+            padding: 20px;
             background: #000;
             background-image: 
                 linear-gradient(rgba(57, 229, 117, 0.05) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(57, 229, 117, 0.05) 1px, transparent 1px);
             background-size: 50px 50px;
-            min-height: calc(100vh - 120px);
         }
 
         /* Avatar Selection Styles */
@@ -2857,7 +2855,7 @@ PAMIĘTAJ: Jesteś ${type === 'client' ? 'skeptycznym ale zainteresowanym klient
                             )
                     ) // form-panel end
                 ) // creator-body end  
-            ); // creator-container end
+            ; // creator-container end
         }
 
 
