@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Avatar - Symulacja Konwersacji</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -17,15 +18,16 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #0d1117;
-            color: #c9d1d9;
+            font-family: 'Inter', sans-serif;
+            background: #000;
+            color: #fff;
             line-height: 1.6;
         }
         
         .header {
-            background: #161b22;
-            border-bottom: 1px solid #30363d;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(57, 229, 117, 0.3);
             padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
@@ -34,7 +36,7 @@
         }
 
         .header h1 {
-            color: #58a6ff;
+            color: #39e575;
             font-size: 1.5rem;
             font-weight: 600;
         }

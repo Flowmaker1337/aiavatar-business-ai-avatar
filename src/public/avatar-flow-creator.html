@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Avatar & Flow Creator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -21,9 +22,9 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #1a1a1a;
-            color: #e1e5e9;
+            font-family: 'Inter', sans-serif;
+            background: #000;
+            color: #fff;
             line-height: 1.6;
         }
 
@@ -34,18 +35,28 @@
         }
 
         .creator-header {
-            background: #2a2a2a;
+            background: #000;
             padding: 20px;
-            border-bottom: 2px solid #3a3a3a;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .creator-title {
-            font-size: 24px;
-            color: #58a6ff;
-            font-weight: bold;
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-nav-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
 
         .creator-tabs {
@@ -53,65 +64,59 @@
             gap: 10px;
         }
 
+        .creator-title {
+            font-size: 24px;
+            color: #39e575;
+            font-weight: 600;
+        }
+
         .tab-btn {
-            background: #3a3a3a;
-            color: #e1e5e9;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 16px;
-            transition: all 0.3s;
+            background: rgba(0, 0, 0, 0.8) !important;
+            color: #fff !important;
+            border: 1px solid rgba(57, 229, 117, 0.3) !important;
+            padding: 12px 24px !important;
+            border-radius: 0 !important;
+            cursor: pointer !important;
+            font-weight: 600 !important;
+            font-size: 16px !important;
+            transition: all 0.3s !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
         }
 
         .tab-btn.active {
-            background: #58a6ff;
-            color: white;
+            background: linear-gradient(135deg, #39e575, #2dd866) !important;
+            color: #000 !important;
+            border-color: #39e575 !important;
+            box-shadow: 0 4px 15px rgba(57, 229, 117, 0.4) !important;
         }
 
         .tab-btn:hover {
-            background: #4a4a4a;
+            border-color: #39e575 !important;
+            box-shadow: 0 4px 15px rgba(57, 229, 117, 0.2) !important;
+            transform: translateY(-2px) !important;
         }
 
         .tab-btn.active:hover {
-            background: #4285f4;
+            box-shadow: 0 6px 20px rgba(57, 229, 117, 0.6) !important;
+            background: linear-gradient(135deg, #2dd866, #39e575) !important;
         }
 
         .creator-body {
             flex: 1;
-            display: flex;
             overflow: hidden;
         }
 
         .form-panel {
-            flex: 1;
+            width: 100%;
             padding: 30px;
             overflow-y: auto;
-        }
-
-        /* NEW: ReactFlow Preview Panel */
-        .preview-panel {
-            flex: 1;
-            background: #0d1117;
-            border-left: 2px solid #3a3a3a;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .preview-header {
-            background: #2a2a2a;
-            padding: 15px 20px;
-            border-bottom: 1px solid #3a3a3a;
-            font-size: 16px;
-            font-weight: 600;
-            color: #58a6ff;
-        }
-
-        .preview-content {
-            flex: 1;
-            position: relative;
-            overflow: hidden;
+            background: #000;
+            background-image: 
+                linear-gradient(rgba(57, 229, 117, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(57, 229, 117, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            min-height: calc(100vh - 120px);
         }
 
         /* Avatar Selection Styles */
@@ -123,28 +128,32 @@
         }
 
         .avatar-card {
-            background: #2a2a2a;
-            border: 2px solid #3a3a3a;
-            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(57, 229, 117, 0.3);
+            border-radius: 0;
             padding: 16px;
             cursor: pointer;
             transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
         .avatar-card:hover {
-            border-color: #58a6ff;
-            background: #333;
+            border-color: #39e575;
+            box-shadow: 0 20px 40px rgba(57, 229, 117, 0.3);
+            transform: translateY(-5px);
         }
 
         .avatar-card.selected {
-            border-color: #28a745;
-            background: #1a4a2a;
+            border-color: #39e575;
+            background: rgba(57, 229, 117, 0.1);
+            box-shadow: 0 20px 40px rgba(57, 229, 117, 0.4);
         }
 
         .avatar-name {
             font-size: 16px;
             font-weight: 600;
-            color: #58a6ff;
+            color: #39e575;
             margin-bottom: 8px;
         }
 
@@ -286,27 +295,35 @@
             padding: 4px 8px;
             font-size: 12px;
             border: none;
-            border-radius: 4px;
+            border-radius: 0;
             cursor: pointer;
             transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .btn-edit {
-            background: #4285f4;
-            color: white;
+            background: linear-gradient(135deg, #39e575, #2dd866);
+            color: #000;
+            box-shadow: 0 2px 8px rgba(57, 229, 117, 0.3);
         }
 
         .btn-edit:hover {
-            background: #3367d6;
+            background: linear-gradient(135deg, #2dd866, #39e575);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(57, 229, 117, 0.5);
         }
 
         .btn-danger {
-            background: #dc2626;
+            background: rgba(220, 38, 38, 0.8);
             color: white;
+            border: 1px solid rgba(220, 38, 38, 0.5);
         }
 
         .btn-danger:hover {
-            background: #b91c1c;
+            background: rgba(185, 28, 28, 0.9);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
         }
 
         .flow-description {
@@ -348,25 +365,30 @@
         }
 
         .ai-generate-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.3s;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-            white-space: nowrap;
-            flex-shrink: 0;
-            min-width: 140px;
+            background: linear-gradient(135deg, #39e575, #2dd866) !important;
+            color: #000 !important;
+            border: none !important;
+            padding: 10px 20px !important;
+            border-radius: 0 !important;
+            cursor: pointer !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
+            transition: all 0.3s !important;
+            box-shadow: 0 4px 15px rgba(57, 229, 117, 0.4) !important;
+            white-space: nowrap !important;
+            flex-shrink: 0 !important;
+            min-width: 140px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
         }
 
         .ai-generate-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(57, 229, 117, 0.6) !important;
+            background: linear-gradient(135deg, #2dd866, #39e575) !important;
         }
+
+        /* Live Flow Preview Styles - minimalne zmiany */
 
         .form-group {
             margin-bottom: 20px;
@@ -414,36 +436,57 @@
         }
 
         .btn {
-            background: #58a6ff;
-            color: white;
+            background: linear-gradient(135deg, #39e575, #2dd866);
+            color: #000;
             border: none;
             padding: 12px 24px;
-            border-radius: 8px;
+            border-radius: 0;
             cursor: pointer;
             font-weight: 600;
             font-size: 15px;
             transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(57, 229, 117, 0.4);
         }
 
         .btn:hover {
-            background: #4285f4;
-            transform: translateY(-1px);
+            background: linear-gradient(135deg, #2dd866, #39e575);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(57, 229, 117, 0.6);
         }
 
         .btn-success {
-            background: #28a745;
+            background: linear-gradient(135deg, #39e575, #2dd866);
         }
 
         .btn-success:hover {
-            background: #218838;
+            background: linear-gradient(135deg, #2dd866, #39e575);
         }
 
         .btn-secondary {
-            background: #6c757d;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            border: 1px solid rgba(57, 229, 117, 0.3);
         }
 
         .btn-secondary:hover {
-            background: #5a6268;
+            border-color: #39e575;
+            box-shadow: 0 4px 15px rgba(57, 229, 117, 0.2);
+        }
+
+        .btn:disabled {
+            background: rgba(108, 117, 125, 0.8) !important;
+            color: #6c757d !important;
+            cursor: not-allowed !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .btn:disabled:hover {
+            background: rgba(108, 117, 125, 0.8) !important;
+            transform: none !important;
+            box-shadow: none !important;
         }
 
         .btn-large {
@@ -451,34 +494,208 @@
             font-size: 18px;
         }
 
+        .nav-btn {
+            padding: 0.75rem 1.5rem !important;
+            background: linear-gradient(135deg, #39e575, #2dd866) !important;
+            border: none !important;
+            border-radius: 0 !important;
+            color: #000 !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            box-shadow: 0 4px 15px rgba(57, 229, 117, 0.4) !important;
+            font-size: 0.875rem !important;
+            margin: 0 2px !important;
+        }
+        
+        /* Specjalne style dla tabów w creator-tabs */
+        .creator-tabs .nav-btn {
+            padding: 8px 16px !important;
+            font-size: 14px !important;
+            min-width: 120px !important;
+            margin: 0 4px !important;
+            background: rgba(0, 0, 0, 0.8) !important;
+            color: #fff !important;
+            border: 1px solid rgba(57, 229, 117, 0.3) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+        }
+        
+        .creator-tabs .nav-btn:hover {
+            border-color: #39e575 !important;
+            box-shadow: 0 4px 15px rgba(57, 229, 117, 0.2) !important;
+            background: rgba(57, 229, 117, 0.1) !important;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(57, 229, 117, 0.6) !important;
+            background: linear-gradient(135deg, #2dd866, #39e575) !important;
+        }
+
+        .nav-btn:disabled {
+            background: rgba(108, 117, 125, 0.8) !important;
+            color: #6c757d !important;
+            cursor: not-allowed !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .nav-btn:disabled:hover {
+            background: rgba(108, 117, 125, 0.8) !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .creator-tabs .nav-btn.active {
+            background: linear-gradient(135deg, #39e575, #2dd866) !important;
+            color: #000 !important;
+            box-shadow: 0 4px 15px rgba(57, 229, 117, 0.6) !important;
+            transform: translateY(-2px) !important;
+            border-color: #39e575 !important;
+        }
+
+        .creator-tabs .nav-btn.active:hover {
+            background: linear-gradient(135deg, #2dd866, #39e575) !important;
+            box-shadow: 0 6px 20px rgba(57, 229, 117, 0.8) !important;
+        }
+        
+        .nav-btn.active {
+            background: linear-gradient(135deg, #39e575, #2dd866) !important;
+            color: #000 !important;
+            box-shadow: 0 4px 15px rgba(57, 229, 117, 0.6) !important;
+            transform: translateY(-2px) !important;
+        }
+
+        .nav-btn.active:hover {
+            background: linear-gradient(135deg, #2dd866, #39e575) !important;
+            box-shadow: 0 6px 20px rgba(57, 229, 117, 0.8) !important;
+        }
+
+        /* Specjalny styl dla przycisku Zapisz Avatar */
+        .creator-header .nav-btn {
+            padding: 8px 16px !important;
+            background: linear-gradient(135deg, #39e575, #2dd866) !important;
+            border: none !important;
+            border-radius: 0 !important;
+            color: #000 !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            box-shadow: 0 4px 15px rgba(57, 229, 117, 0.4) !important;
+            font-size: 0.875rem !important;
+            margin: 0 !important;
+            min-width: auto !important;
+        }
+
+        .creator-header .nav-btn:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(57, 229, 117, 0.6) !important;
+            background: linear-gradient(135deg, #2dd866, #39e575) !important;
+        }
+
+        .creator-header .nav-btn:disabled {
+            background: rgba(108, 117, 125, 0.8) !important;
+            color: #6c757d !important;
+            cursor: not-allowed !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .creator-header .nav-btn:disabled:hover {
+            background: rgba(108, 117, 125, 0.8) !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Style formularzy */
+        input, textarea, select {
+            background: rgba(0, 0, 0, 0.8) !important;
+            border: 1px solid rgba(57, 229, 117, 0.3) !important;
+            border-radius: 0 !important;
+            color: #fff !important;
+            padding: 12px !important;
+            font-family: 'Inter', sans-serif !important;
+            font-size: 14px !important;
+            transition: all 0.3s ease !important;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none !important;
+            border-color: #39e575 !important;
+            box-shadow: 0 0 0 2px rgba(57, 229, 117, 0.2) !important;
+            background: rgba(0, 0, 0, 0.9) !important;
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: #888 !important;
+        }
+
+        /* Style dla przycisków generuj */
+        .generate-btn, button[onclick*="generate"] {
+            background: linear-gradient(135deg, #39e575, #2dd866) !important;
+            border: none !important;
+            border-radius: 0 !important;
+            color: #000 !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            box-shadow: 0 4px 15px rgba(57, 229, 117, 0.4) !important;
+            padding: 8px 16px !important;
+            font-size: 14px !important;
+        }
+
+        .generate-btn:hover, button[onclick*="generate"]:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(57, 229, 117, 0.6) !important;
+            background: linear-gradient(135deg, #2dd866, #39e575) !important;
+        }
+
         .preview-section {
-            background: #2a2a2a;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
             padding: 20px;
-            border-radius: 10px;
+            border-radius: 0;
             margin-bottom: 20px;
-            border: 1px solid #3a3a3a;
+            border: 1px solid rgba(57, 229, 117, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
         }
 
         .preview-title {
             font-size: 16px;
-            font-weight: bold;
-            color: #58a6ff;
+            font-weight: 600;
+            color: #39e575;
             margin-bottom: 15px;
             display: flex;
             align-items: center;
             gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .preview-content {
-            background: #1a1a1a;
+            background: #111;
+            background-image: 
+                linear-gradient(rgba(57, 229, 117, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(57, 229, 117, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
             padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #3a3a3a;
-            font-family: 'Courier New', monospace;
+            border-radius: 0;
+            border: 1px solid rgba(57, 229, 117, 0.3);
+            font-family: 'Inter', sans-serif;
             font-size: 13px;
             line-height: 1.5;
-            color: #c9d1d9;
+            color: #fff;
             white-space: pre-wrap;
+            position: relative;
+            overflow: hidden;
+            height: 500px; /* Wysokość dla ReactFlow */
         }
 
         .keyword-input-container {
@@ -489,17 +706,23 @@
 
         .keyword-tag {
             display: inline-block;
-            background: #58a6ff;
-            color: white;
+            background: #39e575;
+            color: #000;
             padding: 4px 10px;
-            border-radius: 15px;
+            border-radius: 0;
             font-size: 12px;
             margin: 2px;
             cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
         }
 
         .keyword-tag:hover {
-            background: #4285f4;
+            background: #2dd866;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(57, 229, 117, 0.4);
         }
 
         .keywords-container {
@@ -535,13 +758,14 @@
         }
 
         .step.active {
-            background: #58a6ff;
-            color: white;
+            background: #39e575;
+            color: #000;
+            box-shadow: 0 4px 15px rgba(57, 229, 117, 0.4);
         }
 
         .step.completed {
-            background: #28a745;
-            color: white;
+            background: #39e575;
+            color: #000;
         }
 
         .loading {
@@ -550,7 +774,7 @@
             height: 20px;
             border: 3px solid #3a3a3a;
             border-radius: 50%;
-            border-top-color: #58a6ff;
+            border-top-color: #39e575;
             animation: spin 1s ease-in-out infinite;
         }
 
@@ -593,8 +817,10 @@
         }
 
         .flow-step-title {
-            font-weight: bold;
-            color: #58a6ff;
+            font-weight: 600;
+            color: #39e575;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .remove-step-btn {
@@ -1017,6 +1243,14 @@ Twoja odpowiedź:`
                 user_prompt_template: ''
             });
             
+            // AI Generator State for Reactive Avatars
+            const [showReactiveGenerator, setShowReactiveGenerator] = useState(false);
+            const [reactiveGeneratorData, setReactiveGeneratorData] = useState({
+                description: '',
+                avatarType: 'client'
+            });
+            const [generatedReactiveAvatar, setGeneratedReactiveAvatar] = useState(null);
+            
             // Company Profiles state
             const [companyProfiles, setCompanyProfiles] = useState({});
             const [selectedCompany, setSelectedCompany] = useState('aureus');
@@ -1264,6 +1498,89 @@ PAMIĘTAJ: Jesteś ${type === 'client' ? 'skeptycznym ale zainteresowanym klient
                     }
                 } catch (error) {
                     setMessage(`❌ Błąd generowania ${fieldName}`);
+                } finally {
+                    setIsGenerating(false);
+                }
+            };
+
+            // Generate new Reactive Avatar with AI
+            const generateReactiveAvatar = async () => {
+                if (!reactiveGeneratorData.description.trim()) {
+                    setMessage('Podaj opis reaktywnego avatara');
+                    return;
+                }
+
+                setIsGenerating(true);
+                try {
+                    const response = await fetch('/api/reactive-avatars/generate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            description: reactiveGeneratorData.description,
+                            avatarType: reactiveGeneratorData.avatarType
+                        })
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        setGeneratedReactiveAvatar(result.data);
+                        setMessage(`✅ Wygenerowano reaktywny avatar: ${result.data.firstName} ${result.data.lastName}`);
+                    } else {
+                        const error = await response.json();
+                        setMessage(`❌ Błąd generowania avatara: ${error.error}`);
+                    }
+                } catch (error) {
+                    console.error('Error generating reactive avatar:', error);
+                    setMessage('❌ Błąd podczas generowania reaktywnego avatara');
+                } finally {
+                    setIsGenerating(false);
+                }
+            };
+
+            // Add generated avatar to simulation-avatars.json
+            const addGeneratedAvatarToSystem = async () => {
+                if (!generatedReactiveAvatar) return;
+
+                try {
+                    setIsGenerating(true);
+                    
+                    // Zapisz avatar do simulation-avatars.json
+                    const response = await fetch('/api/reactive-avatars/save-generated', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            avatarData: generatedReactiveAvatar
+                        })
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        console.log('Avatar saved successfully:', result);
+                        
+                        // Reset generator state
+                        const avatarName = `${generatedReactiveAvatar.firstName} ${generatedReactiveAvatar.lastName}`;
+                        setGeneratedReactiveAvatar(null);
+                        setReactiveGeneratorData({
+                            description: '',
+                            avatarType: 'client'
+                        });
+                        setShowReactiveGenerator(false);
+                        
+                        // Reload reactive avatars to show new one
+                        await loadReactiveAvatars();
+                        
+                        setMessage(`✅ Avatar ${avatarName} dodany do systemu jako ${result.data.avatar_key}`);
+                    } else {
+                        const error = await response.json();
+                        setMessage(`❌ Błąd zapisywania avatara: ${error.error}`);
+                    }
+                } catch (error) {
+                    console.error('Error adding avatar to system:', error);
+                    setMessage('❌ Błąd podczas dodawania avatara do systemu');
                 } finally {
                     setIsGenerating(false);
                 }
@@ -1561,76 +1878,52 @@ PAMIĘTAJ: Jesteś ${type === 'client' ? 'skeptycznym ale zainteresowanym klient
             return React.createElement('div', { className: 'creator-container' },
                 // Header
                 React.createElement('div', { className: 'creator-header' },
-                    React.createElement('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' } },
+                    React.createElement('div', { className: 'header-left' },
                         React.createElement('div', { className: 'creator-title' }, '🧙‍♂️ Avatar & Flow Creator'),
-                        React.createElement('div', { style: { display: 'flex', gap: '12px' } },
+                        React.createElement('div', { className: 'header-nav-buttons' },
                             React.createElement('button', {
                                 className: 'nav-btn',
-                                onClick: () => window.location.href = '/simulation-chat.html',
-                                style: { 
-                                    padding: '8px 16px',
-                                    background: 'linear-gradient(135deg, #667eea, #764ba2)',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '6px',
-                                    cursor: 'pointer',
-                                    fontSize: '14px',
-                                    fontWeight: '500'
-                                }
+                                onClick: () => window.location.href = '/simulation-chat.html'
                             }, '🎭 Symulacja'),
                             React.createElement('button', {
                                 className: 'nav-btn',
-                                onClick: () => window.location.href = '/react-dashboard.html',
-                                style: { 
-                                    padding: '8px 16px',
-                                    background: '#2ea043',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '6px',
-                                    cursor: 'pointer',
-                                    fontSize: '14px',
-                                    fontWeight: '500'
-                                }
+                                onClick: () => window.location.href = '/react-dashboard.html'
                             }, '📊 Dashboard')
                         )
                     ),
-                    React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: '20px' } },
+                    React.createElement('div', { className: 'header-right' },
                         React.createElement('button', {
-                            className: 'btn btn-success btn-large',
+                            className: 'nav-btn',
                             onClick: saveCompleteAvatar,
-                            disabled: isGenerating || !avatarData.name.trim(),
-                            style: { 
-                                background: avatarData.name.trim() ? '#28a745' : '#6c757d',
-                                cursor: avatarData.name.trim() ? 'pointer' : 'not-allowed'
-                            }
+                            disabled: isGenerating || !avatarData.name.trim()
                         }, isGenerating ? 
                             React.createElement('span', { className: 'loading' }) : '💾 Zapisz Avatar'
                         ),
                         React.createElement('div', { className: 'creator-tabs' },
                         React.createElement('button', {
-                            className: `tab-btn ${activeTab === 'avatar' ? 'active' : ''}`,
+                            className: `nav-btn ${activeTab === 'avatar' ? 'active' : ''}`,
                             onClick: () => setActiveTab('avatar')
                         }, '👤 Avatar Selection'),
                         React.createElement('button', {
-                            className: `tab-btn ${activeTab === 'flows' ? 'active' : ''}`,
+                            className: `nav-btn ${activeTab === 'flows' ? 'active' : ''}`,
                             onClick: () => setActiveTab('flows')
                         }, '🔄 Flows Manager'),
                         React.createElement('button', {
-                            className: `tab-btn ${activeTab === 'flow' ? 'active' : ''}`,
+                            className: `nav-btn ${activeTab === 'flow' ? 'active' : ''}`,
                             onClick: () => setActiveTab('flow')
                         }, '🆕 Flow Creator'),
                         React.createElement('button', {
-                            className: `tab-btn ${activeTab === 'reactive' ? 'active' : ''}`,
+                            className: `nav-btn ${activeTab === 'reactive' ? 'active' : ''}`,
                             onClick: () => setActiveTab('reactive')
                         }, '🎭 Reactive Avatars'),
                         
                         React.createElement('button', {
-                            className: `tab-btn ${activeTab === 'companies' ? 'active' : ''}`,
+                            className: `nav-btn ${activeTab === 'companies' ? 'active' : ''}`,
                             onClick: () => setActiveTab('companies')
                         }, '🏢 Company Profiles')
                         )
                     )
-                ),
+                ), // header end
 
                 // Body
                 React.createElement('div', { className: 'creator-body' },
@@ -1947,14 +2240,29 @@ PAMIĘTAJ: Jesteś ${type === 'client' ? 'skeptycznym ale zainteresowanym klient
                                                         React.createElement('div', { className: 'flow-name' }, flow.name),
                                                         React.createElement('div', { className: 'flow-actions' },
                                                             React.createElement('button', {
-                                                                className: 'btn-small btn-edit',
+                                                                className: 'nav-btn',
+                                                                style: { padding: '4px 8px', fontSize: '12px' },
                                                                 onClick: (e) => {
                                                                     e.stopPropagation();
-                                                                    setEditingFlow(flow);
+                                                                    // Załaduj flow do edycji
+                                                                    setFlowData({
+                                                                        name: flow.name || '',
+                                                                        description: flow.description || '',
+                                                                        steps: flow.steps || [],
+                                                                        entry_intents: flow.entry_intents || [],
+                                                                        priority: flow.priority || 5
+                                                                    });
+                                                                    setActiveTab('flow');
                                                                 }
                                                             }, '✏️ Edit'),
                                                             React.createElement('button', {
-                                                                className: 'btn-small btn-danger',
+                                                                className: 'nav-btn',
+                                                                style: { 
+                                                                    padding: '4px 8px', 
+                                                                    fontSize: '12px',
+                                                                    background: 'rgba(220, 38, 38, 0.8) !important',
+                                                                    color: 'white !important'
+                                                                },
                                                                 onClick: (e) => {
                                                                     e.stopPropagation();
                                                                     if (confirm(`Czy na pewno usunąć flow "${flow.name}"?`)) {
@@ -1976,7 +2284,8 @@ PAMIĘTAJ: Jesteś ${type === 'client' ? 'skeptycznym ale zainteresowanym klient
                                 // Create New Flow Button
                                 React.createElement('div', { className: 'form-section' },
                                     React.createElement('button', {
-                                        className: 'btn btn-primary btn-large',
+                                        className: 'nav-btn',
+                                        style: { padding: '16px 32px', fontSize: '18px' },
                                         onClick: () => setActiveTab('flow')
                                     }, '🆕 Stwórz Nowy Flow')
                                 )
@@ -2142,9 +2451,18 @@ PAMIĘTAJ: Jesteś ${type === 'client' ? 'skeptycznym ale zainteresowanym klient
                         // Reactive Avatars Tab
                         activeTab === 'reactive' && React.createElement('div', null,
                             React.createElement('div', { className: 'form-section' },
-                                React.createElement('h3', { className: 'section-title' }, '🎭 Reactive Avatars Editor'),
-                                React.createElement('p', { className: 'section-description' }, 
-                                    'Edytuj system prompts i user prompts dla reaktywnych avatarów (client, student) używanych w symulacjach'
+                                React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' } },
+                                    React.createElement('div', null,
+                                        React.createElement('h3', { className: 'section-title' }, '🎭 Reactive Avatars Editor'),
+                                        React.createElement('p', { className: 'section-description' }, 
+                                            'Edytuj system prompts i user prompts dla reaktywnych avatarów (client, student) używanych w symulacjach'
+                                        )
+                                    ),
+                                    React.createElement('button', {
+                                        className: 'generate-btn',
+                                        onClick: () => setShowReactiveGenerator(true),
+                                        disabled: isGenerating
+                                    }, '🤖 Generuj Nowy Avatar')
                                 ),
                                 
                                 // Reactive Avatars Grid
@@ -2258,6 +2576,141 @@ PAMIĘTAJ: Jesteś ${type === 'client' ? 'skeptycznym ale zainteresowanym klient
                                             }
                                         }
                                     }, '💾 Zapisz Prompty')
+                                )
+                            )
+                        ),
+
+                        // ============ REACTIVE AVATAR GENERATOR MODAL ============
+                        showReactiveGenerator && React.createElement('div', { className: 'modal-overlay' },
+                                React.createElement('div', { className: 'modal-content large-modal' },
+                                    React.createElement('div', { className: 'modal-header' },
+                                        React.createElement('h3', null, '🤖 Generator Reaktywnych Avatarów'),
+                                        React.createElement('button', {
+                                            className: 'close-btn',
+                                            onClick: () => {
+                                                setShowReactiveGenerator(false);
+                                                setGeneratedReactiveAvatar(null);
+                                                setReactiveGeneratorData({ description: '', avatarType: 'client' });
+                                            }
+                                        }, '×')
+                                    ),
+                                    
+                                    React.createElement('div', { className: 'modal-body' },
+                                        !generatedReactiveAvatar ? 
+                                        // Generator Form
+                                        React.createElement('div', null,
+                                            React.createElement('p', { className: 'section-description' },
+                                                'Opisz jakiego reaktywnego avatara chcesz stworzyć. AI wygeneruje kompletny profil z osobowością, firmą i specjalizacjami.'
+                                            ),
+                                            
+                                            React.createElement('div', { className: 'form-group' },
+                                                React.createElement('label', { className: 'form-label' }, 'Typ Avatara'),
+                                                React.createElement('select', {
+                                                    className: 'form-input',
+                                                    value: reactiveGeneratorData.avatarType,
+                                                    onChange: (e) => setReactiveGeneratorData({
+                                                        ...reactiveGeneratorData,
+                                                        avatarType: e.target.value
+                                                    })
+                                                },
+                                                    React.createElement('option', { value: 'client' }, '🏢 Client - Klient biznesowy, właściciel firmy'),
+                                                    React.createElement('option', { value: 'student' }, '🎓 Student - Uczestnik szkolenia, chętny do nauki'),
+                                                    React.createElement('option', { value: 'employee' }, '👔 Employee - Pracownik firmy, wykonawczy')
+                                                )
+                                            ),
+                                            
+                                            React.createElement('div', { className: 'form-group' },
+                                                React.createElement('label', { className: 'form-label' }, 'Opis Avatara'),
+                                                React.createElement('textarea', {
+                                                    className: 'form-input form-textarea',
+                                                    value: reactiveGeneratorData.description,
+                                                    onChange: (e) => setReactiveGeneratorData({
+                                                        ...reactiveGeneratorData,
+                                                        description: e.target.value
+                                                    }),
+                                                    placeholder: 'Np. "Właściciel małej firmy produkcyjnej, sceptyczny wobec nowych technologii, skupiony na kosztach i jakości. Ma 20 lat doświadczenia w branży metalowej."',
+                                                    rows: 4
+                                                })
+                                            ),
+                                            
+                                            React.createElement('div', { className: 'form-actions' },
+                                                React.createElement('button', {
+                                                    className: 'generate-btn',
+                                                    onClick: generateReactiveAvatar,
+                                                    disabled: isGenerating || !reactiveGeneratorData.description.trim()
+                                                }, isGenerating ? 'Generuję...' : '🤖 Generuj Avatar'),
+                                                
+                                                React.createElement('button', {
+                                                    className: 'cancel-btn',
+                                                    onClick: () => setShowReactiveGenerator(false)
+                                                }, 'Anuluj')
+                                            )
+                                        ) :
+                                        // Generated Avatar Preview
+                                        React.createElement('div', null,
+                                            React.createElement('h4', { style: { color: '#58a6ff', marginBottom: '20px' } }, 
+                                                `✅ Wygenerowano: ${generatedReactiveAvatar.firstName} ${generatedReactiveAvatar.lastName}`
+                                            ),
+                                            
+                                            React.createElement('div', { className: 'generated-avatar-preview' },
+                                                React.createElement('div', { className: 'avatar-info-grid' },
+                                                    React.createElement('div', { className: 'info-section' },
+                                                        React.createElement('h5', null, '👤 Dane Osobowe'),
+                                                        React.createElement('p', null, `Imię: ${generatedReactiveAvatar.firstName}`),
+                                                        React.createElement('p', null, `Nazwisko: ${generatedReactiveAvatar.lastName}`),
+                                                        React.createElement('p', null, `Stanowisko: ${generatedReactiveAvatar.position}`),
+                                                        React.createElement('p', null, `Doświadczenie: ${generatedReactiveAvatar.experience_years} lat`)
+                                                    ),
+                                                    
+                                                    React.createElement('div', { className: 'info-section' },
+                                                        React.createElement('h5', null, '🏢 Firma'),
+                                                        React.createElement('p', null, `Nazwa: ${generatedReactiveAvatar.company.name}`),
+                                                        React.createElement('p', null, `Branża: ${generatedReactiveAvatar.company.industry}`),
+                                                        React.createElement('p', null, `Lokalizacja: ${generatedReactiveAvatar.company.location}`),
+                                                        React.createElement('p', null, `Rozmiar: ${generatedReactiveAvatar.company.size}`)
+                                                    ),
+                                                    
+                                                    React.createElement('div', { className: 'info-section' },
+                                                        React.createElement('h5', null, '🧠 Osobowość'),
+                                                        React.createElement('p', null, `Styl: ${generatedReactiveAvatar.personality.style}`),
+                                                        React.createElement('p', null, `Ton: ${generatedReactiveAvatar.personality.tone}`),
+                                                        React.createElement('p', null, `Motywacja: ${generatedReactiveAvatar.personality.business_motivation}`)
+                                                    ),
+                                                    
+                                                    React.createElement('div', { className: 'info-section' },
+                                                        React.createElement('h5', null, '🎯 Specjalizacje'),
+                                                        React.createElement('div', { className: 'tags' },
+                                                            generatedReactiveAvatar.specializations.map((spec, index) => 
+                                                                React.createElement('span', { key: index, className: 'tag' }, spec)
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            ),
+                                            
+                                            React.createElement('div', { className: 'form-actions', style: { marginTop: '20px' } },
+                                                React.createElement('button', {
+                                                    className: 'save-btn',
+                                                    onClick: addGeneratedAvatarToSystem,
+                                                    disabled: isGenerating
+                                                }, isGenerating ? 'Dodaję...' : '✅ Dodaj do Systemu'),
+                                                
+                                                React.createElement('button', {
+                                                    className: 'generate-btn',
+                                                    onClick: generateReactiveAvatar,
+                                                    disabled: isGenerating
+                                                }, '🔄 Generuj Ponownie'),
+                                                
+                                                React.createElement('button', {
+                                                    className: 'cancel-btn',
+                                                    onClick: () => {
+                                                        setGeneratedReactiveAvatar(null);
+                                                        setReactiveGeneratorData({ description: '', avatarType: 'client' });
+                                                    }
+                                                }, 'Nowy Avatar')
+                                            )
+                                        )
+                                    )
                                 )
                             )
                         ),
@@ -2402,99 +2855,12 @@ PAMIĘTAJ: Jesteś ${type === 'client' ? 'skeptycznym ale zainteresowanym klient
                                     }, isGenerating ? '💾 Zapisywanie...' : '💾 Zapisz Profil Firmy')
                                 )
                             )
-                        ),
-
-                    // NEW: Preview Panel with ReactFlow
-                    React.createElement('div', { className: 'preview-panel' },
-                        React.createElement('div', { className: 'preview-header' },
-                            '🎯 Live Flow Preview'
-                        ),
-                        React.createElement('div', { className: 'preview-content' },
-                            // ReactFlow Preview
-                            React.createElement('div', {
-                                style: {
-                                    width: '100%',
-                                    height: '100%',
-                                    background: '#0d1117'
-                                }
-                            },
-                                (activeTab === 'flow' && selectedAvatar && window.ZoomableFlowEditor && flowData.steps.length > 0) ||
-                                (activeTab === 'flows' && selectedAvatar && selectedFlow && window.ZoomableFlowEditor) ? 
-                                    React.createElement(window.ZoomableFlowEditor, {
-                                        flowDefinitions: activeTab === 'flows' && selectedFlow ? 
-                                            [selectedFlow] : // Show selected flow from Flows Manager
-                                            [{ // Show flow being created in Flow Creator
-                                                ...flowData,
-                                                id: flowData.id || 'preview_flow',
-                                                name: flowData.name || 'Preview Flow',
-                                                description: flowData.description || 'Live preview of your flow',
-                                                avatar_type: selectedAvatar.name
-                                            }],
-                                        activeFlow: activeTab === 'flows' && selectedFlow ? selectedFlow.id : (flowData.id || 'preview_flow'),
-                                        currentStep: null, // No active step in preview mode
-                                        onNodeClick: (node) => {
-                                            console.log('🎯 Preview node clicked:', node);
-                                        },
-                                        editable: activeTab === 'flows' ? true : false, // Editable in Flows Manager
-                                        avatar: selectedAvatar // Pass avatar for custom intents
-                                    }) :
-                                    React.createElement('div', {
-                                        style: {
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            height: '100%',
-                                            color: '#8b949e',
-                                            fontSize: '18px',
-                                            textAlign: 'center'
-                                        }
-                                    }, 
-                                        React.createElement('div', null,
-                                            activeTab === 'avatar' ? [
-                                                React.createElement('div', { key: 'icon', style: { fontSize: '48px', marginBottom: '16px' } }, '👤'),
-                                                React.createElement('div', { key: 'title' }, 'Avatar Selection'),
-                                                React.createElement('div', { key: 'desc', style: { fontSize: '14px', marginTop: '8px' } }, 
-                                                    'Wybierz lub stwórz avatar'
-                                                )
-                                            ] : activeTab === 'flow' && !selectedAvatar ? [
-                                                React.createElement('div', { key: 'icon', style: { fontSize: '48px', marginBottom: '16px' } }, '⚠️'),
-                                                React.createElement('div', { key: 'title' }, 'Select Avatar First'),
-                                                React.createElement('div', { key: 'desc', style: { fontSize: '14px', marginTop: '8px' } }, 
-                                                    'Wybierz avatar żeby zacząć tworzyć flow'
-                                                )
-                                            ] : activeTab === 'flows' && !selectedAvatar ? [
-                                                React.createElement('div', { key: 'icon', style: { fontSize: '48px', marginBottom: '16px' } }, '⚠️'),
-                                                React.createElement('div', { key: 'title' }, 'Select Avatar First'),
-                                                React.createElement('div', { key: 'desc', style: { fontSize: '14px', marginTop: '8px' } }, 
-                                                    'Wybierz avatar żeby zobaczyć jego flows'
-                                                )
-                                            ] : activeTab === 'flows' && selectedAvatar && !selectedFlow ? [
-                                                React.createElement('div', { key: 'icon', style: { fontSize: '48px', marginBottom: '16px' } }, '🔄'),
-                                                React.createElement('div', { key: 'title' }, 'Flows Manager'),
-                                                React.createElement('div', { key: 'desc', style: { fontSize: '14px', marginTop: '8px' } }, 
-                                                    'Wybierz flow z listy żeby zobaczyć preview'
-                                                )
-                                            ] : activeTab === 'flow' && selectedAvatar && flowData.steps.length === 0 ? [
-                                                React.createElement('div', { key: 'icon', style: { fontSize: '48px', marginBottom: '16px' } }, '🔄'),
-                                                React.createElement('div', { key: 'title' }, 'Flow Preview'),
-                                                React.createElement('div', { key: 'desc', style: { fontSize: '14px', marginTop: '8px' } }, 
-                                                    'Dodaj kroki żeby zobaczyć live preview'
-                                                )
-                                            ] : [
-                                                React.createElement('div', { key: 'icon', style: { fontSize: '48px', marginBottom: '16px' } }, '🎯'),
-                                                React.createElement('div', { key: 'title' }, 'Creator Mode'),
-                                                React.createElement('div', { key: 'desc', style: { fontSize: '14px', marginTop: '8px' } }, 
-                                                    'Preview dostępny w Flow Creator'
-                                                )
-                                            ]
-                                        )
-                                    )
-                            )
-                        )
-                    )
-                )
-            );
+                    ) // form-panel end
+                ) // creator-body end  
+            ); // creator-container end
         }
+
+
 
         // Render the app
         ReactDOM.render(React.createElement(AvatarFlowCreator), document.getElementById('root'));

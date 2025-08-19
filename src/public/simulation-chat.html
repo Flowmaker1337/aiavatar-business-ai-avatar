@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎭 Simulation Chat - AI Avatar Training</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -15,10 +16,14 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', sans-serif;
+            background: #000;
+            background-image: 
+                linear-gradient(rgba(57, 229, 117, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(57, 229, 117, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
             min-height: 100vh;
-            color: #333;
+            color: #fff;
         }
 
         .simulation-container {
@@ -31,27 +36,31 @@
         }
 
         .header {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            background: rgba(0, 0, 0, 0.95);
             backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(57, 229, 117, 0.3);
+            padding: 1rem 2rem;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 10px;
+            color: #39e575;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0;
         }
 
         .header p {
-            font-size: 1.1rem;
-            color: #666;
+            font-size: 1rem;
+            color: #ccc;
+            margin: 0;
         }
 
         .main-content {
@@ -62,32 +71,49 @@
         }
 
         .sidebar {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            background: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(10px);
+            border: 1px solid rgba(57, 229, 117, 0.3);
+            border-radius: 0;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             height: fit-content;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar:hover {
+            border-color: #39e575;
+            box-shadow: 0 20px 40px rgba(57, 229, 117, 0.3);
+            transform: translateY(-5px);
         }
 
         .chat-container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            background: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(10px);
+            border: 1px solid rgba(57, 229, 117, 0.3);
+            border-radius: 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
             height: calc(100vh - 160px);
+            transition: all 0.3s ease;
+        }
+
+        .chat-container:hover {
+            border-color: #39e575;
+            box-shadow: 0 20px 40px rgba(57, 229, 117, 0.3);
         }
 
         .section-title {
             font-size: 1.2rem;
             font-weight: 600;
             margin-bottom: 15px;
-            color: #2d3748;
+            color: #39e575;
             display: flex;
             align-items: center;
             gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .avatar-selector {
@@ -101,67 +127,79 @@
 
         .avatar-card {
             padding: 16px;
-            border: 2px solid transparent;
-            border-radius: 12px;
-            background: #f8fafc;
+            border: 1px solid rgba(57, 229, 117, 0.3);
+            border-radius: 0;
+            background: rgba(0, 0, 0, 0.8);
             cursor: pointer;
             transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
 
         .avatar-card:hover {
-            background: #e2e8f0;
+            background: rgba(57, 229, 117, 0.1);
+            border-color: #39e575;
             transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(57, 229, 117, 0.2);
         }
 
         .avatar-card.selected {
-            border-color: #667eea;
-            background: linear-gradient(135deg, #667eea10, #764ba210);
+            border-color: #39e575;
+            background: rgba(57, 229, 117, 0.2);
+            box-shadow: 0 4px 15px rgba(57, 229, 117, 0.3);
         }
 
         .avatar-name {
             font-weight: 600;
-            color: #2d3748;
+            color: #39e575;
             margin-bottom: 4px;
         }
 
         .avatar-role {
             font-size: 0.9rem;
-            color: #667eea;
+            color: #39e575;
             margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .avatar-company {
             font-size: 0.8rem;
-            color: #666;
+            color: #ccc;
         }
 
         .role-indicator {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
+            background: linear-gradient(135deg, #39e575, #2dd866);
+            color: #000;
             padding: 8px 16px;
-            border-radius: 20px;
+            border-radius: 0;
             font-size: 0.9rem;
-            font-weight: 500;
+            font-weight: 600;
             text-align: center;
             margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .start-button {
             width: 100%;
             padding: 16px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
+            background: linear-gradient(135deg, #39e575, #2dd866);
+            color: #000;
             border: none;
-            border-radius: 12px;
+            border-radius: 0;
             font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(57, 229, 117, 0.4);
         }
 
         .start-button:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 6px 20px rgba(57, 229, 117, 0.6);
+            background: linear-gradient(135deg, #2dd866, #39e575);
         }
 
         .start-button:disabled {
@@ -339,24 +377,23 @@
         }
 
         .nav-button {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            padding: 12px 20px;
-            background: rgba(255, 255, 255, 0.9);
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #39e575, #2dd866);
             border: none;
-            border-radius: 10px;
-            color: #667eea;
+            border-radius: 0;
+            color: #000;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(57, 229, 117, 0.4);
         }
 
         .nav-button:hover {
-            background: rgba(255, 255, 255, 1);
             transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(57, 229, 117, 0.6);
+            background: linear-gradient(135deg, #2dd866, #39e575);
         }
     </style>
 </head>
@@ -562,24 +599,16 @@
                             <h1>🎭 Simulation Chat</h1>
                             <p>Trenuj swoje umiejętności w rozmowie z AI klientem lub uczniem</p>
                         </div>
-                        <div style={{ display: 'flex', gap: '12px' }}>
+                        <div style={{ display: 'flex', gap: '12px', marginTop: '1rem', marginLeft: '50px' }}>
                             <button 
                                 className="nav-button"
                                 onClick={() => window.location.href = '/avatar-flow-creator.html'}
-                                style={{ 
-                                    background: 'linear-gradient(135deg, #667eea, #764ba2)',
-                                    color: 'white'
-                                }}
                             >
                                 🧙‍♂️ Creator
                             </button>
                             <button 
                                 className="nav-button"
                                 onClick={() => window.location.href = '/react-dashboard.html'}
-                                style={{ 
-                                    background: '#2ea043',
-                                    color: 'white'
-                                }}
                             >
                                 📊 Dashboard
                             </button>

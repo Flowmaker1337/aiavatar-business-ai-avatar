@@ -872,6 +872,77 @@ Przykład: "15-letnie doświadczenie w branży technologicznej, prowadził 3 sta
 Odpowiedz tylko opisem background.`;
                     break;
 
+                case 'firstName':
+                    prompt = `Na podstawie opisu: "${description}"
+                    
+Wygeneruj typowe polskie imię dla tej osoby.
+Imię powinno pasować do opisu i być realistyczne.
+
+Odpowiedz tylko imieniem, bez dodatkowych komentarzy.`;
+                    break;
+
+                case 'lastName':
+                    prompt = `Na podstawie opisu: "${description}"
+                    
+Wygeneruj typowe polskie nazwisko dla tej osoby.
+Nazwisko powinno brzmieć naturalnie i profesjonalnie.
+
+Odpowiedz tylko nazwiskiem, bez dodatkowych komentarzy.`;
+                    break;
+
+                case 'position':
+                    prompt = `Na podstawie opisu: "${description}"
+                    
+Wygeneruj stanowisko/pozycję zawodową tej osoby.
+Stanowisko powinno odpowiadać opisowi i być realistyczne.
+
+Przykłady:
+- "Właściciel i Dyrektor Generalny"
+- "Team Leader / Junior Manager"
+- "Senior Executive Coach & Psycholog"
+- "Specjalista ds. Procesów"
+
+Odpowiedz tylko stanowiskiem, bez dodatkowych komentarzy.`;
+                    break;
+
+                case 'companyName':
+                    prompt = `Na podstawie opisu: "${description}"
+                    
+Wygeneruj nazwę firmy dla tej osoby.
+Nazwa powinna brzmieć profesjonalnie i pasować do branży.
+Może zawierać polskie elementy ale powinna być biznesowa.
+
+Przykłady:
+- "TechSolutions Sp. z o.o."
+- "WisProd Manufacturing"
+- "LogisPol International"
+- "Instytut Archetypów Osobowości"
+
+Odpowiedz tylko nazwą firmy, bez dodatkowych komentarzy.`;
+                    break;
+
+                case 'industry':
+                    prompt = `Na podstawie opisu: "${description}"
+                    
+Wygeneruj nazwę branży/sektora dla tej firmy.
+Branża powinna pasować do opisu i być konkretna.
+
+Przykłady:
+- "Produkcja przemysłowa"
+- "Usługi IT"
+- "Logistyka międzynarodowa"
+- "Edukacja i rozwój osobisty"
+
+Odpowiedz tylko nazwą branży, bez dodatkowych komentarzy.`;
+                    break;
+
+                case 'specializations':
+                case 'companyDetails':
+                case 'personalityTraits':
+                    // Te są obsługiwane przez bardziej złożone prompty w ReactiveAvatarController
+                    prompt = `Generate content for ${fieldName} based on: "${description}"`;
+                    break;
+
                 default:
                     throw new Error(`Unknown field name: ${fieldName}`);
             }

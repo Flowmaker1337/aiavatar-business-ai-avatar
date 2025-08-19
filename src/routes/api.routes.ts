@@ -237,6 +237,12 @@ router.post('/reactive-avatars/:avatarId/prompts', reactiveAvatarController.save
 router.get('/reactive-avatars/:avatarId/prompts', reactiveAvatarController.getPrompts.bind(reactiveAvatarController));
 router.get('/reactive-avatars/prompts', reactiveAvatarController.getAllPrompts.bind(reactiveAvatarController));
 
+// Generate new reactive avatar with AI
+router.post('/reactive-avatars/generate', reactiveAvatarController.generateReactiveAvatar.bind(reactiveAvatarController));
+
+// Save generated reactive avatar to simulation-avatars.json
+router.post('/reactive-avatars/save-generated', reactiveAvatarController.saveGeneratedAvatar.bind(reactiveAvatarController));
+
 // ============ COMPANY PROFILES ENDPOINTS ============
 
 // Company profile endpoints
