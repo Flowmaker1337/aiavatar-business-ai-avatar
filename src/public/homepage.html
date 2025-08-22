@@ -42,6 +42,13 @@
                         </li>
                         
                         <li class="nav-item">
+                            <a href="#avatar-manager" class="nav-link" data-page="avatar-manager">
+                                <i class="fas fa-users nav-icon"></i>
+                                <span class="nav-text">Avatar Manager</span>
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
                             <a href="#avatar-creator" class="nav-link" data-page="avatar-creator">
                                 <i class="fas fa-user-plus nav-icon"></i>
                                 <span class="nav-text">Avatar Creator</span>
@@ -322,6 +329,72 @@
                                     <div class="activity-time">1 godzina temu</div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Avatar Manager Screen -->
+                <div class="avatar-manager-screen" id="avatarManagerScreen" style="display: none;">
+                    <div class="screen-header">
+                        <div class="screen-title">
+                            <h1>Avatar Manager</h1>
+                            <p>Zarządzaj wszystkimi swoimi avatarami AI</p>
+                        </div>
+                        <div class="screen-actions">
+                            <button class="btn-secondary" id="importAvatarBtn">
+                                <i class="fas fa-upload"></i>
+                                Import Avatar
+                            </button>
+                            <button class="btn-primary" id="createAvatarBtn">
+                                <i class="fas fa-plus"></i>
+                                Nowy Avatar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="avatar-categories">
+                        <div class="category-tabs">
+                            <button class="category-tab active" data-category="all">
+                                <i class="fas fa-users"></i>
+                                Wszystkie
+                                <span class="tab-count">0</span>
+                            </button>
+                            <button class="category-tab" data-category="with-flows">
+                                <i class="fas fa-project-diagram"></i>
+                                Z Flows
+                                <span class="tab-count">0</span>
+                            </button>
+                            <button class="category-tab" data-category="reactive">
+                                <i class="fas fa-brain"></i>
+                                Reaktywne
+                                <span class="tab-count">0</span>
+                            </button>
+                            <button class="category-tab" data-category="demo">
+                                <i class="fas fa-star"></i>
+                                Demo
+                                <span class="tab-count">6</span>
+                            </button>
+                        </div>
+
+                        <div class="category-filters">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" placeholder="Szukaj avatarów..." id="avatarSearch">
+                            </div>
+                            <select class="filter-select" id="sortFilter">
+                                <option value="name">Sortuj: Nazwa</option>
+                                <option value="created">Sortuj: Data utworzenia</option>
+                                <option value="activity">Sortuj: Ostatnia aktywność</option>
+                                <option value="performance">Sortuj: Wydajność</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="avatars-grid" id="avatarsGrid">
+                        <!-- Avatars will be loaded dynamically -->
+                        <div class="loading-avatars">
+                            <div class="loading-spinner-small"></div>
+                            <p>Ładowanie avatarów...</p>
                         </div>
                     </div>
                 </div>

@@ -191,16 +191,20 @@ class HomepageApp {
             'role-training': 'roleTrainingPage'
         };
 
-        const targetPageId = pageMapping[pageName];
-        if (targetPageId) {
-            const targetPage = document.getElementById(targetPageId);
-            if (targetPage) {
-                targetPage.style.display = 'block';
-                targetPage.style.animation = 'fadeInUp 0.5s ease forwards';
-            }
+        if (pageName === 'avatar-manager') {
+            this.showAvatarManager();
         } else {
-            // Show placeholder for non-implemented pages
-            this.showPlaceholder(pageName);
+            const targetPageId = pageMapping[pageName];
+            if (targetPageId) {
+                const targetPage = document.getElementById(targetPageId);
+                if (targetPage) {
+                    targetPage.style.display = 'block';
+                    targetPage.style.animation = 'fadeInUp 0.5s ease forwards';
+                }
+            } else {
+                // Show placeholder for non-implemented pages
+                this.showPlaceholder(pageName);
+            }
         }
     }
 
@@ -1096,6 +1100,488 @@ class HomepageApp {
             console.error('Authenticated request failed:', error);
             throw error;
         }
+    }
+
+    // ============ AVATAR MANAGER METHODS ============
+
+    showAvatarManager() {
+        const avatarManagerScreen = document.getElementById('avatarManagerScreen');
+        if (avatarManagerScreen) {
+            avatarManagerScreen.style.display = 'block';
+            avatarManagerScreen.style.animation = 'fadeInUp 0.5s ease forwards';
+            
+            // Initialize Avatar Manager
+            this.initializeAvatarManager();
+            
+            // Load avatars
+            this.loadAvatars();
+        }
+    }
+
+    initializeAvatarManager() {
+        // Bind category tab events
+        const categoryTabs = document.querySelectorAll('.category-tab');
+        categoryTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                this.switchAvatarCategory(tab.dataset.category);
+            });
+        });
+
+        // Bind search
+        const searchInput = document.getElementById('avatarSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                this.filterAvatars(e.target.value);
+            });
+        }
+
+        // Bind sort filter
+        const sortFilter = document.getElementById('sortFilter');
+        if (sortFilter) {
+            sortFilter.addEventListener('change', (e) => {
+                this.sortAvatars(e.target.value);
+            });
+        }
+
+        // Bind action buttons
+        const createAvatarBtn = document.getElementById('createAvatarBtn');
+        if (createAvatarBtn) {
+            createAvatarBtn.addEventListener('click', () => {
+                this.navigateToPage('avatar-creator');
+            });
+        }
+
+        const importAvatarBtn = document.getElementById('importAvatarBtn');
+        if (importAvatarBtn) {
+            importAvatarBtn.addEventListener('click', () => {
+                this.showImportAvatarDialog();
+            });
+        }
+
+        console.log('🎭 Avatar Manager initialized');
+    }
+
+    async loadAvatars() {
+        const avatarsGrid = document.getElementById('avatarsGrid');
+        if (!avatarsGrid) return;
+
+        try {
+            // Show loading
+            avatarsGrid.innerHTML = `
+                <div class="loading-avatars">
+                    <div class="loading-spinner-small"></div>
+                    <p>Ładowanie avatarów...</p>
+                </div>
+            `;
+
+            // Load demo avatars (always available)
+            const demoAvatars = this.getDemoAvatars();
+            
+            // Load user avatars if logged in
+            let userAvatars = [];
+            if (this.isLoggedIn) {
+                try {
+                    const response = await this.makeAuthenticatedRequest('/api/avatars');
+                    if (response.ok) {
+                        const data = await response.json();
+                        userAvatars = data.avatars || [];
+                    }
+                } catch (error) {
+                    console.error('Failed to load user avatars:', error);
+                }
+            }
+
+            // Combine all avatars
+            this.allAvatars = [...demoAvatars, ...userAvatars];
+            this.currentAvatars = this.allAvatars;
+
+            // Update counts
+            this.updateAvatarCounts();
+
+            // Render avatars
+            this.renderAvatars(this.currentAvatars);
+
+        } catch (error) {
+            console.error('Error loading avatars:', error);
+            this.showAvatarsError();
+        }
+    }
+
+    getDemoAvatars() {
+        return [
+            {
+                id: 'demo-prezes-it',
+                name: 'Prezes IT',
+                type: 'demo',
+                description: 'Doświadczony prezes firmy technologicznej, ekspert od AI i automatyzacji',
+                personality: 'Charyzmatyczny, wizjonerski, analityczny',
+                specialization: 'Zarządzanie projektami AI, rozwój algorytmów uczenia maszynowego',
+                stats: { conversations: 45, flows: 3, accuracy: 94 },
+                status: 'active',
+                category: 'business'
+            },
+            {
+                id: 'demo-networker',
+                name: 'Networker',
+                type: 'demo',
+                description: 'Ekspert od networkingu i budowania relacji biznesowych',
+                personality: 'Towarzyski, empatyczny, perswazyjny',
+                specialization: 'Budowanie sieci kontaktów, sprzedaż B2B',
+                stats: { conversations: 67, flows: 4, accuracy: 91 },
+                status: 'active',
+                category: 'sales'
+            },
+            {
+                id: 'demo-trener',
+                name: 'Trener',
+                type: 'demo',
+                description: 'Profesjonalny trener biznesowy i coach rozwoju osobistego',
+                personality: 'Motywujący, cierpliwy, analityczny',
+                specialization: 'Szkolenia biznesowe, coaching, rozwój umiejętności',
+                stats: { conversations: 89, flows: 5, accuracy: 96 },
+                status: 'active',
+                category: 'training'
+            },
+            {
+                id: 'demo-uczen',
+                name: 'Uczeń',
+                type: 'demo',
+                description: 'Ciekawy świata student gotowy do nauki i zadawania pytań',
+                personality: 'Ciekawski, entuzjastyczny, otwarty na wiedzę',
+                specialization: 'Uczenie się, zadawanie pytań, przyswajanie wiedzy',
+                stats: { conversations: 23, flows: 2, accuracy: 87 },
+                status: 'active',
+                category: 'education'
+            },
+            {
+                id: 'demo-pracownik',
+                name: 'Pracownik',
+                type: 'demo',
+                description: 'Doświadczony pracownik biurowy, ekspert od codziennych zadań',
+                personality: 'Praktyczny, zorganizowany, pomocny',
+                specialization: 'Zarządzanie zadaniami, organizacja pracy, efektywność',
+                stats: { conversations: 56, flows: 3, accuracy: 92 },
+                status: 'active',
+                category: 'workplace'
+            },
+            {
+                id: 'demo-klient',
+                name: 'Klient',
+                type: 'demo',
+                description: 'Reprezentuje perspektywę klienta w różnych scenariuszach biznesowych',
+                personality: 'Wymagający, dociekliwy, zorientowany na wartość',
+                specialization: 'Ocena produktów/usług, negocjacje, podejmowanie decyzji',
+                stats: { conversations: 34, flows: 2, accuracy: 89 },
+                status: 'active',
+                category: 'customer'
+            }
+        ];
+    }
+
+    updateAvatarCounts() {
+        const counts = {
+            all: this.allAvatars.length,
+            'with-flows': this.allAvatars.filter(a => a.stats && a.stats.flows > 0).length,
+            reactive: this.allAvatars.filter(a => a.type === 'reactive').length,
+            demo: this.allAvatars.filter(a => a.type === 'demo').length
+        };
+
+        // Update tab counts
+        Object.keys(counts).forEach(category => {
+            const tab = document.querySelector(`[data-category="${category}"] .tab-count`);
+            if (tab) {
+                tab.textContent = counts[category];
+            }
+        });
+    }
+
+    switchAvatarCategory(category) {
+        // Update active tab
+        document.querySelectorAll('.category-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.querySelector(`[data-category="${category}"]`).classList.add('active');
+
+        // Filter avatars
+        switch (category) {
+            case 'all':
+                this.currentAvatars = this.allAvatars;
+                break;
+            case 'with-flows':
+                this.currentAvatars = this.allAvatars.filter(a => a.stats && a.stats.flows > 0);
+                break;
+            case 'reactive':
+                this.currentAvatars = this.allAvatars.filter(a => a.type === 'reactive');
+                break;
+            case 'demo':
+                this.currentAvatars = this.allAvatars.filter(a => a.type === 'demo');
+                break;
+            default:
+                this.currentAvatars = this.allAvatars;
+        }
+
+        this.renderAvatars(this.currentAvatars);
+    }
+
+    filterAvatars(searchTerm) {
+        if (!searchTerm.trim()) {
+            this.renderAvatars(this.currentAvatars);
+            return;
+        }
+
+        const filtered = this.currentAvatars.filter(avatar =>
+            avatar.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            avatar.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            avatar.specialization.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+
+        this.renderAvatars(filtered);
+    }
+
+    sortAvatars(sortBy) {
+        const sorted = [...this.currentAvatars].sort((a, b) => {
+            switch (sortBy) {
+                case 'name':
+                    return a.name.localeCompare(b.name);
+                case 'created':
+                    return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+                case 'activity':
+                    return (b.stats?.conversations || 0) - (a.stats?.conversations || 0);
+                case 'performance':
+                    return (b.stats?.accuracy || 0) - (a.stats?.accuracy || 0);
+                default:
+                    return 0;
+            }
+        });
+
+        this.renderAvatars(sorted);
+    }
+
+    renderAvatars(avatars) {
+        const avatarsGrid = document.getElementById('avatarsGrid');
+        if (!avatarsGrid) return;
+
+        if (avatars.length === 0) {
+            this.showEmptyState();
+            return;
+        }
+
+        const avatarsHTML = avatars.map(avatar => this.createAvatarCard(avatar)).join('');
+        avatarsGrid.innerHTML = avatarsHTML;
+
+        // Add event listeners to avatar cards
+        this.bindAvatarCardEvents();
+    }
+
+    createAvatarCard(avatar) {
+        const initial = avatar.name.charAt(0);
+        const hasFlows = avatar.stats && avatar.stats.flows > 0;
+        const badgeClass = avatar.type === 'demo' ? 'demo' : (avatar.status === 'active' ? '' : 'inactive');
+        const badgeText = avatar.type === 'demo' ? 'DEMO' : (avatar.status === 'active' ? 'AKTYWNY' : 'NIEAKTYWNY');
+
+        return `
+            <div class="avatar-card" data-avatar-id="${avatar.id}">
+                <div class="avatar-badge ${badgeClass}">${badgeText}</div>
+                <button class="avatar-menu-btn" data-avatar-id="${avatar.id}">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+                
+                <div class="avatar-header">
+                    <div class="avatar-image">${initial}</div>
+                    <div class="avatar-info">
+                        <div class="avatar-name">${avatar.name}</div>
+                        <div class="avatar-type">${avatar.type === 'demo' ? 'Demo Avatar' : (hasFlows ? 'Z Flows' : 'Reaktywny')}</div>
+                        <div class="avatar-description">${avatar.description}</div>
+                    </div>
+                </div>
+
+                <div class="avatar-stats">
+                    <div class="avatar-stat">
+                        <div class="stat-value">${avatar.stats?.conversations || 0}</div>
+                        <div class="stat-label">Rozmów</div>
+                    </div>
+                    <div class="avatar-stat">
+                        <div class="stat-value">${avatar.stats?.flows || 0}</div>
+                        <div class="stat-label">Flows</div>
+                    </div>
+                    <div class="avatar-stat">
+                        <div class="stat-value">${avatar.stats?.accuracy || 0}%</div>
+                        <div class="stat-label">Dokładność</div>
+                    </div>
+                </div>
+
+                <div class="avatar-actions">
+                    ${avatar.type === 'demo' 
+                        ? `<button class="avatar-btn avatar-btn-primary" data-action="copy" data-avatar-id="${avatar.id}">Kopiuj</button>
+                           <button class="avatar-btn avatar-btn-secondary" data-action="chat" data-avatar-id="${avatar.id}">Testuj</button>`
+                        : `<button class="avatar-btn avatar-btn-primary" data-action="edit" data-avatar-id="${avatar.id}">Edytuj</button>
+                           <button class="avatar-btn avatar-btn-secondary" data-action="chat" data-avatar-id="${avatar.id}">Chat</button>`
+                    }
+                </div>
+            </div>
+        `;
+    }
+
+    bindAvatarCardEvents() {
+        // Avatar action buttons
+        document.querySelectorAll('.avatar-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const action = btn.dataset.action;
+                const avatarId = btn.dataset.avatarId;
+                this.handleAvatarAction(action, avatarId);
+            });
+        });
+
+        // Avatar menu buttons
+        document.querySelectorAll('.avatar-menu-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const avatarId = btn.dataset.avatarId;
+                this.showAvatarMenu(avatarId, e.target);
+            });
+        });
+
+        // Avatar cards (click to view details)
+        document.querySelectorAll('.avatar-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const avatarId = card.dataset.avatarId;
+                this.showAvatarDetails(avatarId);
+            });
+        });
+    }
+
+    handleAvatarAction(action, avatarId) {
+        console.log(`🎭 Avatar action: ${action} for ${avatarId}`);
+
+        switch (action) {
+            case 'chat':
+                this.startChatWithAvatar(avatarId);
+                break;
+            case 'edit':
+                this.editAvatar(avatarId);
+                break;
+            case 'copy':
+                this.copyDemoAvatar(avatarId);
+                break;
+            default:
+                console.log('Unknown avatar action:', action);
+        }
+    }
+
+    startChatWithAvatar(avatarId) {
+        // Store selected avatar for chat
+        localStorage.setItem('selectedAvatarId', avatarId);
+        this.navigateToPage('simulation-dashboard');
+    }
+
+    editAvatar(avatarId) {
+        // Store avatar for editing
+        localStorage.setItem('editAvatarId', avatarId);
+        this.navigateToPage('avatar-creator');
+    }
+
+    copyDemoAvatar(avatarId) {
+        if (!this.isLoggedIn) {
+            this.showNotification('Zaloguj się aby skopiować demo avatar', 'warning');
+            return;
+        }
+
+        const avatar = this.allAvatars.find(a => a.id === avatarId);
+        if (!avatar) return;
+
+        // Show confirmation dialog
+        if (confirm(`Czy chcesz skopiować avatar "${avatar.name}" do swojego konta?`)) {
+            this.performCopyAvatar(avatar);
+        }
+    }
+
+    async performCopyAvatar(avatar) {
+        try {
+            this.showNotification('Kopiowanie avatara...', 'info');
+
+            const response = await this.makeAuthenticatedRequest('/api/avatars/copy', {
+                method: 'POST',
+                body: JSON.stringify({
+                    sourceAvatarId: avatar.id,
+                    name: `${avatar.name} (Kopia)`,
+                    customizations: {}
+                })
+            });
+
+            if (response.ok) {
+                this.showNotification('Avatar skopiowany pomyślnie!', 'success');
+                this.loadAvatars(); // Refresh the list
+            } else {
+                throw new Error('Failed to copy avatar');
+            }
+        } catch (error) {
+            console.error('Error copying avatar:', error);
+            this.showNotification('Błąd podczas kopiowania avatara', 'error');
+        }
+    }
+
+    showAvatarDetails(avatarId) {
+        const avatar = this.allAvatars.find(a => a.id === avatarId);
+        if (!avatar) return;
+
+        // Show avatar details modal/sidebar
+        console.log('🔍 Showing avatar details for:', avatar);
+        // TODO: Implement avatar details view
+        this.showNotification('Szczegóły avatara - funkcja w przygotowaniu', 'info');
+    }
+
+    showAvatarMenu(avatarId, buttonElement) {
+        // TODO: Implement context menu for avatar
+        console.log('📋 Avatar menu for:', avatarId);
+        this.showNotification('Menu avatara - funkcja w przygotowaniu', 'info');
+    }
+
+    showEmptyState() {
+        const avatarsGrid = document.getElementById('avatarsGrid');
+        if (!avatarsGrid) return;
+
+        avatarsGrid.innerHTML = `
+            <div class="avatars-empty">
+                <div class="empty-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="empty-title">Brak avatarów</h3>
+                <p class="empty-description">
+                    Nie masz jeszcze żadnych avatarów. Stwórz swojego pierwszego avatara lub skopiuj jeden z demo avatarów.
+                </p>
+                <button class="empty-action" onclick="homepageApp.navigateToPage('avatar-creator')">
+                    <i class="fas fa-plus"></i>
+                    Stwórz Pierwszego Avatara
+                </button>
+            </div>
+        `;
+    }
+
+    showAvatarsError() {
+        const avatarsGrid = document.getElementById('avatarsGrid');
+        if (!avatarsGrid) return;
+
+        avatarsGrid.innerHTML = `
+            <div class="avatars-empty">
+                <div class="empty-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 class="empty-title">Błąd ładowania</h3>
+                <p class="empty-description">
+                    Nie udało się załadować avatarów. Sprawdź połączenie internetowe i spróbuj ponownie.
+                </p>
+                <button class="empty-action" onclick="homepageApp.loadAvatars()">
+                    <i class="fas fa-refresh"></i>
+                    Spróbuj Ponownie
+                </button>
+            </div>
+        `;
+    }
+
+    showImportAvatarDialog() {
+        this.showNotification('Import avatara - funkcja w przygotowaniu', 'info');
+        // TODO: Implement avatar import functionality
     }
 }
 
