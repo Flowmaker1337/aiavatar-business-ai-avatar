@@ -61,6 +61,15 @@ app.get('/', (_req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, 'public', 'homepage.html'));
 });
 
+// Authentication pages
+app.get('/login.html', (_req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+app.get('/register.html', (_req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'public', 'register.html'));
+});
+
 // Legacy routes for backward compatibility
 app.get('/dashboard', (_req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));

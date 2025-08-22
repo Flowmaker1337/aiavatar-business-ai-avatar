@@ -5,11 +5,14 @@ class HomepageApp {
         this.currentPage = 'welcome';
         this.sidebarCollapsed = false;
         this.isMobile = window.innerWidth <= 768;
+        this.isLoggedIn = false;
+        this.currentUser = null;
         
         this.init();
     }
 
     init() {
+        this.checkAuthentication();
         this.bindEvents();
         this.loadCustomAvatars();
         this.setupRouting();
@@ -711,6 +714,388 @@ class HomepageApp {
                 }
             }, 300);
         }, 3000);
+    }
+
+    // ============ AUTHENTICATION METHODS ============
+
+    checkAuthentication() {
+        // Check if user is logged in
+        const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+        const userInfo = localStorage.getItem('userInfo');
+        
+        if (token && userInfo) {
+            try {
+                this.currentUser = JSON.parse(userInfo);
+                this.isLoggedIn = true;
+                this.updateUIForLoggedInUser();
+                console.log('✅ User is logged in:', this.currentUser);
+            } catch (error) {
+                console.error('Error parsing user info:', error);
+                this.handleLogout();
+            }
+        } else {
+            this.isLoggedIn = false;
+            this.updateUIForLoggedOutUser();
+            console.log('❌ User is not logged in');
+        }
+    }
+
+    updateUIForLoggedInUser() {
+        // Update user profile in sidebar
+        const userName = document.querySelector('.user-name');
+        const userStatus = document.querySelector('.user-status');
+        
+        if (userName && this.currentUser) {
+            userName.textContent = `${this.currentUser.first_name} ${this.currentUser.last_name}`;
+        }
+        
+        if (userStatus) {
+            userStatus.textContent = this.currentUser?.role === 'admin' ? 'Administrator' : 'Użytkownik';
+        }
+
+        // Show/hide navigation items based on role
+        this.updateNavigationForRole();
+
+        // Update header actions
+        this.updateHeaderActions();
+    }
+
+    updateUIForLoggedOutUser() {
+        // Show login/register options
+        this.showAuthenticationPrompt();
+    }
+
+    updateNavigationForRole() {
+        if (!this.currentUser) return;
+
+        const isAdmin = this.currentUser.role === 'admin';
+        
+        // Show admin-only sections
+        const adminSections = document.querySelectorAll('[data-admin-only]');
+        adminSections.forEach(section => {
+            section.style.display = isAdmin ? 'block' : 'none';
+        });
+
+        // Add admin navigation if needed
+        if (isAdmin) {
+            this.addAdminNavigation();
+        }
+    }
+
+    addAdminNavigation() {
+        const navSections = document.querySelector('.sidebar-nav');
+        
+        // Check if admin section already exists
+        if (document.querySelector('.admin-nav-section')) return;
+
+        const adminSection = document.createElement('div');
+        adminSection.className = 'nav-section admin-nav-section';
+        adminSection.innerHTML = `
+            <h3 class="nav-section-title">Administracja</h3>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#users" class="nav-link" data-page="users">
+                        <i class="fas fa-users nav-icon"></i>
+                        <span class="nav-text">Użytkownicy</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#system" class="nav-link" data-page="system">
+                        <i class="fas fa-server nav-icon"></i>
+                        <span class="nav-text">System</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#logs" class="nav-link" data-page="logs">
+                        <i class="fas fa-file-alt nav-icon"></i>
+                        <span class="nav-text">Logi</span>
+                    </a>
+                </li>
+            </ul>
+        `;
+
+        navSections.appendChild(adminSection);
+    }
+
+    updateHeaderActions() {
+        const headerActions = document.querySelector('.header-actions');
+        if (!headerActions) return;
+
+        // Add logout button
+        const logoutBtn = document.createElement('button');
+        logoutBtn.className = 'action-btn logout-btn';
+        logoutBtn.innerHTML = `
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Wyloguj</span>
+        `;
+        logoutBtn.addEventListener('click', () => this.handleLogout());
+
+        // Add user menu button
+        const userMenuBtn = document.createElement('button');
+        userMenuBtn.className = 'action-btn user-menu-btn';
+        userMenuBtn.innerHTML = `
+            <i class="fas fa-user-circle"></i>
+            <span>${this.currentUser?.first_name || 'Profil'}</span>
+        `;
+        userMenuBtn.addEventListener('click', () => this.showUserMenu());
+
+        headerActions.appendChild(userMenuBtn);
+        headerActions.appendChild(logoutBtn);
+    }
+
+    showAuthenticationPrompt() {
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        if (!welcomeScreen) return;
+
+        // Add authentication prompt to welcome screen
+        const authPrompt = document.createElement('div');
+        authPrompt.className = 'auth-prompt';
+        authPrompt.innerHTML = `
+            <div class="auth-prompt-content" style="
+                background: rgba(57, 229, 117, 0.05);
+                border: 1px solid rgba(57, 229, 117, 0.2);
+                border-radius: 16px;
+                padding: 32px;
+                text-align: center;
+                margin: 40px 0;
+            ">
+                <h3 style="color: #39e575; margin-bottom: 16px; font-size: 24px;">
+                    Zaloguj się aby uzyskać pełny dostęp
+                </h3>
+                <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 24px; font-size: 16px;">
+                    Stwórz konto lub zaloguj się aby zarządzać swoimi avatarami AI
+                </p>
+                <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+                    <a href="login.html" class="auth-prompt-btn" style="
+                        background: linear-gradient(135deg, #39e575, #2dd866);
+                        color: #000;
+                        padding: 12px 24px;
+                        border-radius: 8px;
+                        text-decoration: none;
+                        font-weight: 600;
+                        transition: all 0.3s ease;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 8px;
+                    ">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Zaloguj się
+                    </a>
+                    <a href="register.html" class="auth-prompt-btn" style="
+                        background: rgba(57, 229, 117, 0.1);
+                        border: 1px solid rgba(57, 229, 117, 0.3);
+                        color: #39e575;
+                        padding: 12px 24px;
+                        border-radius: 8px;
+                        text-decoration: none;
+                        font-weight: 600;
+                        transition: all 0.3s ease;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 8px;
+                    ">
+                        <i class="fas fa-user-plus"></i>
+                        Stwórz konto
+                    </a>
+                </div>
+                <div style="margin-top: 20px;">
+                    <button onclick="homepageApp.enableDemoMode()" style="
+                        background: none;
+                        border: none;
+                        color: rgba(255, 255, 255, 0.5);
+                        font-size: 14px;
+                        cursor: pointer;
+                        text-decoration: underline;
+                    ">
+                        Lub kontynuuj w trybie demo
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // Insert at the beginning of welcome screen
+        welcomeScreen.insertBefore(authPrompt, welcomeScreen.firstChild);
+    }
+
+    enableDemoMode() {
+        localStorage.setItem('demoMode', 'true');
+        this.showNotification('Tryb demo włączony', 'info');
+        
+        // Hide auth prompt
+        const authPrompt = document.querySelector('.auth-prompt');
+        if (authPrompt) {
+            authPrompt.style.display = 'none';
+        }
+    }
+
+    showUserMenu() {
+        const userMenu = `
+            <div class="user-menu" style="
+                position: fixed;
+                top: 80px;
+                right: 32px;
+                background: rgba(0, 0, 0, 0.95);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(57, 229, 117, 0.2);
+                border-radius: 16px;
+                padding: 20px;
+                width: 280px;
+                z-index: 1001;
+                animation: fadeInDown 0.3s ease forwards;
+            ">
+                <div class="user-menu-header" style="
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    margin-bottom: 20px;
+                    padding-bottom: 16px;
+                    border-bottom: 1px solid rgba(57, 229, 117, 0.1);
+                ">
+                    <div class="user-avatar" style="
+                        width: 48px;
+                        height: 48px;
+                        background: linear-gradient(135deg, #39e575, #2dd866);
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: #000;
+                        font-weight: 700;
+                        font-size: 18px;
+                    ">${this.currentUser?.first_name?.charAt(0) || 'U'}</div>
+                    <div>
+                        <div style="color: #ffffff; font-weight: 600; font-size: 16px;">
+                            ${this.currentUser?.first_name || ''} ${this.currentUser?.last_name || ''}
+                        </div>
+                        <div style="color: rgba(255, 255, 255, 0.6); font-size: 14px;">
+                            ${this.currentUser?.email || ''}
+                        </div>
+                        <div style="color: #39e575; font-size: 12px; text-transform: uppercase; font-weight: 600;">
+                            ${this.currentUser?.role || 'user'}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="user-menu-items">
+                    <div class="user-menu-item" onclick="homepageApp.navigateToPage('profile')" style="
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        padding: 12px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        margin-bottom: 8px;
+                    " onmouseover="this.style.background='rgba(57, 229, 117, 0.1)'" onmouseout="this.style.background='transparent'">
+                        <i class="fas fa-user" style="color: #39e575; font-size: 16px;"></i>
+                        <span style="color: #ffffff; font-size: 14px;">Profil użytkownika</span>
+                    </div>
+                    
+                    <div class="user-menu-item" onclick="homepageApp.navigateToPage('settings')" style="
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        padding: 12px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        margin-bottom: 8px;
+                    " onmouseover="this.style.background='rgba(57, 229, 117, 0.1)'" onmouseout="this.style.background='transparent'">
+                        <i class="fas fa-cog" style="color: #39e575; font-size: 16px;"></i>
+                        <span style="color: #ffffff; font-size: 14px;">Ustawienia</span>
+                    </div>
+                    
+                    <div class="user-menu-item" onclick="homepageApp.handleLogout()" style="
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        padding: 12px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        border-top: 1px solid rgba(57, 229, 117, 0.1);
+                        margin-top: 12px;
+                        padding-top: 16px;
+                    " onmouseover="this.style.background='rgba(255, 71, 87, 0.1)'" onmouseout="this.style.background='transparent'">
+                        <i class="fas fa-sign-out-alt" style="color: #ff4757; font-size: 16px;"></i>
+                        <span style="color: #ff4757; font-size: 14px;">Wyloguj się</span>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Remove existing menu
+        const existingMenu = document.querySelector('.user-menu');
+        if (existingMenu) {
+            existingMenu.remove();
+            return;
+        }
+
+        document.body.insertAdjacentHTML('beforeend', userMenu);
+
+        // Close menu when clicking outside
+        setTimeout(() => {
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.user-menu') && !e.target.closest('.user-menu-btn')) {
+                    const menu = document.querySelector('.user-menu');
+                    if (menu) menu.remove();
+                }
+            }, { once: true });
+        }, 100);
+    }
+
+    handleLogout() {
+        if (confirm('Czy na pewno chcesz się wylogować?')) {
+            // Clear auth data
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('tokenExpiry');
+            localStorage.removeItem('userInfo');
+            sessionStorage.removeItem('accessToken');
+            sessionStorage.removeItem('refreshToken');
+            sessionStorage.removeItem('tokenExpiry');
+
+            this.showNotification('Wylogowano pomyślnie', 'success');
+
+            // Redirect to login page after short delay
+            setTimeout(() => {
+                window.location.href = '/login.html';
+            }, 1500);
+        }
+    }
+
+    async makeAuthenticatedRequest(url, options = {}) {
+        const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+        
+        if (!token) {
+            this.handleLogout();
+            throw new Error('No authentication token');
+        }
+
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            ...options.headers
+        };
+
+        try {
+            const response = await fetch(url, {
+                ...options,
+                headers
+            });
+
+            // If token expired, redirect to login
+            if (response.status === 401) {
+                this.showNotification('Sesja wygasła. Zaloguj się ponownie.', 'warning');
+                this.handleLogout();
+                throw new Error('Authentication failed');
+            }
+
+            return response;
+        } catch (error) {
+            console.error('Authenticated request failed:', error);
+            throw error;
+        }
     }
 }
 

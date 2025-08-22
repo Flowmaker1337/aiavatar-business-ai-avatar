@@ -50,12 +50,12 @@ class AuthService {
 
     const accessToken = jwt.sign(payload, this.jwtSecret, {
       expiresIn: this.jwtExpiresIn
-    });
+    } as jwt.SignOptions);
 
     const refreshToken = jwt.sign(
       { userId: user.id, sessionId, type: 'refresh' },
       this.jwtSecret,
-      { expiresIn: this.refreshTokenExpiresIn }
+      { expiresIn: this.refreshTokenExpiresIn } as jwt.SignOptions
     );
 
     return { accessToken, refreshToken };

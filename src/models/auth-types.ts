@@ -1,6 +1,7 @@
 // ============ AUTHENTICATION & AUTHORIZATION TYPES ============
 
 import { ObjectId } from 'mongodb';
+import { SimulationAnalysis } from './types';
 
 export type UserRole = 'admin' | 'user';
 
