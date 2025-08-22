@@ -409,12 +409,22 @@ class AvatarChatDashboard {
                 // Convert activeFlow to our flow_info format
                 const flowInfo = {
                     current_flow: response.activeFlow.flow_id,
-                    detected_intent: response.activeFlow.triggered_intent || 'unknown',
+                    detected_intent: response.activeFlow.triggered_intent || 
+                                   response.activeFlow.context?.intent || 
+                                   response.mindState?.stack?.[response.mindState.stack.length - 1]?.intent ||
+                                   'unknown',
                     current_step: response.activeFlow.current_step,
                     current_step_index: response.activeFlow.step_index || 1,
                     completed_steps: response.activeFlow.completed_steps || [],
                     status: response.activeFlow.status
                 };
+                
+                console.log('🔍 Intent sources:', {
+                    triggered_intent: response.activeFlow.triggered_intent,
+                    context_intent: response.activeFlow.context?.intent,
+                    mindstate_intent: response.mindState?.stack?.[response.mindState.stack.length - 1]?.intent,
+                    final_intent: flowInfo.detected_intent
+                });
                 
                 this.updateCurrentFlow(flowInfo);
             } else {
