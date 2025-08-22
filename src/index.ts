@@ -78,6 +78,10 @@ app.get('/flow-studio.html', (_req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, 'public', 'flow-studio.html'));
 });
 
+app.get('/avatar-chat-dashboard.html', (_req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'public', 'avatar-chat-dashboard.html'));
+});
+
 // Legacy routes for backward compatibility
 app.get('/dashboard', (_req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avatar Chat Dashboard - AI Avatar Business</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="homepage-styles.css">
+    <link rel="stylesheet" href="avatar-chat-dashboard-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <button class="back-btn" onclick="window.location.href='/homepage.html'">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Powrót do Menu</span>
+                </button>
+                <h1>Avatar Chat Dashboard</h1>
+            </div>
+            
+            <div class="header-center">
+                <div class="avatar-selector">
+                    <label for="avatarSelect">Wybierz Avatar:</label>
+                    <select id="avatarSelect" onchange="avatarDashboard.selectAvatar(this.value)">
+                        <option value="">-- Wybierz Avatar --</option>
+                        <optgroup label="Predefiniowane">
+                            <option value="networker">🤝 Networker</option>
+                            <option value="trainer">🎓 Trainer</option>
+                        </optgroup>
+                        <optgroup label="Custom Avatary" id="customAvatarsGroup">
+                            <!-- Dynamically populated -->
+                        </optgroup>
+                    </select>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <div class="session-info">
+                    <span class="session-status" id="sessionStatus">Gotowy</span>
+                    <button class="btn-secondary" onclick="avatarDashboard.clearSession()">
+                        <i class="fas fa-refresh"></i>
+                        Reset
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-main">
+            <!-- Left Panel: Chat Interface -->
+            <div class="chat-panel">
+                <div class="chat-header">
+                    <div class="avatar-info" id="avatarInfo">
+                        <div class="avatar-icon">🤖</div>
+                        <div class="avatar-details">
+                            <h3 id="avatarName">Wybierz Avatar</h3>
+                            <p id="avatarDescription">Wybierz avatar aby rozpocząć rozmowę</p>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-controls">
+                        <button class="btn-icon" title="Wyczyść chat" onclick="avatarDashboard.clearChat()">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        <button class="btn-icon" title="Eksportuj rozmowę" onclick="avatarDashboard.exportChat()">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="chat-messages" id="chatMessages">
+                    <div class="welcome-message">
+                        <i class="fas fa-comments"></i>
+                        <h3>Witaj w Avatar Chat Dashboard!</h3>
+                        <p>Wybierz avatar z menu powyżej aby rozpocząć strukturyzowaną rozmowę.</p>
+                    </div>
+                </div>
+
+                <div class="chat-input-container">
+                    <div class="input-group">
+                        <input type="text" id="messageInput" placeholder="Wpisz wiadomość..." 
+                               onkeypress="if(event.key==='Enter') avatarDashboard.sendMessage()">
+                        <button class="btn-primary" onclick="avatarDashboard.sendMessage()">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="input-status" id="inputStatus">
+                        <span class="typing-indicator" style="display: none;">
+                            <i class="fas fa-circle-notch fa-spin"></i>
+                            Avatar pisze...
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Middle Panel: Current Flow Status -->
+            <div class="current-flow-panel">
+                <div class="current-flow-header">
+                    <h3>
+                        <i class="fas fa-play-circle"></i>
+                        Aktualny Flow
+                    </h3>
+                    <div class="flow-progress" id="flowProgress">
+                        <span class="progress-text">Gotowy do rozmowy</span>
+                    </div>
+                </div>
+
+                <div class="current-flow-content" id="currentFlowContent">
+                    <div class="no-active-flow">
+                        <i class="fas fa-pause-circle"></i>
+                        <p>Brak aktywnego flow</p>
+                        <small>Rozpocznij rozmowę aby aktywować flow</small>
+                    </div>
+                </div>
+
+                <div class="flow-steps-container" id="flowStepsContainer" style="display: none;">
+                    <div class="steps-header">
+                        <h4>Kroki Flow:</h4>
+                        <div class="step-counter">
+                            <span id="currentStepNumber">0</span> / <span id="totalSteps">0</span>
+                        </div>
+                    </div>
+                    <div class="flow-steps" id="flowSteps">
+                        <!-- Dynamic steps will be added here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Flow Preview -->
+            <div class="flow-panel">
+                <div class="flow-header">
+                    <h3>
+                        <i class="fas fa-sitemap"></i>
+                        Flow Preview
+                    </h3>
+                    <div class="flow-stats" id="flowStats">
+                        <span class="stat">
+                            <i class="fas fa-list"></i>
+                            <span id="totalFlows">0</span> flows
+                        </span>
+                    </div>
+                </div>
+
+                <div class="flow-content" id="flowContent">
+                    <div class="no-avatar-selected">
+                        <i class="fas fa-robot"></i>
+                        <p>Wybierz avatar aby zobaczyć dostępne flows</p>
+                    </div>
+                </div>
+
+                <div class="flow-actions">
+                    <button class="btn-secondary" onclick="avatarDashboard.refreshFlows()" disabled id="refreshFlowsBtn">
+                        <i class="fas fa-sync"></i>
+                        Odśwież Flows
+                    </button>
+                    <button class="btn-accent" onclick="avatarDashboard.openFlowStudio()" disabled id="openFlowStudioBtn">
+                        <i class="fas fa-edit"></i>
+                        Flow Studio
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Intent Detection Display -->
+        <div class="intent-overlay" id="intentOverlay" style="display: none;">
+            <div class="intent-info">
+                <span class="intent-label">Wykryty Intent:</span>
+                <span class="intent-value" id="detectedIntent">-</span>
+                <span class="flow-label">Aktywny Flow:</span>
+                <span class="flow-value" id="activeFlow">-</span>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="loading-spinner">
+                <i class="fas fa-circle-notch fa-spin"></i>
+                <p>Ładowanie...</p>
+            </div>
+        </div>
+
+        <!-- Notification Container -->
+        <div id="notificationContainer" class="notification-container"></div>
+    </div>
+
+    <script src="avatar-chat-dashboard-script.js"></script>
+</body>
+</html>

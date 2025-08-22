@@ -193,6 +193,8 @@ class HomepageApp {
 
         if (pageName === 'avatar-manager') {
             this.showAvatarManager();
+        } else if (pageName === 'avatar-chat') {
+            this.showAvatarChat();
         } else if (pageName === 'flow-studio') {
             this.showFlowStudio();
         } else {
@@ -1118,6 +1120,11 @@ class HomepageApp {
             // Load avatars
             this.loadAvatars();
         }
+    }
+
+    showAvatarChat() {
+        // Redirect to Avatar Chat Dashboard page
+        window.location.href = '/avatar-chat-dashboard.html';
     }
 
     showFlowStudio() {
