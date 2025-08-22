@@ -176,8 +176,8 @@ class FlowStudio {
 
         // Create FlowCanvas functional component
         const FlowCanvas = () => {
-            const [nodes, setNodes, onNodesChange] = window.ReactFlow.useNodesState([]);
-            const [edges, setEdges, onEdgesChange] = window.ReactFlow.useEdgesState([]);
+            const [nodes, setNodes] = window.ReactFlow.useNodesState([]);
+            const [edges, setEdges] = window.ReactFlow.useEdgesState([]);
             const reactFlowInstance = React.useRef(null);
 
             // Store references in class instance
@@ -195,7 +195,31 @@ class FlowStudio {
             };
 
             const onNodeClick = (event, node) => {
+                console.log('ReactFlow onNodeClick triggered:', node);
                 this.onNodeClick(event, node);
+            };
+
+            const onNodesChange = (changes) => {
+                console.log('Nodes changes:', changes);
+                
+                // Handle selection changes
+                changes.forEach(change => {
+                    if (change.type === 'select') {
+                        const node = nodes.find(n => n.id === change.id);
+                        if (node && change.selected) {
+                            console.log('Node selected via onNodesChange:', node);
+                            this.onNodeClick(null, node);
+                        }
+                    }
+                });
+                
+                // Apply changes to nodes
+                setNodes(nds => window.ReactFlow.applyNodeChanges(changes, nds));
+            };
+
+            const onEdgesChange = (changes) => {
+                console.log('Edges changes:', changes);
+                setEdges(eds => window.ReactFlow.applyEdgeChanges(changes, eds));
             };
 
             const onConnect = (connection) => {
@@ -220,6 +244,9 @@ class FlowStudio {
                 snapToGrid: true,
                 snapGrid: [20, 20],
                 fitView: true,
+                nodesConnectable: true,
+                nodesDraggable: true,
+                elementsSelectable: true,
                 attributionPosition: 'bottom-left'
             }, [
                 // Background
@@ -256,9 +283,11 @@ class FlowStudio {
     }
 
     getCustomNodeTypes() {
+        const self = this; // Capture reference to FlowStudio instance
+        
         return {
             flowNode: ({ data, selected }) => {
-                const nodeType = this.getNodeTypeDefinition(data.type);
+                const nodeType = self.getNodeTypeDefinition(data.type);
                 
                 const hasInputs = nodeType?.inputs > 0;
                 const hasOutputs = nodeType?.outputs > 0;
@@ -421,24 +450,72 @@ class FlowStudio {
 
     onConnect(connection) {
         // Handle new connections
-        console.log('New connection:', connection);
+        console.log('New connection attempt:', connection);
         
-        if (this.setEdges) {
-            const newEdge = {
-                id: `edge_${connection.source}_${connection.target}`,
-                source: connection.source,
-                target: connection.target,
-                type: 'smoothstep',
-                animated: true,
-                style: { stroke: '#39e575', strokeWidth: 2 }
-            };
-            
-            this.setEdges(edges => [...edges, newEdge]);
-            this.showNotification('Połączenie utworzone', 'success');
+        if (!this.setEdges || !this.edges) {
+            console.log('Missing setEdges or edges');
+            return;
         }
+
+        // Check if source node already has an outgoing connection
+        const existingOutgoing = this.edges.find(edge => edge.source === connection.source);
+        if (existingOutgoing) {
+            this.showNotification('Węzeł może mieć tylko jedno wyjście', 'warning');
+            return;
+        }
+
+        // Check if target node already has an incoming connection
+        const existingIncoming = this.edges.find(edge => edge.target === connection.target);
+        if (existingIncoming) {
+            this.showNotification('Węzeł może mieć tylko jedno wejście', 'warning');
+            return;
+        }
+
+        // Check if trying to connect to itself
+        if (connection.source === connection.target) {
+            this.showNotification('Nie można połączyć węzła z samym sobą', 'warning');
+            return;
+        }
+
+        // Create new edge
+        const newEdge = {
+            id: `edge_${connection.source}_${connection.target}`,
+            source: connection.source,
+            target: connection.target,
+            type: 'smoothstep',
+            animated: true,
+            style: { stroke: '#39e575', strokeWidth: 2 }
+        };
+        
+        this.setEdges(edges => [...edges, newEdge]);
+        
+        // Update next_steps in source node
+        this.updateNodeNextSteps(connection.source, connection.target);
+        
+        this.showNotification('Połączenie utworzone', 'success');
+    }
+
+    updateNodeNextSteps(sourceNodeId, targetNodeId) {
+        if (!this.setNodes || !this.nodes) return;
+
+        this.setNodes(nodes => 
+            nodes.map(node => {
+                if (node.id === sourceNodeId) {
+                    return {
+                        ...node,
+                        data: {
+                            ...node.data,
+                            next_steps: [targetNodeId]
+                        }
+                    };
+                }
+                return node;
+            })
+        );
     }
 
     onNodeClick(event, node) {
+        console.log('Node clicked:', node);
         this.selectedNode = node;
         this.updatePropertiesPanel(node);
     }
@@ -448,10 +525,17 @@ class FlowStudio {
     }
 
     updatePropertiesPanel(node) {
+        console.log('Updating properties panel for node:', node);
         const propertiesContent = document.getElementById('propertiesContent');
-        if (!propertiesContent || !node) return;
+        console.log('Properties content element:', propertiesContent);
+        
+        if (!propertiesContent || !node) {
+            console.log('Missing element or node:', { propertiesContent, node });
+            return;
+        }
 
         const nodeDefinition = this.getNodeTypeDefinition(node.data.type);
+        console.log('Node definition:', nodeDefinition);
         
         propertiesContent.innerHTML = `
             <div class="property-section">
@@ -483,11 +567,43 @@ class FlowStudio {
                 </div>
                 
                 <div class="form-group">
+                    <label for="nodeSystemPrompt">System Prompt</label>
+                    <textarea id="nodeSystemPrompt" rows="4" 
+                              onchange="flowStudio.updateNodeProperty('system_prompt', this.value)"
+                              placeholder="Instrukcja dla AI jak ma się zachowywać w tym kroku...">${node.data.system_prompt || ''}</textarea>
+                    <div class="input-hint">Instrukcja systemowa dla AI w tym kroku</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="nodeUserPrompt">User Prompt Template</label>
+                    <textarea id="nodeUserPrompt" rows="4" 
+                              onchange="flowStudio.updateNodeProperty('user_prompt_template', this.value)"
+                              placeholder="Template dla user prompt z zmiennymi {{variable}}...">${node.data.user_prompt_template || ''}</textarea>
+                    <div class="input-hint">Template dla user prompt z zmiennymi</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="nodeVariables">Variables</label>
+                    <input type="text" id="nodeVariables" value="${(node.data.variables || []).join(', ')}" 
+                           onchange="flowStudio.updateNodeProperty('variables', this.value.split(',').map(s => s.trim()).filter(s => s))"
+                           placeholder="user_message, npc_persona.firstName, rag_context">
+                    <div class="input-hint">Dostępne zmienne w promptach (oddzielone przecinkami)</div>
+                </div>
+                
+                <div class="form-group">
                     <label for="nodeNextSteps">Next Steps</label>
                     <input type="text" id="nodeNextSteps" value="${(node.data.next_steps || []).join(', ')}" 
                            onchange="flowStudio.updateNodeProperty('next_steps', this.value.split(',').map(s => s.trim()).filter(s => s))"
                            placeholder="step_id_1, step_id_2">
                     <div class="input-hint">ID następnych kroków (oddzielone przecinkami)</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="nodePriority">Priority</label>
+                    <input type="number" id="nodePriority" value="${node.data.priority || 5}" 
+                           onchange="flowStudio.updateNodeProperty('priority', parseInt(this.value))"
+                           min="1" max="10">
+                    <div class="input-hint">Priorytet kroku (1-10, wyższy = ważniejszy)</div>
                 </div>
                 
                 <div class="form-group">
@@ -547,6 +663,45 @@ class FlowStudio {
     updateNodeProperty(property, value) {
         if (!this.selectedNode || !this.setNodes) return;
 
+        // Special handling for intent_name - auto-fill prompts
+        if (property === 'intent_name' && value && this.promptTemplates) {
+            const template = this.promptTemplates.find(t => t.intent === value);
+            if (template) {
+                // Auto-fill system prompt, user prompt and variables
+                this.setNodes(nodes => 
+                    nodes.map(node => {
+                        if (node.id === this.selectedNode.id) {
+                            return {
+                                ...node,
+                                data: {
+                                    ...node.data,
+                                    intent_name: value,
+                                    system_prompt: template.system_prompt || node.data.system_prompt,
+                                    user_prompt_template: template.user_prompt_template || node.data.user_prompt_template,
+                                    variables: template.variables || node.data.variables,
+                                    priority: template.priority || node.data.priority
+                                }
+                            };
+                        }
+                        return node;
+                    })
+                );
+
+                // Update selected node reference
+                this.selectedNode.data.intent_name = value;
+                this.selectedNode.data.system_prompt = template.system_prompt || this.selectedNode.data.system_prompt;
+                this.selectedNode.data.user_prompt_template = template.user_prompt_template || this.selectedNode.data.user_prompt_template;
+                this.selectedNode.data.variables = template.variables || this.selectedNode.data.variables;
+                this.selectedNode.data.priority = template.priority || this.selectedNode.data.priority;
+
+                // Refresh properties panel
+                this.updatePropertiesPanel(this.selectedNode);
+                
+                this.showNotification(`Auto-wypełniono prompty dla intent: ${value}`, 'success');
+                return;
+            }
+        }
+
         // Update node data
         this.setNodes(nodes => 
             nodes.map(node => 
@@ -565,15 +720,24 @@ class FlowStudio {
 
         const nodeId = this.selectedNode.id;
         
-        // Remove node
-        this.setNodes(nodes => nodes.filter(node => node.id !== nodeId));
-        
-        // Remove connected edges
+        // Remove connected edges first
         if (this.setEdges) {
             this.setEdges(edges => edges.filter(edge => 
                 edge.source !== nodeId && edge.target !== nodeId
             ));
         }
+
+        // Update next_steps in other nodes that pointed to this node
+        this.setNodes(nodes => 
+            nodes.filter(node => node.id !== nodeId) // Remove the node
+                 .map(node => ({
+                     ...node,
+                     data: {
+                         ...node.data,
+                         next_steps: (node.data.next_steps || []).filter(step => step !== nodeId)
+                     }
+                 }))
+        );
         
         // Clear selection
         this.selectedNode = null;
@@ -718,8 +882,25 @@ class FlowStudio {
         selector.appendChild(option);
     }
 
+    async loadPromptTemplates() {
+        try {
+            const response = await fetch('/api/prompt-templates');
+            if (response.ok) {
+                const data = await response.json();
+                this.promptTemplates = data.templates || [];
+                console.log(`✅ Loaded ${this.promptTemplates.length} prompt templates`);
+            }
+        } catch (error) {
+            console.error('Error loading prompt templates:', error);
+            this.promptTemplates = [];
+        }
+    }
+
     async loadUserFlows() {
         try {
+            // Load prompt templates first
+            await this.loadPromptTemplates();
+            
             // Load flows for different avatar types
             const avatarTypes = ['networker', 'trainer'];
             const allFlows = [];
@@ -873,6 +1054,23 @@ class FlowStudio {
         steps.forEach((step, index) => {
             const nodeType = this.getNodeTypeForStep(step);
             
+            // Find matching prompt template for this step's intent
+            let promptTemplate = null;
+            let inferredIntent = step.intent_name;
+            
+            // If no intent_name, try to infer from step id/name and flow entry_intents
+            if (!inferredIntent && this.promptTemplates) {
+                // Try to map step to intent based on step id patterns
+                inferredIntent = this.inferIntentFromStep(step, flowData);
+            }
+            
+            if (inferredIntent && this.promptTemplates) {
+                promptTemplate = this.promptTemplates.find(t => t.intent === inferredIntent);
+                if (promptTemplate) {
+                    console.log(`✅ Mapped step "${step.id}" to intent "${inferredIntent}"`);
+                }
+            }
+            
             const node = {
                 id: step.id,
                 type: 'flowNode',
@@ -884,9 +1082,14 @@ class FlowStudio {
                     type: nodeType,
                     label: step.name || step.id,
                     description: step.description || '',
-                    intent_name: step.intent_name || '',
+                    intent_name: inferredIntent || step.intent_name || '',
                     next_steps: step.next_steps || [],
                     required: step.required || false,
+                    // Add prompt template data if found
+                    system_prompt: promptTemplate?.system_prompt || step.system_prompt || '',
+                    user_prompt_template: promptTemplate?.user_prompt_template || step.user_prompt_template || '',
+                    variables: promptTemplate?.variables || step.variables || [],
+                    priority: promptTemplate?.priority || step.priority || 5,
                     // Copy all original step data
                     ...step
                 }
@@ -924,6 +1127,61 @@ class FlowStudio {
         });
         
         return edges;
+    }
+
+    inferIntentFromStep(step, flowData) {
+        // Map step IDs/names to intents based on common patterns
+        const stepId = step.id.toLowerCase();
+        const stepName = (step.name || '').toLowerCase();
+        const flowEntryIntents = flowData.entry_intents || [];
+        
+        // Direct mappings based on step ID patterns
+        if (stepId.includes('greeting') || stepId.includes('initial_greeting')) {
+            return 'greeting';
+        }
+        if (stepId.includes('company_intro') || stepId.includes('company_overview')) {
+            return 'ask_about_npc_firm';
+        }
+        if (stepId.includes('user_question') || stepId.includes('answer_question')) {
+            return 'user_questions';
+        }
+        if (stepId.includes('solution') || stepId.includes('value_proposition')) {
+            return 'solution_presentation';
+        }
+        if (stepId.includes('need') || stepId.includes('gather_info')) {
+            return 'user_needs_gathering';
+        }
+        if (stepId.includes('comment') || stepId.includes('feedback')) {
+            return 'user_comments';
+        }
+        if (stepId.includes('expectation') || stepId.includes('expect')) {
+            return 'user_expectations';
+        }
+        
+        // For training flows
+        if (stepId.includes('theory') || stepName.includes('teoria')) {
+            return 'theory_request';
+        }
+        if (stepId.includes('practice') || stepName.includes('praktyk')) {
+            return 'practice_together';
+        }
+        if (stepId.includes('guide') || stepName.includes('przewodnik')) {
+            return 'guide_me';
+        }
+        if (stepId.includes('what_is') || stepName.includes('co to')) {
+            return 'what_is';
+        }
+        if (stepId.includes('show_me') || stepName.includes('pokaż')) {
+            return 'show_me_how';
+        }
+        
+        // If flow has entry_intents, use the first one as fallback
+        if (flowEntryIntents.length > 0) {
+            return flowEntryIntents[0];
+        }
+        
+        // Default fallback
+        return 'user_questions';
     }
 
     getNodeTypeForStep(step) {
