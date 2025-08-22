@@ -1147,7 +1147,8 @@ class HomepageApp {
         const createAvatarBtn = document.getElementById('createAvatarBtn');
         if (createAvatarBtn) {
             createAvatarBtn.addEventListener('click', () => {
-                this.navigateToPage('avatar-creator');
+                // Use enhanced avatar builder
+                window.location.href = '/enhanced-avatar-builder.html';
             });
         }
 
@@ -1501,7 +1502,8 @@ class HomepageApp {
     editAvatar(avatarId) {
         // Store avatar for editing
         localStorage.setItem('editAvatarId', avatarId);
-        this.navigateToPage('avatar-creator');
+        // Use enhanced avatar builder for editing
+        window.location.href = '/enhanced-avatar-builder.html';
     }
 
     copyDemoAvatar(avatarId) {

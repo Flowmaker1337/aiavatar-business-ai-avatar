@@ -70,6 +70,10 @@ app.get('/register.html', (_req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, 'public', 'register.html'));
 });
 
+app.get('/enhanced-avatar-builder.html', (_req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'public', 'enhanced-avatar-builder.html'));
+});
+
 // Legacy routes for backward compatibility
 app.get('/dashboard', (_req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));

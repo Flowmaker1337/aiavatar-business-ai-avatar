@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Avatar Builder - AI Avatar Business</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="homepage-styles.css">
+    <link rel="stylesheet" href="enhanced-avatar-builder-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <div class="builder-container">
+        <!-- Header -->
+        <header class="builder-header">
+            <div class="header-left">
+                <button class="back-btn" id="backBtn">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Powrót</span>
+                </button>
+                <div class="header-title">
+                    <h1>Enhanced Avatar Builder</h1>
+                    <p>Stwórz inteligentnego avatara AI w kilku prostych krokach</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn-secondary" id="saveAsDraftBtn">
+                    <i class="fas fa-save"></i>
+                    Zapisz jako szkic
+                </button>
+                <button class="btn-primary" id="createAvatarBtn">
+                    <i class="fas fa-magic"></i>
+                    Stwórz Avatara
+                </button>
+            </div>
+        </header>
+
+        <div class="builder-content">
+            <!-- Progress Steps -->
+            <div class="progress-steps">
+                <div class="step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-info">
+                        <div class="step-title">Podstawy</div>
+                        <div class="step-description">Nazwa i typ</div>
+                    </div>
+                </div>
+                <div class="step-connector"></div>
+                <div class="step" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-info">
+                        <div class="step-title">Personalność</div>
+                        <div class="step-description">Charakter i styl</div>
+                    </div>
+                </div>
+                <div class="step-connector"></div>
+                <div class="step" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-info">
+                        <div class="step-title">Specjalizacja</div>
+                        <div class="step-description">Obszar ekspertyzy</div>
+                    </div>
+                </div>
+                <div class="step-connector"></div>
+                <div class="step" data-step="4">
+                    <div class="step-number">4</div>
+                    <div class="step-info">
+                        <div class="step-title">Wiedza</div>
+                        <div class="step-description">Pliki i dane</div>
+                    </div>
+                </div>
+                <div class="step-connector"></div>
+                <div class="step" data-step="5">
+                    <div class="step-number">5</div>
+                    <div class="step-info">
+                        <div class="step-title">Podsumowanie</div>
+                        <div class="step-description">Przegląd i test</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="builder-main">
+                <!-- Left Panel - Form -->
+                <div class="form-panel">
+                    <!-- Step 1: Podstawy -->
+                    <div class="form-step active" id="step1">
+                        <div class="step-header">
+                            <h2>Podstawowe informacje</h2>
+                            <p>Zacznij od nadania nazwy i wyboru typu avatara</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="avatarName">Nazwa avatara</label>
+                            <input type="text" id="avatarName" placeholder="np. Ekspert ds. Marketingu">
+                            <div class="input-hint">Wybierz nazwę opisującą rolę lub funkcję avatara</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="avatarDescription">Opis avatara</label>
+                            <textarea id="avatarDescription" rows="3" placeholder="Krótki opis tego, czym zajmuje się avatar..."></textarea>
+                            <div class="input-hint">Opisz w kilku zdaniach główne zadania i kompetencje avatara</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Typ avatara</label>
+                            <div class="avatar-type-selector">
+                                <div class="type-option active" data-type="custom">
+                                    <div class="type-icon">
+                                        <i class="fas fa-user-cog"></i>
+                                    </div>
+                                    <div class="type-info">
+                                        <div class="type-title">Custom Avatar</div>
+                                        <div class="type-description">Avatar z flow i intencjami</div>
+                                    </div>
+                                </div>
+                                <div class="type-option" data-type="reactive">
+                                    <div class="type-icon">
+                                        <i class="fas fa-brain"></i>
+                                    </div>
+                                    <div class="type-info">
+                                        <div class="type-title">Reaktywny Avatar</div>
+                                        <div class="type-description">Avatar oparty tylko na AI</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="avatarCategory">Kategoria</label>
+                            <select id="avatarCategory">
+                                <option value="business">Business</option>
+                                <option value="sales">Sprzedaż</option>
+                                <option value="training">Szkolenia</option>
+                                <option value="education">Edukacja</option>
+                                <option value="customer">Obsługa klienta</option>
+                                <option value="technical">Techniczny</option>
+                                <option value="general">Ogólny</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Personalność -->
+                    <div class="form-step" id="step2">
+                        <div class="step-header">
+                            <h2>Personalność i styl komunikacji</h2>
+                            <p>Określ jak avatar ma się zachowywać i komunikować</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="personalityInput">Personalność</label>
+                            <textarea id="personalityInput" rows="3" placeholder="np. Przyjazny, profesjonalny, pomocny, cierpliwy..."></textarea>
+                            <div class="input-hint">Opisz cechy charakteru i podejście avatara</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Gotowe szablony personalności</label>
+                            <div class="personality-templates">
+                                <button class="template-btn" data-personality="Profesjonalny, analityczny, zorientowany na wyniki, bezpośredni">
+                                    <i class="fas fa-briefcase"></i>
+                                    Biznesowy
+                                </button>
+                                <button class="template-btn" data-personality="Przyjazny, empatyczny, cierpliwy, wspierający">
+                                    <i class="fas fa-heart"></i>
+                                    Pomocny
+                                </button>
+                                <button class="template-btn" data-personality="Kreatywny, inspirujący, entuzjastyczny, otwarty na nowe idee">
+                                    <i class="fas fa-lightbulb"></i>
+                                    Kreatywny
+                                </button>
+                                <button class="template-btn" data-personality="Techniczny, precyzyjny, logiczny, skupiony na szczegółach">
+                                    <i class="fas fa-cogs"></i>
+                                    Techniczny
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="communicationStyle">Styl komunikacji</label>
+                            <select id="communicationStyle">
+                                <option value="professional">Profesjonalny</option>
+                                <option value="friendly">Przyjazny</option>
+                                <option value="casual">Nieformalny</option>
+                                <option value="technical">Techniczny</option>
+                                <option value="educational">Edukacyjny</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="backgroundInfo">Tło i doświadczenie</label>
+                            <textarea id="backgroundInfo" rows="3" placeholder="np. Wieloletnie doświadczenie w branży, certyfikacje, specjalizacje..."></textarea>
+                            <div class="input-hint">Opisz doświadczenie i kwalifikacje avatara</div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Specjalizacja -->
+                    <div class="form-step" id="step3">
+                        <div class="step-header">
+                            <h2>Specjalizacja i obszar ekspertyzy</h2>
+                            <p>Określ w czym avatar jest ekspertem</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="specializationInput">Główna specjalizacja</label>
+                            <input type="text" id="specializationInput" placeholder="np. Marketing cyfrowy, Zarządzanie projektami, Obsługa klienta...">
+                            <div class="input-hint">Główny obszar, w którym avatar ma być ekspertem</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="expertiseAreas">Obszary wiedzy (tagi)</label>
+                            <div class="tags-input-container">
+                                <input type="text" id="tagsInput" placeholder="Wpisz tag i naciśnij Enter">
+                                <div class="tags-list" id="tagsList"></div>
+                            </div>
+                            <div class="input-hint">Dodaj tagi opisujące obszary wiedzy (np. "SEO", "Google Ads", "Analytics")</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Sugerowane tagi dla kategorii:</label>
+                            <div class="suggested-tags" id="suggestedTags">
+                                <!-- Dynamically populated based on category -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Wiedza -->
+                    <div class="form-step" id="step4">
+                        <div class="step-header">
+                            <h2>Baza wiedzy</h2>
+                            <p>Dodaj pliki i dokumenty, które avatar ma znać</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Pliki wiedzy</label>
+                            <div class="file-upload-area" id="fileUploadArea">
+                                <div class="upload-placeholder">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <h3>Przeciągnij pliki tutaj lub kliknij aby wybrać</h3>
+                                    <p>Obsługiwane formaty: PDF, DOC, DOCX, TXT, MD</p>
+                                    <button class="btn-secondary" id="selectFilesBtn">
+                                        <i class="fas fa-folder-open"></i>
+                                        Wybierz pliki
+                                    </button>
+                                </div>
+                                <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx,.txt,.md" style="display: none;">
+                            </div>
+                        </div>
+
+                        <div class="uploaded-files" id="uploadedFiles">
+                            <!-- Dynamically populated with uploaded files -->
+                        </div>
+
+                        <div class="form-group">
+                            <label for="manualKnowledge">Wiedza tekstowa</label>
+                            <textarea id="manualKnowledge" rows="6" placeholder="Wklej lub wpisz dodatkową wiedzę, którą avatar ma posiadać..."></textarea>
+                            <div class="input-hint">Dodatkowe informacje, instrukcje lub wiedza, którą avatar ma znać</div>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Podsumowanie -->
+                    <div class="form-step" id="step5">
+                        <div class="step-header">
+                            <h2>Podsumowanie i test</h2>
+                            <p>Sprawdź wszystkie ustawienia przed utworzeniem avatara</p>
+                        </div>
+
+                        <div class="summary-sections">
+                            <div class="summary-section">
+                                <h3>Podstawowe informacje</h3>
+                                <div class="summary-item">
+                                    <span class="label">Nazwa:</span>
+                                    <span class="value" id="summaryName">-</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="label">Typ:</span>
+                                    <span class="value" id="summaryType">-</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="label">Kategoria:</span>
+                                    <span class="value" id="summaryCategory">-</span>
+                                </div>
+                            </div>
+
+                            <div class="summary-section">
+                                <h3>Personalność</h3>
+                                <div class="summary-item">
+                                    <span class="label">Cechy:</span>
+                                    <span class="value" id="summaryPersonality">-</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="label">Styl:</span>
+                                    <span class="value" id="summaryStyle">-</span>
+                                </div>
+                            </div>
+
+                            <div class="summary-section">
+                                <h3>Specjalizacja</h3>
+                                <div class="summary-item">
+                                    <span class="label">Główna:</span>
+                                    <span class="value" id="summarySpecialization">-</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="label">Tagi:</span>
+                                    <span class="value" id="summaryTags">-</span>
+                                </div>
+                            </div>
+
+                            <div class="summary-section">
+                                <h3>Baza wiedzy</h3>
+                                <div class="summary-item">
+                                    <span class="label">Pliki:</span>
+                                    <span class="value" id="summaryFiles">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="test-section">
+                            <h3>Test avatara</h3>
+                            <p>Przetestuj jak avatar odpowiada na przykładowe pytanie</p>
+                            <div class="test-chat">
+                                <div class="test-input">
+                                    <input type="text" id="testQuestion" placeholder="Zadaj pytanie avatarowi...">
+                                    <button class="btn-primary" id="testBtn">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                                <div class="test-response" id="testResponse">
+                                    <p>Zadaj pytanie aby zobaczyć jak avatar odpowie</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation -->
+                    <div class="step-navigation">
+                        <button class="btn-secondary" id="prevStepBtn" style="display: none;">
+                            <i class="fas fa-arrow-left"></i>
+                            Poprzedni krok
+                        </button>
+                        <button class="btn-primary" id="nextStepBtn">
+                            Następny krok
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Panel - Preview -->
+                <div class="preview-panel">
+                    <div class="preview-header">
+                        <h3>Podgląd avatara</h3>
+                        <div class="preview-actions">
+                            <button class="preview-btn" id="refreshPreviewBtn">
+                                <i class="fas fa-sync"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="avatar-preview">
+                        <div class="preview-avatar">
+                            <div class="avatar-image" id="previewImage">
+                                <span id="previewInitial">A</span>
+                            </div>
+                            <div class="avatar-status online">
+                                <i class="fas fa-circle"></i>
+                            </div>
+                        </div>
+
+                        <div class="preview-info">
+                            <h4 id="previewName">Nowy Avatar</h4>
+                            <p id="previewDescription">Opis zostanie wygenerowany automatycznie</p>
+                            <div class="preview-tags" id="previewTags">
+                                <!-- Dynamic tags -->
+                            </div>
+                        </div>
+
+                        <div class="preview-stats">
+                            <div class="stat-item">
+                                <div class="stat-label">Typ</div>
+                                <div class="stat-value" id="previewTypeValue">Custom</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Kategoria</div>
+                                <div class="stat-value" id="previewCategoryValue">Business</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Pliki wiedzy</div>
+                                <div class="stat-value" id="previewFilesValue">0</div>
+                            </div>
+                        </div>
+
+                        <div class="preview-sample">
+                            <h5>Przykładowa odpowiedź:</h5>
+                            <div class="sample-message">
+                                <p id="sampleResponse">Cześć! Jestem nowym avatarem i jestem gotowy do pomocy. Jak mogę Ci dziś pomóc?</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <div class="loading-text">Tworzenie avatara...</div>
+        </div>
+    </div>
+
+    <script src="enhanced-avatar-builder-script.js"></script>
+</body>
+</html>
