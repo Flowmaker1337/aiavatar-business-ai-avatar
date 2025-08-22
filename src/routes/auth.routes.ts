@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import AuthController from '../controllers/auth.controller';
 import AuthService from '../services/auth.service';
+import { authenticateToken, requireRole } from '../middleware/auth.middleware';
 
 class AuthRoutes {
   private router: Router;
@@ -29,33 +30,33 @@ class AuthRoutes {
     // ============ PROTECTED ROUTES (Authentication required) ============
     
     // User logout
-    this.router.post('/logout', this.authService.authenticate, this.authController.logout);
+    this.router.post('/logout', authenticateToken, this.authController.logout);
     
     // Get current user profile
-    this.router.get('/profile', this.authService.authenticate, this.authController.getProfile);
+    this.router.get('/profile', authenticateToken, this.authController.getProfile);
     
     // Update user profile
-    this.router.put('/profile', this.authService.authenticate, this.authController.updateProfile);
+    this.router.put('/profile', authenticateToken, this.authController.updateProfile);
     
     // Change password
-    this.router.put('/password', this.authService.authenticate, this.authController.changePassword);
+    this.router.put('/password', authenticateToken, this.authController.changePassword);
     
     // Validate token (useful for frontend to check if token is still valid)
-    this.router.get('/validate', this.authService.authenticate, this.authController.validateToken);
+    this.router.get('/validate', authenticateToken, this.authController.validateToken);
 
     // ============ ADMIN ROUTES (Admin role required) ============
     
     // Get all users (admin only)
     this.router.get('/users', 
-      this.authService.authenticate, 
-      this.authService.authorize(['admin']), 
+      authenticateToken,
+      requireRole('admin'),
       this.authController.getAllUsers
     );
     
     // Update user status (admin only)
     this.router.put('/users/:userId/status', 
-      this.authService.authenticate, 
-      this.authService.authorize(['admin']), 
+      authenticateToken,
+      requireRole('admin'),
       this.authController.updateUserStatus
     );
   }

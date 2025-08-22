@@ -158,4 +158,16 @@ export const validateEnv = (): boolean => {
     }
 
     return true;
+};
+
+// Config object for easier importing
+export const config = {
+    JWT_SECRET,
+    JWT_EXPIRES_IN,
+    REFRESH_TOKEN_EXPIRES_IN,
+    PORT,
+    NODE_ENV,
+    OPENAI_API_KEY,
+    MONGODB_URI,
+    MONGODB_DB_NAME
 }; 

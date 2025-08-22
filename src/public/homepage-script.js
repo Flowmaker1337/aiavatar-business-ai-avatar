@@ -1174,8 +1174,21 @@ class HomepageApp {
                 </div>
             `;
 
-            // Load demo avatars (always available)
-            const demoAvatars = this.getDemoAvatars();
+            // Load demo avatars (always available - no auth required)
+            let demoAvatars = [];
+            try {
+                const demoResponse = await fetch('/api/avatars/demo');
+                if (demoResponse.ok) {
+                    const demoData = await demoResponse.json();
+                    demoAvatars = demoData.avatars || [];
+                } else {
+                    // Fallback to hardcoded demo avatars
+                    demoAvatars = this.getDemoAvatars();
+                }
+            } catch (error) {
+                console.error('Failed to load demo avatars, using fallback:', error);
+                demoAvatars = this.getDemoAvatars();
+            }
             
             // Load user avatars if logged in
             let userAvatars = [];
@@ -1281,7 +1294,9 @@ class HomepageApp {
     updateAvatarCounts() {
         const counts = {
             all: this.allAvatars.length,
-            'with-flows': this.allAvatars.filter(a => a.stats && a.stats.flows > 0).length,
+            'with-flows': this.allAvatars.filter(a => 
+                (a.flows && a.flows.length > 0) || (a.stats && a.stats.flows > 0)
+            ).length,
             reactive: this.allAvatars.filter(a => a.type === 'reactive').length,
             demo: this.allAvatars.filter(a => a.type === 'demo').length
         };
@@ -1308,7 +1323,9 @@ class HomepageApp {
                 this.currentAvatars = this.allAvatars;
                 break;
             case 'with-flows':
-                this.currentAvatars = this.allAvatars.filter(a => a.stats && a.stats.flows > 0);
+                this.currentAvatars = this.allAvatars.filter(a => 
+                    (a.flows && a.flows.length > 0) || (a.stats && a.stats.flows > 0)
+                );
                 break;
             case 'reactive':
                 this.currentAvatars = this.allAvatars.filter(a => a.type === 'reactive');
@@ -1375,7 +1392,13 @@ class HomepageApp {
 
     createAvatarCard(avatar) {
         const initial = avatar.name.charAt(0);
-        const hasFlows = avatar.stats && avatar.stats.flows > 0;
+        
+        // Handle both old format (stats) and new format (usage_stats + flows array)
+        const hasFlows = (avatar.flows && avatar.flows.length > 0) || (avatar.stats && avatar.stats.flows > 0);
+        const conversations = avatar.usage_stats?.total_conversations || avatar.stats?.conversations || 0;
+        const flows = (avatar.flows && avatar.flows.length) || avatar.stats?.flows || 0;
+        const accuracy = avatar.usage_stats?.success_rate || avatar.stats?.accuracy || 0;
+        
         const badgeClass = avatar.type === 'demo' ? 'demo' : (avatar.status === 'active' ? '' : 'inactive');
         const badgeText = avatar.type === 'demo' ? 'DEMO' : (avatar.status === 'active' ? 'AKTYWNY' : 'NIEAKTYWNY');
 
@@ -1397,15 +1420,15 @@ class HomepageApp {
 
                 <div class="avatar-stats">
                     <div class="avatar-stat">
-                        <div class="stat-value">${avatar.stats?.conversations || 0}</div>
+                        <div class="stat-value">${conversations}</div>
                         <div class="stat-label">Rozmów</div>
                     </div>
                     <div class="avatar-stat">
-                        <div class="stat-value">${avatar.stats?.flows || 0}</div>
+                        <div class="stat-value">${flows}</div>
                         <div class="stat-label">Flows</div>
                     </div>
                     <div class="avatar-stat">
-                        <div class="stat-value">${avatar.stats?.accuracy || 0}%</div>
+                        <div class="stat-value">${Math.round(accuracy)}%</div>
                         <div class="stat-label">Dokładność</div>
                     </div>
                 </div>

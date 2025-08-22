@@ -485,6 +485,50 @@ class ExtendedDatabaseService {
     return copiedAvatar;
   }
 
+  public async updateAvatar(id: string, updateData: Partial<ExtendedAvatar>): Promise<boolean> {
+    const result = await this.extendedAvatars!.updateOne(
+      { id },
+      { 
+        $set: {
+          ...updateData,
+          updated_at: new Date()
+        }
+      }
+    );
+    return result.modifiedCount > 0;
+  }
+
+  public async deleteAvatar(id: string): Promise<boolean> {
+    const result = await this.extendedAvatars!.deleteOne({ id });
+    return result.deletedCount > 0;
+  }
+
+  public async getAvatarsByType(type: 'demo' | 'custom' | 'reactive'): Promise<ExtendedAvatar[]> {
+    return this.extendedAvatars!.find({ type }).toArray();
+  }
+
+  public async searchAvatars(userId: string, query: string, filters: {
+    type?: string;
+    category?: string;
+    status?: string;
+  } = {}): Promise<ExtendedAvatar[]> {
+    const searchCriteria: any = {
+      user_id: userId,
+      $or: [
+        { name: { $regex: query, $options: 'i' } },
+        { description: { $regex: query, $options: 'i' } },
+        { specialization: { $regex: query, $options: 'i' } },
+        { tags: { $in: [new RegExp(query, 'i')] } }
+      ]
+    };
+
+    if (filters.type) searchCriteria.type = filters.type;
+    if (filters.category) searchCriteria.category = filters.category;
+    if (filters.status) searchCriteria.status = filters.status;
+
+    return this.extendedAvatars!.find(searchCriteria).toArray();
+  }
+
   // ============ COMPANY PROFILES ============
 
   public async createCompanyProfile(profileData: Omit<CompanyProfile, '_id' | 'id' | 'created_at' | 'updated_at'>): Promise<CompanyProfile> {

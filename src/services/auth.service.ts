@@ -12,10 +12,7 @@ export interface JWTPayload {
   exp?: number;
 }
 
-export interface AuthenticatedRequest extends Request {
-  user?: UserAccount;
-  session?: UserSession;
-}
+// AuthenticatedRequest is now defined in middleware/auth.middleware.ts
 
 class AuthService {
   private static instance: AuthService;
@@ -333,8 +330,10 @@ class AuthService {
   }
 
   // ============ MIDDLEWARE ============
+  // Note: These middleware methods are deprecated - use middleware/auth.middleware.ts instead
 
-  public authenticate = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  /*
+  public authenticate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const authHeader = req.headers.authorization;
       if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -382,7 +381,7 @@ class AuthService {
   };
 
   public authorize = (roles: UserRole[]) => {
-    return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+    return (req: Request, res: Response, next: NextFunction): void => {
       if (!req.user) {
         res.status(401).json({ error: 'Authentication required' });
         return;
@@ -397,7 +396,7 @@ class AuthService {
     };
   };
 
-  public optionalAuth = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  public optionalAuth = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const authHeader = req.headers.authorization;
       if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -462,6 +461,22 @@ class AuthService {
 
   public hasPermission(userPermissions: string[], requiredPermission: string): boolean {
     return userPermissions.includes(requiredPermission);
+  }
+  */
+
+  // ============ UTILITY METHODS ============
+
+  private parseExpirationTime(expiresIn: string): number {
+    const unit = expiresIn.slice(-1);
+    const value = parseInt(expiresIn.slice(0, -1));
+
+    switch (unit) {
+      case 's': return value * 1000;
+      case 'm': return value * 60 * 1000;
+      case 'h': return value * 60 * 60 * 1000;
+      case 'd': return value * 24 * 60 * 60 * 1000;
+      default: return 60 * 60 * 1000; // Default 1 hour
+    }
   }
 }
 

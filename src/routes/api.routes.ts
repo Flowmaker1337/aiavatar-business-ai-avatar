@@ -13,6 +13,7 @@ import CustomAvatarController from '../controllers/custom-avatar.controller';
 import { ReactiveAvatarController } from '../controllers/reactive-avatar.controller';
 import CompanyProfileController from '../controllers/company-profile.controller';
 import AuthRoutes from './auth.routes';
+import ExtendedAvatarRoutes from './extended-avatar.routes';
 
 const router = Router();
 
@@ -26,9 +27,13 @@ const companyProfileController = new CompanyProfileController();
 
 // Initialize auth routes
 const authRoutes = new AuthRoutes();
+const extendedAvatarRoutes = new ExtendedAvatarRoutes();
 
 // ============ AUTHENTICATION ROUTES ============
 router.use('/auth', authRoutes.getRouter());
+
+// ============ EXTENDED AVATAR ROUTES ============
+router.use('/avatars', extendedAvatarRoutes.getRouter());
 
 // Endpoint for processing queries
 router.post('/query', queryController.handleQuery.bind(queryController));
