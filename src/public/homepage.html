@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Avatar Business - Homepage</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="homepage-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Left Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-robot"></i>
+                    <span class="logo-text">AiAvatar</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <h3 class="nav-section-title">Narzędzia</h3>
+                    <ul class="nav-menu">
+                        <li class="nav-item active">
+                            <a href="#dashboard" class="nav-link" data-page="dashboard">
+                                <i class="fas fa-chart-line nav-icon"></i>
+                                <span class="nav-text">Basic Dashboard</span>
+                                <span class="nav-badge">NEW</span>
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a href="#simulation" class="nav-link" data-page="simulation-dashboard">
+                                <i class="fas fa-comments nav-icon"></i>
+                                <span class="nav-text">Talk Simulator</span>
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a href="#avatar-creator" class="nav-link" data-page="avatar-creator">
+                                <i class="fas fa-user-plus nav-icon"></i>
+                                <span class="nav-text">Avatar Creator</span>
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a href="#flow-manager" class="nav-link" data-page="flow-manager">
+                                <i class="fas fa-project-diagram nav-icon"></i>
+                                <span class="nav-text">Flow Manager</span>
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a href="#flow-creator" class="nav-link" data-page="flow-creator">
+                                <i class="fas fa-sitemap nav-icon"></i>
+                                <span class="nav-text">Flow Creator</span>
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a href="#role-training" class="nav-link" data-page="role-training">
+                                <i class="fas fa-graduation-cap nav-icon"></i>
+                                <span class="nav-text">Role Training</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h3 class="nav-section-title">Analityka</h3>
+                    <ul class="nav-menu">
+                        <li class="nav-item">
+                            <a href="#analytics" class="nav-link" data-page="analytics">
+                                <i class="fas fa-chart-bar nav-icon"></i>
+                                <span class="nav-text">Analityka</span>
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a href="#reports" class="nav-link" data-page="reports">
+                                <i class="fas fa-file-alt nav-icon"></i>
+                                <span class="nav-text">Raporty</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h3 class="nav-section-title">Ustawienia</h3>
+                    <ul class="nav-menu">
+                        <li class="nav-item">
+                            <a href="#settings" class="nav-link" data-page="settings">
+                                <i class="fas fa-cog nav-icon"></i>
+                                <span class="nav-text">Ustawienia</span>
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a href="#help" class="nav-link" data-page="help">
+                                <i class="fas fa-question-circle nav-icon"></i>
+                                <span class="nav-text">Pomoc</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name">Admin User</div>
+                        <div class="user-status">Online</div>
+                    </div>
+                    <button class="user-menu-toggle">
+                        <i class="fas fa-chevron-up"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <h1 class="page-title">Basic Dashboard</h1>
+                    <div class="breadcrumb">
+                        <span class="breadcrumb-item">Narzędzia</span>
+                        <i class="fas fa-chevron-right breadcrumb-separator"></i>
+                        <span class="breadcrumb-item active">Basic Dashboard</span>
+                    </div>
+                </div>
+                
+                <div class="header-right">
+                    <div class="header-actions">
+                        <button class="action-btn search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                        
+                        <button class="action-btn notifications-btn">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge">3</span>
+                        </button>
+                        
+                        <div class="avatar-selector">
+                            <label for="avatar-type">Avatar:</label>
+                            <select id="avatar-type" class="avatar-dropdown">
+                                <option value="networker">🤝 Networker (Anna Kowalczyk)</option>
+                                <option value="trainer">🎓 Trener (Prof. Anna Kowalska)</option>
+                            </select>
+                        </div>
+                        
+                        <button class="action-btn new-chat-btn">
+                            <i class="fas fa-plus"></i>
+                            <span>Nowy Chat</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area" id="contentArea">
+                <!-- Welcome Screen -->
+                <div class="welcome-screen" id="welcomeScreen">
+                    <div class="welcome-hero">
+                        <div class="hero-content">
+                            <h1 class="hero-title">
+                                Witaj w <span class="gradient-text">AI Avatar Business</span>
+                            </h1>
+                            <p class="hero-subtitle">
+                                Kompletna platforma do tworzenia i zarządzania inteligentnych avatarów AI dla biznesu
+                            </p>
+                            
+                            <div class="hero-stats">
+                                <div class="stat-item">
+                                    <div class="stat-number">12</div>
+                                    <div class="stat-label">Aktywnych Avatarów</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number">1.2K</div>
+                                    <div class="stat-label">Rozmów</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number">98%</div>
+                                    <div class="stat-label">Dokładność</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="hero-visual">
+                            <div class="floating-elements">
+                                <div class="floating-card card-1">
+                                    <i class="fas fa-robot"></i>
+                                    <span>AI Avatar</span>
+                                </div>
+                                <div class="floating-card card-2">
+                                    <i class="fas fa-comments"></i>
+                                    <span>Smart Chat</span>
+                                </div>
+                                <div class="floating-card card-3">
+                                    <i class="fas fa-brain"></i>
+                                    <span>Deep Learning</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="quick-actions">
+                        <h2 class="section-title">Szybki Start</h2>
+                        <div class="actions-grid">
+                            <div class="action-card" data-page="avatar-creator">
+                                <div class="action-icon">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                                <h3 class="action-title">Stwórz Avatar</h3>
+                                <p class="action-description">
+                                    Stwórz nowy avatar AI z własną personalności i wiedzą
+                                </p>
+                                <button class="action-btn-primary">
+                                    Rozpocznij
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="action-card" data-page="simulation-dashboard">
+                                <div class="action-icon">
+                                    <i class="fas fa-comments"></i>
+                                </div>
+                                <h3 class="action-title">Testuj Rozmowy</h3>
+                                <p class="action-description">
+                                    Przetestuj swoich avatarów w symulowanych rozmowach
+                                </p>
+                                <button class="action-btn-primary">
+                                    Uruchom Test
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="action-card" data-page="flow-creator">
+                                <div class="action-icon">
+                                    <i class="fas fa-sitemap"></i>
+                                </div>
+                                <h3 class="action-title">Zaprojektuj Flow</h3>
+                                <p class="action-description">
+                                    Stwórz przepływ rozmowy dla swoich avatarów
+                                </p>
+                                <button class="action-btn-primary">
+                                    Projektuj
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="action-card" data-page="dashboard">
+                                <div class="action-icon">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <h3 class="action-title">Zobacz Analityki</h3>
+                                <p class="action-description">
+                                    Monitoruj wydajność i skuteczność avatarów
+                                </p>
+                                <button class="action-btn-primary">
+                                    Analizuj
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="recent-activity">
+                        <div class="section-header">
+                            <h2 class="section-title">Ostatnia Aktywność</h2>
+                            <button class="view-all-btn">Zobacz wszystkie</button>
+                        </div>
+                        
+                        <div class="activity-list">
+                            <div class="activity-item">
+                                <div class="activity-icon success">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Avatar "Prezes AI Tech" został utworzony</div>
+                                    <div class="activity-time">2 minuty temu</div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon info">
+                                    <i class="fas fa-comment"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">127 nowych rozmów w systemie</div>
+                                    <div class="activity-time">15 minut temu</div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon warning">
+                                    <i class="fas fa-upload"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Przetwarzanie pliku wiedzy: blockchain_whitepaper.pdf</div>
+                                    <div class="activity-time">30 minut temu</div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon success">
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Flow "Prezentacja AI Solutions" zaktualizowany</div>
+                                    <div class="activity-time">1 godzina temu</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Embedded iframes for different pages (hidden initially) -->
+                <div class="embedded-page" id="dashboardPage" style="display: none;">
+                    <iframe src="index.html" frameborder="0" width="100%" height="100%"></iframe>
+                </div>
+                
+                <div class="embedded-page" id="simulationPage" style="display: none;">
+                    <iframe src="simulation-dashboard.html" frameborder="0" width="100%" height="100%"></iframe>
+                </div>
+                
+                <div class="embedded-page" id="avatarCreatorPage" style="display: none;">
+                    <iframe src="avatar-flow-creator.html" frameborder="0" width="100%" height="100%"></iframe>
+                </div>
+                
+                <div class="embedded-page" id="flowManagerPage" style="display: none;">
+                    <iframe src="react-dashboard.html" frameborder="0" width="100%" height="100%"></iframe>
+                </div>
+                
+                <div class="embedded-page" id="flowCreatorPage" style="display: none;">
+                    <iframe src="visual-flow-designer.html" frameborder="0" width="100%" height="100%"></iframe>
+                </div>
+                
+                <div class="embedded-page" id="roleTrainingPage" style="display: none;">
+                    <iframe src="simulation-chat.html" frameborder="0" width="100%" height="100%"></iframe>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Floating Action Button -->
+    <button class="fab" id="fabButton">
+        <i class="fas fa-magic"></i>
+    </button>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <div class="loading-text">Ładowanie...</div>
+        </div>
+    </div>
+
+    <script src="homepage-script.js"></script>
+</body>
+</html>

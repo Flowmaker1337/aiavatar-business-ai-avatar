@@ -47,8 +47,17 @@ app.use((req: Request, _res: Response, next: NextFunction) => {
   next();
 });
 
-// Serve React dashboard for root path
+// Serve new Homepage for root path
 app.get('/', (_req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'public', 'homepage.html'));
+});
+
+// Legacy routes for backward compatibility
+app.get('/dashboard', (_req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/react-dashboard', (_req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, 'public', 'react-dashboard.html'));
 });
 
