@@ -160,6 +160,15 @@ class EnhancedAvatarBuilder {
         
         // Preview refresh
         document.getElementById('refreshPreviewBtn')?.addEventListener('click', () => this.updatePreview());
+
+        // AI Generators
+        document.getElementById('generateNameBtn')?.addEventListener('click', () => this.generateWithAI('name'));
+        document.getElementById('generateDescriptionBtn')?.addEventListener('click', () => this.generateWithAI('description'));
+        document.getElementById('generatePersonalityBtn')?.addEventListener('click', () => this.generateWithAI('personality'));
+        document.getElementById('generateBackgroundBtn')?.addEventListener('click', () => this.generateWithAI('background'));
+        document.getElementById('generateSpecializationBtn')?.addEventListener('click', () => this.generateWithAI('specialization'));
+        document.getElementById('generateTagsBtn')?.addEventListener('click', () => this.generateWithAI('tags'));
+        document.getElementById('generateKnowledgeBtn')?.addEventListener('click', () => this.generateWithAI('knowledge'));
     }
 
     goBack() {
@@ -286,12 +295,20 @@ class EnhancedAvatarBuilder {
         }
 
         // Update preview stats
-        document.getElementById('previewTypeValue')?.textContent = 
-            this.avatarData.type === 'custom' ? 'Custom' : 'Reaktywny';
-        document.getElementById('previewCategoryValue')?.textContent = 
-            this.getCategoryDisplayName(this.avatarData.category);
-        document.getElementById('previewFilesValue')?.textContent = 
-            this.uploadedFiles.length.toString();
+        const previewTypeValue = document.getElementById('previewTypeValue');
+        if (previewTypeValue) {
+            previewTypeValue.textContent = this.avatarData.type === 'custom' ? 'Custom' : 'Reaktywny';
+        }
+        
+        const previewCategoryValue = document.getElementById('previewCategoryValue');
+        if (previewCategoryValue) {
+            previewCategoryValue.textContent = this.getCategoryDisplayName(this.avatarData.category);
+        }
+        
+        const previewFilesValue = document.getElementById('previewFilesValue');
+        if (previewFilesValue) {
+            previewFilesValue.textContent = this.uploadedFiles.length.toString();
+        }
 
         // Update sample response
         this.updateSampleResponse();
@@ -342,7 +359,7 @@ class EnhancedAvatarBuilder {
         const tags = tagsByCategory[this.avatarData.category] || tagsByCategory.general;
         
         suggestedTags.innerHTML = tags.map(tag => 
-            `<button class="suggested-tag" onclick="avatarBuilder.addTag('${tag}')">${tag}</button>`
+            `<button class="suggested-tag" onclick="window.avatarBuilder.addTag('${tag}')">${tag}</button>`
         ).join('');
     }
 
@@ -367,7 +384,7 @@ class EnhancedAvatarBuilder {
         tagsList.innerHTML = this.avatarData.tags.map(tag => 
             `<div class="tag-item">
                 ${tag}
-                <span class="tag-remove" onclick="avatarBuilder.removeTag('${tag}')">&times;</span>
+                <span class="tag-remove" onclick="window.avatarBuilder.removeTag('${tag}')">&times;</span>
             </div>`
         ).join('');
     }
@@ -419,7 +436,7 @@ class EnhancedAvatarBuilder {
                         <div class="file-size">${this.formatFileSize(file.size)}</div>
                     </div>
                 </div>
-                <div class="file-remove" onclick="avatarBuilder.removeFile(${index})">
+                <div class="file-remove" onclick="window.avatarBuilder.removeFile(${index})">
                     <i class="fas fa-times"></i>
                 </div>
             </div>`
@@ -506,6 +523,179 @@ class EnhancedAvatarBuilder {
             `Dzięki mojemu doświadczeniu w ${this.avatarData.specialization || 'tej branży'} mogę powiedzieć, że kluczowe jest...`
         ];
         return responses[Math.floor(Math.random() * responses.length)];
+    }
+
+    async generateWithAI(fieldType) {
+        const generateBtn = document.getElementById(`generate${fieldType.charAt(0).toUpperCase() + fieldType.slice(1)}Btn`);
+        if (!generateBtn) return;
+
+        // Check if we have enough context
+        if (!this.avatarData.category && fieldType !== 'name') {
+            this.showNotification('Wybierz najpierw kategorię avatara', 'warning');
+            return;
+        }
+
+        // For some fields, we need more context
+        if ((fieldType === 'tags' || fieldType === 'knowledge') && !this.avatarData.specialization) {
+            this.showNotification('Podaj najpierw specjalizację avatara', 'warning');
+            return;
+        }
+
+        // Disable button and show loading
+        generateBtn.disabled = true;
+        const originalText = generateBtn.innerHTML;
+        generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generuję...';
+
+        try {
+            // Get auth token
+            const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+            if (!token) {
+                throw new Error('Authentication required');
+            }
+
+            // Prepare context for AI
+            const context = {
+                category: this.avatarData.category,
+                name: this.avatarData.name,
+                description: this.avatarData.description,
+                specialization: this.avatarData.specialization,
+                personality: this.avatarData.personality,
+                background: this.avatarData.background
+            };
+
+            // Make API call
+            const response = await fetch('/api/flow-wizard/generate-avatar-field', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    fieldName: fieldType,
+                    context: context
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to generate content');
+            }
+
+            const result = await response.json();
+            
+            if (result.success) {
+                // Apply generated content
+                this.applyGeneratedContent(fieldType, result.data);
+                this.showNotification(`✅ ${this.getFieldDisplayName(fieldType)} wygenerowane!`, 'success');
+            } else {
+                throw new Error(result.error || 'Generation failed');
+            }
+
+        } catch (error) {
+            console.error('AI Generation error:', error);
+            
+            // Fallback to mock generation for demo purposes
+            this.generateMockContent(fieldType);
+            this.showNotification(`🤖 Wygenerowano ${this.getFieldDisplayName(fieldType)} (demo)`, 'info');
+            
+        } finally {
+            // Restore button
+            generateBtn.disabled = false;
+            generateBtn.innerHTML = originalText;
+        }
+    }
+
+    applyGeneratedContent(fieldType, content) {
+        switch (fieldType) {
+            case 'name':
+                document.getElementById('avatarName').value = content;
+                this.avatarData.name = content;
+                break;
+            case 'description':
+                document.getElementById('avatarDescription').value = content;
+                this.avatarData.description = content;
+                break;
+            case 'personality':
+                document.getElementById('personalityInput').value = content;
+                this.avatarData.personality = content;
+                break;
+            case 'background':
+                document.getElementById('backgroundInfo').value = content;
+                this.avatarData.background = content;
+                break;
+            case 'specialization':
+                document.getElementById('specializationInput').value = content;
+                this.avatarData.specialization = content;
+                this.loadSuggestedTags(); // Reload suggested tags
+                break;
+            case 'tags':
+                if (Array.isArray(content)) {
+                    // Clear existing tags and add new ones
+                    this.avatarData.tags = [];
+                    content.forEach(tag => this.addTag(tag));
+                }
+                break;
+            case 'knowledge':
+                document.getElementById('manualKnowledge').value = content;
+                this.avatarData.manual_knowledge = content;
+                break;
+        }
+        this.updatePreview();
+    }
+
+    generateMockContent(fieldType) {
+        const mockContent = this.getMockContentForField(fieldType);
+        this.applyGeneratedContent(fieldType, mockContent);
+    }
+
+    getMockContentForField(fieldType) {
+        const category = this.avatarData.category || 'business';
+        
+        const mockData = {
+            business: {
+                name: 'Ekspert Strategii Biznesowej',
+                description: 'Doświadczony konsultant biznesowy specjalizujący się w opracowywaniu strategii rozwoju dla firm z różnych branż.',
+                personality: 'Analityczny, strategiczny, zorientowany na wyniki, profesjonalny w komunikacji, umie upraszczać skomplikowane koncepty biznesowe',
+                background: '15 lat doświadczenia w consulting, MBA w zarządzaniu strategicznym, współpraca z ponad 200 firmami, specjalista od transformacji cyfrowej',
+                specialization: 'Strategia biznesowa i transformacja cyfrowa',
+                tags: ['Strategia', 'Planowanie', 'ROI', 'KPI', 'Analityka', 'Transformacja'],
+                knowledge: 'Metodologie strategiczne: Blue Ocean Strategy, Porter\'s Five Forces, SWOT, Business Model Canvas. Znajomość trendów rynkowych, analizy konkurencji, planowania finansowego.'
+            },
+            sales: {
+                name: 'Mistrz Sprzedaży B2B',
+                description: 'Ekspert sprzedaży B2B z wieloletnim doświadczeniem w budowaniu relacji z klientami i zamykaniu dużych kontraktów.',
+                personality: 'Charyzmatyczny, empatyczny, wytrwały, zorientowany na klienta, umie budować zaufanie i długoterminowe relacje',
+                background: '12 lat w sprzedaży B2B, certyfikaty SPIN Selling i Challenger Sale, top 1% sprzedawców w branży tech',
+                specialization: 'Sprzedaż B2B i budowanie relacji',
+                tags: ['Sprzedaż', 'B2B', 'Negocjacje', 'CRM', 'Lead Generation', 'Konwersja'],
+                knowledge: 'Techniki sprzedaży: SPIN, MEDDIC, Challenger Sale. Psychologia sprzedaży, analiza potrzeb klienta, objection handling, prezentacje biznesowe.'
+            },
+            training: {
+                name: 'Coach Rozwoju Personalnego',
+                description: 'Certyfikowany coach i trener specjalizujący się w rozwoju umiejętności miękkich i budowaniu zespołów.',
+                personality: 'Inspirujący, cierpliwy, wspierający, kreatywny w metodach nauczania, umie motywować do działania',
+                background: 'Certyfikat ICF, 8 lat doświadczenia w coachingu, psychologia pozytywna, praca z ponad 500 klientami',
+                specialization: 'Coaching i rozwój osobisty',
+                tags: ['Coaching', 'Rozwój', 'Motywacja', 'Umiejętności', 'Zespoły', 'Leadership'],
+                knowledge: 'Metodologie coachingowe: GROW, Solution Focused, ontologiczny coaching. Psychologia motywacji, komunikacja interpersonalna, budowanie zespołów.'
+            }
+        };
+
+        const categoryData = mockData[category] || mockData.business;
+        return categoryData[fieldType] || `Wygenerowana zawartość dla ${fieldType}`;
+    }
+
+    getFieldDisplayName(fieldType) {
+        const displayNames = {
+            name: 'nazwę',
+            description: 'opis',
+            personality: 'personalność',
+            background: 'tło',
+            specialization: 'specjalizację',
+            tags: 'tagi',
+            knowledge: 'wiedzę'
+        };
+        return displayNames[fieldType] || fieldType;
     }
 
     async saveAsDraft() {
@@ -728,6 +918,9 @@ let avatarBuilder;
 document.addEventListener('DOMContentLoaded', () => {
     avatarBuilder = new EnhancedAvatarBuilder();
     
+    // Export to window immediately
+    window.avatarBuilder = avatarBuilder;
+    
     // Load draft if exists
     avatarBuilder.loadDraft();
     
@@ -759,5 +952,4 @@ document.addEventListener('DOMContentLoaded', () => {
     document.head.appendChild(style);
 });
 
-// Export for global access
-window.avatarBuilder = avatarBuilder;
+// Note: avatarBuilder is exported to window after DOM load

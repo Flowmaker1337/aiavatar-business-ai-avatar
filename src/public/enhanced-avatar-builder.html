@@ -90,13 +90,23 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="avatarName">Nazwa avatara</label>
+                            <div class="form-group-header">
+                                <label for="avatarName">Nazwa avatara</label>
+                                <button type="button" class="ai-generate-btn" id="generateNameBtn">
+                                    <i class="fas fa-magic"></i> Generuj z AI
+                                </button>
+                            </div>
                             <input type="text" id="avatarName" placeholder="np. Ekspert ds. Marketingu">
                             <div class="input-hint">Wybierz nazwę opisującą rolę lub funkcję avatara</div>
                         </div>
 
                         <div class="form-group">
-                            <label for="avatarDescription">Opis avatara</label>
+                            <div class="form-group-header">
+                                <label for="avatarDescription">Opis avatara</label>
+                                <button type="button" class="ai-generate-btn" id="generateDescriptionBtn">
+                                    <i class="fas fa-magic"></i> Generuj z AI
+                                </button>
+                            </div>
                             <textarea id="avatarDescription" rows="3" placeholder="Krótki opis tego, czym zajmuje się avatar..."></textarea>
                             <div class="input-hint">Opisz w kilku zdaniach główne zadania i kompetencje avatara</div>
                         </div>
@@ -147,7 +157,12 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="personalityInput">Personalność</label>
+                            <div class="form-group-header">
+                                <label for="personalityInput">Personalność</label>
+                                <button type="button" class="ai-generate-btn" id="generatePersonalityBtn">
+                                    <i class="fas fa-magic"></i> Generuj z AI
+                                </button>
+                            </div>
                             <textarea id="personalityInput" rows="3" placeholder="np. Przyjazny, profesjonalny, pomocny, cierpliwy..."></textarea>
                             <div class="input-hint">Opisz cechy charakteru i podejście avatara</div>
                         </div>
@@ -186,7 +201,12 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="backgroundInfo">Tło i doświadczenie</label>
+                            <div class="form-group-header">
+                                <label for="backgroundInfo">Tło i doświadczenie</label>
+                                <button type="button" class="ai-generate-btn" id="generateBackgroundBtn">
+                                    <i class="fas fa-magic"></i> Generuj z AI
+                                </button>
+                            </div>
                             <textarea id="backgroundInfo" rows="3" placeholder="np. Wieloletnie doświadczenie w branży, certyfikacje, specjalizacje..."></textarea>
                             <div class="input-hint">Opisz doświadczenie i kwalifikacje avatara</div>
                         </div>
@@ -200,13 +220,23 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="specializationInput">Główna specjalizacja</label>
+                            <div class="form-group-header">
+                                <label for="specializationInput">Główna specjalizacja</label>
+                                <button type="button" class="ai-generate-btn" id="generateSpecializationBtn">
+                                    <i class="fas fa-magic"></i> Generuj z AI
+                                </button>
+                            </div>
                             <input type="text" id="specializationInput" placeholder="np. Marketing cyfrowy, Zarządzanie projektami, Obsługa klienta...">
                             <div class="input-hint">Główny obszar, w którym avatar ma być ekspertem</div>
                         </div>
 
                         <div class="form-group">
-                            <label for="expertiseAreas">Obszary wiedzy (tagi)</label>
+                            <div class="form-group-header">
+                                <label for="expertiseAreas">Obszary wiedzy (tagi)</label>
+                                <button type="button" class="ai-generate-btn" id="generateTagsBtn">
+                                    <i class="fas fa-magic"></i> Generuj tagi z AI
+                                </button>
+                            </div>
                             <div class="tags-input-container">
                                 <input type="text" id="tagsInput" placeholder="Wpisz tag i naciśnij Enter">
                                 <div class="tags-list" id="tagsList"></div>
@@ -250,7 +280,12 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="manualKnowledge">Wiedza tekstowa</label>
+                            <div class="form-group-header">
+                                <label for="manualKnowledge">Wiedza tekstowa</label>
+                                <button type="button" class="ai-generate-btn" id="generateKnowledgeBtn">
+                                    <i class="fas fa-magic"></i> Generuj wiedzę z AI
+                                </button>
+                            </div>
                             <textarea id="manualKnowledge" rows="6" placeholder="Wklej lub wpisz dodatkową wiedzę, którą avatar ma posiadać..."></textarea>
                             <div class="input-hint">Dodatkowe informacje, instrukcje lub wiedza, którą avatar ma znać</div>
                         </div>
