@@ -162,7 +162,7 @@
                 flowNodes.push(flowHeaderNode);
                 yOffset += 80; // Add spacing after header
 
-                // CREATE STEP NODES
+                // CREATE STEP NODES (oryginalny layout dashboardu – użyj yOffset i układu zgodnego z poprzednią wersją)
                 const steps = flow.steps || [];
                 let xOffset = 20;
 
@@ -209,7 +209,7 @@
                     xOffset += 280; // 260px width + 20px gap
                 });
 
-                yOffset += 200; // Add vertical spacing between flows
+                yOffset += 200; // powrót do oryginalnego odstępu dashboardu
             });
 
             console.log(`✅ [ZoomableFlowEditor] Generated ${flowNodes.length} nodes for ReactFlow`);
@@ -428,10 +428,10 @@
                     reactFlowInstance.current = reactFlowInstanceParam;
                     console.log('🎯 [REACTFLOW] Instance initialized for auto-focus');
                 },
-                fitView: false, // Don't auto-fit, use our defaultViewport
+                fitView: false, // przywrócone do dashboardowego defaultu
                 minZoom: 0.1,
                 maxZoom: 3,
-                defaultViewport: { x: 0, y: 0, zoom: 1.3 }, // Balanced zoom level
+                defaultViewport: { x: 0, y: 0, zoom: 1.3 }, // oryginalny zoom
                 style: { backgroundColor: '#0d1117' },
                 panOnDrag: true,
                 zoomOnScroll: true,

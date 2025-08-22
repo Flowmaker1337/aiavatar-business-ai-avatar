@@ -13,7 +13,8 @@
     <script src="https://cdn.jsdelivr.net/npm/reactflow@11.10.1/dist/umd/index.js"></script>
     
     <!-- ZoomableFlowEditor Component for live preview -->
-    <script src="components/ZoomableFlowEditor.js?v=1737286300"></script>
+    <script src="components/ZoomableFlowEditor.js?v=1737286301"></script>
+    <script src="components/ZoomableFlowCreator.js?v=1737287000"></script>
     <style>
         * {
             margin: 0;
@@ -242,6 +243,31 @@
         .selected-avatar-desc {
             font-size: 14px;
             color: #d1d5db;
+        }
+
+        /* Flow graph styles (copied from dashboard) */
+        .flow-graph {
+            flex: 1;
+            overflow: auto;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            padding: 16px;
+        }
+
+        /* FORCE ReactFlow nodes to use absolute positioning */
+        .flow-graph .react-flow__node {
+            position: absolute !important;
+            display: block !important;
+            width: auto !important;
+            height: auto !important;
+        }
+
+        .flow-graph .react-flow__node-cardNode {
+            position: absolute !important;
+            display: inline-block !important;
+            width: 260px !important;
+            height: auto !important;
         }
 
         /* Flows Manager Styles */
@@ -2279,6 +2305,28 @@ PAMIĘTAJ: Jesteś ${type === 'client' ? 'skeptycznym ale zainteresowanym klient
                                         )
                                 ),
 
+                                // ReactFlow Preview for selected flow
+                                selectedFlow && React.createElement('div', { className: 'form-section' },
+                                    React.createElement('h3', { className: 'section-title' }, 
+                                        `🎯 Flow Preview: ${selectedFlow.name}`
+                                    ),
+                                    React.createElement('div', { 
+                                        className: 'flow-graph',
+                                        style: { height: '420px', border: '1px solid #3a3a3a', borderRadius: '8px', background: '#0d1117' } 
+                                    },
+                                        (window.ZoomableFlowCreator && selectedAvatar) ? 
+                                            React.createElement(window.ZoomableFlowCreator, {
+                                                flowDefinitions: [selectedFlow],
+                                                activeFlow: selectedFlow.id,
+                                                currentStep: null,
+                                                onNodeClick: (node) => { console.log('Flows Manager node clicked:', node); },
+                                                editable: true,
+                                                avatar: selectedAvatar
+                                            }) :
+                                            React.createElement('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#8b949e', fontSize: '16px' } }, 'Ładowanie ReactFlow...')
+                                    )
+                                ),
+
                                 // Create New Flow Button
                                 React.createElement('div', { className: 'form-section' },
                                     React.createElement('button', {
@@ -2380,6 +2428,34 @@ PAMIĘTAJ: Jesteś ${type === 'client' ? 'skeptycznym ale zainteresowanym klient
                                         value: flowData.priority,
                                         onChange: (e) => setFlowData({ ...flowData, priority: parseInt(e.target.value) })
                                     })
+                                )
+                            ),
+
+                            // Live Preview (ReactFlow)
+                            (selectedAvatar && flowData.steps.length > 0) && React.createElement('div', { className: 'form-section' },
+                                React.createElement('div', { className: 'section-header' },
+                                    React.createElement('h3', { className: 'section-title' }, '🎯 Live Preview (ReactFlow)')
+                                ),
+                                React.createElement('div', { 
+                                    className: 'flow-graph',
+                                    style: { height: '500px', border: '1px solid #3a3a3a', borderRadius: '8px', background: '#0d1117' } 
+                                },
+                                    (window.ZoomableFlowCreator && selectedAvatar) ? 
+                                        React.createElement(window.ZoomableFlowCreator, {
+                                            flowDefinitions: [{
+                                                ...flowData,
+                                                id: flowData.id || 'preview_flow',
+                                                name: flowData.name || 'Preview Flow',
+                                                description: flowData.description || '',
+                                                avatar_type: selectedAvatar.name
+                                            }],
+                                            activeFlow: flowData.id || 'preview_flow',
+                                            currentStep: null,
+                                            onNodeClick: (node) => { console.log('Flow Creator node clicked:', node); },
+                                            editable: true,
+                                            avatar: selectedAvatar
+                                        }) :
+                                        React.createElement('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#8b949e' } }, 'Ładowanie ReactFlow...')
                                 )
                             ),
 
