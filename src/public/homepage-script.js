@@ -193,6 +193,8 @@ class HomepageApp {
 
         if (pageName === 'avatar-manager') {
             this.showAvatarManager();
+        } else if (pageName === 'flow-studio') {
+            this.showFlowStudio();
         } else {
             const targetPageId = pageMapping[pageName];
             if (targetPageId) {
@@ -1116,6 +1118,11 @@ class HomepageApp {
             // Load avatars
             this.loadAvatars();
         }
+    }
+
+    showFlowStudio() {
+        // Redirect to Flow Studio page
+        window.location.href = '/flow-studio.html';
     }
 
     initializeAvatarManager() {

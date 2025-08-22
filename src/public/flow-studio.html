@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flow Studio - Visual Flow Builder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="homepage-styles.css">
+    <link rel="stylesheet" href="flow-studio-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- ReactFlow Dependencies -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/reactflow@11.11.4/dist/umd/index.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/reactflow@11.11.4/dist/style.css">
+</head>
+<body>
+    <div class="flow-studio-container">
+        <!-- Header -->
+        <header class="studio-header">
+            <div class="header-left">
+                <button class="back-btn" id="backBtn">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Powrót</span>
+                </button>
+                <div class="header-title">
+                    <h1>Flow Studio</h1>
+                    <p>Wizualny edytor przepływów rozmowy</p>
+                </div>
+            </div>
+            <div class="header-center">
+                <div class="flow-selector">
+                    <select id="flowSelector">
+                        <option value="">Wybierz flow lub utwórz nowy</option>
+                    </select>
+                    <button class="btn-secondary" id="newFlowBtn">
+                        <i class="fas fa-plus"></i>
+                        Nowy Flow
+                    </button>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn-secondary" id="saveFlowBtn">
+                    <i class="fas fa-save"></i>
+                    Zapisz
+                </button>
+                <button class="btn-secondary" id="testFlowBtn">
+                    <i class="fas fa-play"></i>
+                    Testuj
+                </button>
+                <button class="btn-primary" id="publishFlowBtn">
+                    <i class="fas fa-rocket"></i>
+                    Publikuj
+                </button>
+            </div>
+        </header>
+
+        <div class="studio-content">
+            <!-- Left Sidebar - Node Palette -->
+            <div class="node-palette">
+                <div class="palette-header">
+                    <h3>Węzły</h3>
+                    <div class="palette-search">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Szukaj węzłów..." id="nodeSearch">
+                    </div>
+                </div>
+                
+                <div class="palette-categories">
+                    <div class="category active" data-category="basic">
+                        <i class="fas fa-play"></i>
+                        <span>Podstawowe</span>
+                    </div>
+                    <div class="category" data-category="logic">
+                        <i class="fas fa-code-branch"></i>
+                        <span>Logika</span>
+                    </div>
+                    <div class="category" data-category="ai">
+                        <i class="fas fa-robot"></i>
+                        <span>AI</span>
+                    </div>
+                    <div class="category" data-category="actions">
+                        <i class="fas fa-bolt"></i>
+                        <span>Akcje</span>
+                    </div>
+                </div>
+
+                <div class="palette-nodes" id="paletteNodes">
+                    <!-- Nodes will be populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Main Canvas -->
+            <div class="flow-canvas">
+                <div class="canvas-toolbar">
+                    <div class="toolbar-left">
+                        <button class="tool-btn" id="selectTool" title="Zaznacz">
+                            <i class="fas fa-mouse-pointer"></i>
+                        </button>
+                        <button class="tool-btn" id="panTool" title="Przesuwaj">
+                            <i class="fas fa-hand-paper"></i>
+                        </button>
+                        <div class="tool-divider"></div>
+                        <button class="tool-btn" id="zoomInBtn" title="Przybliż">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                        <button class="tool-btn" id="zoomOutBtn" title="Oddal">
+                            <i class="fas fa-search-minus"></i>
+                        </button>
+                        <button class="tool-btn" id="fitViewBtn" title="Dopasuj widok">
+                            <i class="fas fa-expand-arrows-alt"></i>
+                        </button>
+                    </div>
+                    <div class="toolbar-center">
+                        <div class="zoom-indicator" id="zoomIndicator">100%</div>
+                    </div>
+                    <div class="toolbar-right">
+                        <button class="tool-btn" id="gridToggle" title="Pokaż siatkę">
+                            <i class="fas fa-th"></i>
+                        </button>
+                        <button class="tool-btn" id="minimapToggle" title="Miniatura">
+                            <i class="fas fa-map"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="reactflow-wrapper" id="reactflowWrapper">
+                    <!-- ReactFlow will be mounted here -->
+                </div>
+            </div>
+
+            <!-- Right Sidebar - Properties Panel -->
+            <div class="properties-panel">
+                <div class="panel-header">
+                    <h3>Właściwości</h3>
+                </div>
+                
+                <div class="panel-content" id="propertiesContent">
+                    <div class="no-selection">
+                        <i class="fas fa-mouse-pointer"></i>
+                        <p>Wybierz węzeł aby edytować właściwości</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flow Creation Modal -->
+        <div class="modal-overlay" id="flowModalOverlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Nowy Flow</h3>
+                    <button class="modal-close" id="modalCloseBtn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="flowName">Nazwa flow</label>
+                        <input type="text" id="flowName" placeholder="np. Onboarding nowego klienta">
+                    </div>
+                    <div class="form-group">
+                        <label for="flowDescription">Opis</label>
+                        <textarea id="flowDescription" rows="3" placeholder="Opisz cel i przebieg tego flow..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="flowCategory">Kategoria</label>
+                        <select id="flowCategory">
+                            <option value="sales">Sprzedaż</option>
+                            <option value="support">Wsparcie</option>
+                            <option value="training">Szkolenia</option>
+                            <option value="onboarding">Onboarding</option>
+                            <option value="general">Ogólne</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-secondary" id="modalCancelBtn">Anuluj</button>
+                    <button class="btn-primary" id="modalCreateBtn">
+                        <i class="fas fa-plus"></i>
+                        Utwórz Flow
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Ładowanie Flow Studio...</div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="flow-studio-script.js"></script>
+</body>
+</html>

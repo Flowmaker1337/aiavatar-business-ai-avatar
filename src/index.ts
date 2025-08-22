@@ -74,6 +74,10 @@ app.get('/enhanced-avatar-builder.html', (_req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, 'public', 'enhanced-avatar-builder.html'));
 });
 
+app.get('/flow-studio.html', (_req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'public', 'flow-studio.html'));
+});
+
 // Legacy routes for backward compatibility
 app.get('/dashboard', (_req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
