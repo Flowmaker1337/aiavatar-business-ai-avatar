@@ -12,6 +12,7 @@ import FlowWizardController from '../controllers/flow-wizard.controller';
 import CustomAvatarController from '../controllers/custom-avatar.controller';
 import { ReactiveAvatarController } from '../controllers/reactive-avatar.controller';
 import CompanyProfileController from '../controllers/company-profile.controller';
+import AuthRoutes from './auth.routes';
 
 const router = Router();
 
@@ -22,6 +23,12 @@ const flowWizardController = new FlowWizardController();
 const customAvatarController = new CustomAvatarController();
 const reactiveAvatarController = new ReactiveAvatarController();
 const companyProfileController = new CompanyProfileController();
+
+// Initialize auth routes
+const authRoutes = new AuthRoutes();
+
+// ============ AUTHENTICATION ROUTES ============
+router.use('/auth', authRoutes.getRouter());
 
 // Endpoint for processing queries
 router.post('/query', queryController.handleQuery.bind(queryController));

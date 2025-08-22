@@ -50,6 +50,11 @@ export const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 // Eleven Labs (speech synthesis)
 export const ELEVEN_LABS_API_KEY = process.env.ELEVEN_LABS_API_KEY || '';
 
+// JWT Authentication
+export const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production';
+export const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1h';
+export const REFRESH_TOKEN_EXPIRES_IN = process.env.REFRESH_TOKEN_EXPIRES_IN || '7d';
+
 const maxTokensAsString = process.env.MAX_TOKENS || '1000';
 export const MAX_TOKENS: number = parseInt(maxTokensAsString);
 

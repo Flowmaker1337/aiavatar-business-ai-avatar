@@ -3,6 +3,7 @@ import cors from 'cors';
 import { PORT, validateEnv } from './config/env';
 import apiRoutes from './routes/api.routes';
 import DatabaseService from './services/database.service';
+import ExtendedDatabaseService from './services/extended-database.service';
 import path from 'path';
 
 // Check if all required environment variables are set
@@ -14,9 +15,13 @@ if (!validateEnv()) {
 // Initialize database connection and sessions
 const initDatabase = async () => {
   try {
-    // First initialize the database
+    // First initialize the standard database
     const db = DatabaseService.getInstance();
     await db.connect();
+    
+    // Then initialize the extended database for auth
+    const extendedDb = ExtendedDatabaseService.getInstance();
+    await extendedDb.connect();
   } catch (error) {
     console.error('Error during database initialization:', error);
     process.exit(1);
@@ -28,9 +33,13 @@ const closeDatabase = async () => {
   try {
     const db = DatabaseService.getInstance();
     await db.disconnect();
-          console.log('Database connection closed successfully');
+    
+    const extendedDb = ExtendedDatabaseService.getInstance();
+    await extendedDb.disconnect();
+    
+    console.log('Database connections closed successfully');
   } catch (error) {
-          console.error('Error during database connection closure:', error);
+    console.error('Error during database connection closure:', error);
   }
 };
 
