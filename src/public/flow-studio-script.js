@@ -589,25 +589,40 @@ class FlowStudio {
                 
                 <div class="form-group">
                     <label for="nodeSystemPrompt">System Prompt</label>
-                    <textarea id="nodeSystemPrompt" rows="4" 
-                              onchange="flowStudio.updateNodeProperty('system_prompt', this.value)"
-                              placeholder="Instrukcja dla AI jak ma się zachowywać w tym kroku...">${node.data.system_prompt || ''}</textarea>
+                    <div class="input-with-ai">
+                        <textarea id="nodeSystemPrompt" rows="4" 
+                                  onchange="flowStudio.updateNodeProperty('system_prompt', this.value)"
+                                  placeholder="Instrukcja dla AI jak ma się zachowywać w tym kroku...">${node.data.system_prompt || ''}</textarea>
+                        <button class="btn-ai-generate" onclick="flowStudio.generateNodeSystemPrompt()" title="Generuj AI">
+                            <i class="fas fa-magic"></i>
+                        </button>
+                    </div>
                     <div class="input-hint">Instrukcja systemowa dla AI w tym kroku</div>
                 </div>
                 
                 <div class="form-group">
                     <label for="nodeUserPrompt">User Prompt Template</label>
-                    <textarea id="nodeUserPrompt" rows="4" 
-                              onchange="flowStudio.updateNodeProperty('user_prompt_template', this.value)"
-                              placeholder="Template dla user prompt z zmiennymi {{variable}}...">${node.data.user_prompt_template || ''}</textarea>
+                    <div class="input-with-ai">
+                        <textarea id="nodeUserPrompt" rows="4" 
+                                  onchange="flowStudio.updateNodeProperty('user_prompt_template', this.value)"
+                                  placeholder="Template dla user prompt z zmiennymi {{variable}}...">${node.data.user_prompt_template || ''}</textarea>
+                        <button class="btn-ai-generate" onclick="flowStudio.generateNodeUserPrompt()" title="Generuj AI">
+                            <i class="fas fa-magic"></i>
+                        </button>
+                    </div>
                     <div class="input-hint">Template dla user prompt z zmiennymi</div>
                 </div>
                 
                 <div class="form-group">
                     <label for="nodeVariables">Variables</label>
-                    <input type="text" id="nodeVariables" value="${(node.data.variables || []).join(', ')}" 
-                           onchange="flowStudio.updateNodeProperty('variables', this.value.split(',').map(s => s.trim()).filter(s => s))"
-                           placeholder="user_message, npc_persona.firstName, rag_context">
+                    <div class="input-with-ai">
+                        <input type="text" id="nodeVariables" value="${(node.data.variables || []).join(', ')}" 
+                               onchange="flowStudio.updateNodeProperty('variables', this.value.split(',').map(s => s.trim()).filter(s => s))"
+                               placeholder="user_message, npc_persona.firstName, rag_context">
+                        <button class="btn-ai-generate" onclick="flowStudio.generateNodeVariables()" title="Generuj AI">
+                            <i class="fas fa-magic"></i>
+                        </button>
+                    </div>
                     <div class="input-hint">Dostępne zmienne w promptach (oddzielone przecinkami)</div>
                 </div>
                 
@@ -1613,11 +1628,29 @@ class FlowStudio {
         document.getElementById('intentPriority').value = intent.priority || 5;
         document.getElementById('intentRequiresFlow').checked = intent.requires_flow || false;
         
-        // Fill prompts (from template if available)
-        const template = intent.template || intent;
-        document.getElementById('intentSystemPrompt').value = template.system_prompt || '';
-        document.getElementById('intentUserPrompt').value = template.user_prompt_template || '';
-        document.getElementById('intentVariables').value = Array.isArray(template.variables) ? template.variables.join(', ') : (template.variables || '');
+        // Fill prompts (look in both intent definition AND prompt templates)
+        let systemPrompt = intent.system_prompt || '';
+        let userPrompt = intent.user_prompt_template || '';
+        let variables = intent.variables || [];
+        
+        // If intent has template, use template data
+        if (intent.template) {
+            systemPrompt = intent.template.system_prompt || systemPrompt;
+            userPrompt = intent.template.user_prompt_template || userPrompt;
+            variables = intent.template.variables || variables;
+        }
+        
+        // Also check prompt templates by intent name
+        const promptTemplate = this.promptTemplates?.find(t => t.intent === intent.name);
+        if (promptTemplate) {
+            systemPrompt = promptTemplate.system_prompt || systemPrompt;
+            userPrompt = promptTemplate.user_prompt_template || userPrompt;
+            variables = promptTemplate.variables || variables;
+        }
+        
+        document.getElementById('intentSystemPrompt').value = systemPrompt;
+        document.getElementById('intentUserPrompt').value = userPrompt;
+        document.getElementById('intentVariables').value = Array.isArray(variables) ? variables.join(', ') : (variables || '');
         
         // Fill keywords
         document.getElementById('intentKeywords').value = Array.isArray(intent.keywords) ? intent.keywords.join(', ') : (intent.keywords || '');
@@ -1734,6 +1767,317 @@ class FlowStudio {
             
             this.hideIntentModal();
             this.loadIntentLibrary(); // Refresh the list
+        }
+    }
+
+    // ============ AI GENERATOR METHODS ============
+
+    async generateSystemPrompt() {
+        const button = event.target.closest('.btn-ai-generate');
+        const textarea = document.getElementById('intentSystemPrompt');
+        const intentName = document.getElementById('intentName').value || 'unknown';
+        const description = document.getElementById('intentDescription').value || '';
+        
+        if (!textarea) return;
+        
+        button.classList.add('loading');
+        button.innerHTML = '<i class="fas fa-spinner"></i>';
+        
+        try {
+            const prompt = `Wygeneruj system prompt dla AI avatara na podstawie:
+- Intent: ${intentName}
+- Opis: ${description}
+- Cel: Instrukcja jak AI ma się zachowywać w tym intencji
+
+Zwróć tylko treść promptu, bez dodatkowych komentarzy.`;
+
+            const response = await this.callAIGenerator(prompt);
+            if (response && response.trim()) {
+                textarea.value = response.trim();
+                this.showNotification('System prompt wygenerowany!', 'success');
+            }
+        } catch (error) {
+            console.error('Error generating system prompt:', error);
+            this.showNotification('Błąd generowania system prompt', 'error');
+        } finally {
+            button.classList.remove('loading');
+            button.innerHTML = '<i class="fas fa-magic"></i>';
+        }
+    }
+
+    async generateUserPrompt() {
+        const button = event.target.closest('.btn-ai-generate');
+        const textarea = document.getElementById('intentUserPrompt');
+        const intentName = document.getElementById('intentName').value || 'unknown';
+        const description = document.getElementById('intentDescription').value || '';
+        
+        if (!textarea) return;
+        
+        button.classList.add('loading');
+        button.innerHTML = '<i class="fas fa-spinner"></i>';
+        
+        try {
+            const prompt = `Wygeneruj user prompt template dla intenta:
+- Intent: ${intentName}
+- Opis: ${description}
+- Cel: Szablon wiadomości użytkownika z {{zmiennymi}}
+
+Uwzględnij zmienne jak {{user_message}}, {{user_name}}, itp.
+Zwróć tylko treść template, bez dodatkowych komentarzy.`;
+
+            const response = await this.callAIGenerator(prompt);
+            if (response && response.trim()) {
+                textarea.value = response.trim();
+                this.showNotification('User prompt template wygenerowany!', 'success');
+            }
+        } catch (error) {
+            console.error('Error generating user prompt:', error);
+            this.showNotification('Błąd generowania user prompt', 'error');
+        } finally {
+            button.classList.remove('loading');
+            button.innerHTML = '<i class="fas fa-magic"></i>';
+        }
+    }
+
+    async generateVariables() {
+        const button = event.target.closest('.btn-ai-generate');
+        const input = document.getElementById('intentVariables');
+        const intentName = document.getElementById('intentName').value || 'unknown';
+        const description = document.getElementById('intentDescription').value || '';
+        
+        if (!input) return;
+        
+        button.classList.add('loading');
+        button.innerHTML = '<i class="fas fa-spinner"></i>';
+        
+        try {
+            const prompt = `Wygeneruj listę zmiennych dla intenta:
+- Intent: ${intentName}
+- Opis: ${description}
+
+Przykłady zmiennych: user_message, user_name, company_name, npc_persona, rag_context, current_time
+
+Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy.`;
+
+            const response = await this.callAIGenerator(prompt);
+            if (response && response.trim()) {
+                input.value = response.trim();
+                this.showNotification('Zmienne wygenerowane!', 'success');
+            }
+        } catch (error) {
+            console.error('Error generating variables:', error);
+            this.showNotification('Błąd generowania zmiennych', 'error');
+        } finally {
+            button.classList.remove('loading');
+            button.innerHTML = '<i class="fas fa-magic"></i>';
+        }
+    }
+
+    async generateKeywords() {
+        const button = event.target.closest('.btn-ai-generate');
+        const textarea = document.getElementById('intentKeywords');
+        const intentName = document.getElementById('intentName').value || 'unknown';
+        const description = document.getElementById('intentDescription').value || '';
+        
+        if (!textarea) return;
+        
+        button.classList.add('loading');
+        button.innerHTML = '<i class="fas fa-spinner"></i>';
+        
+        try {
+            const prompt = `Wygeneruj słowa kluczowe i frazy dla intenta:
+- Intent: ${intentName}
+- Opis: ${description}
+
+Uwzględnij różne warianty, skróty, formalne i nieformalne formy.
+Zwróć tylko słowa oddzielone przecinkami, bez dodatkowych komentarzy.`;
+
+            const response = await this.callAIGenerator(prompt);
+            if (response && response.trim()) {
+                textarea.value = response.trim();
+                this.showNotification('Słowa kluczowe wygenerowane!', 'success');
+            }
+        } catch (error) {
+            console.error('Error generating keywords:', error);
+            this.showNotification('Błąd generowania słów kluczowych', 'error');
+        } finally {
+            button.classList.remove('loading');
+            button.innerHTML = '<i class="fas fa-magic"></i>';
+        }
+    }
+
+    async generateExamples() {
+        const button = event.target.closest('.btn-ai-generate');
+        const textarea = document.getElementById('intentExamples');
+        const intentName = document.getElementById('intentName').value || 'unknown';
+        const description = document.getElementById('intentDescription').value || '';
+        
+        if (!textarea) return;
+        
+        button.classList.add('loading');
+        button.innerHTML = '<i class="fas fa-spinner"></i>';
+        
+        try {
+            const prompt = `Wygeneruj przykładowe wypowiedzi użytkownika dla intenta:
+- Intent: ${intentName}
+- Opis: ${description}
+
+Stwórz 5-8 różnorodnych przykładów jak użytkownik może wyrazić ten intent.
+Zwróć każdy przykład w osobnej linii, bez numeracji.`;
+
+            const response = await this.callAIGenerator(prompt);
+            if (response && response.trim()) {
+                textarea.value = response.trim();
+                this.showNotification('Przykłady wygenerowane!', 'success');
+            }
+        } catch (error) {
+            console.error('Error generating examples:', error);
+            this.showNotification('Błąd generowania przykładów', 'error');
+        } finally {
+            button.classList.remove('loading');
+            button.innerHTML = '<i class="fas fa-magic"></i>';
+        }
+    }
+
+    async callAIGenerator(prompt) {
+        // Use existing OpenAI endpoint for content generation
+        const response = await fetch('/api/personas/generate-content', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({
+                prompt: prompt,
+                type: 'intent_content'
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data.content || data.message || '';
+    }
+
+    // ============ NODE AI GENERATOR METHODS ============
+
+    async generateNodeSystemPrompt() {
+        const button = event.target.closest('.btn-ai-generate');
+        const textarea = document.getElementById('nodeSystemPrompt');
+        
+        if (!textarea || !this.selectedNode) return;
+        
+        const node = this.selectedNode;
+        const nodeType = node.data.type || 'unknown';
+        const intentName = node.data.intent_name || 'unknown';
+        const description = node.data.description || '';
+        
+        button.classList.add('loading');
+        button.innerHTML = '<i class="fas fa-spinner"></i>';
+        
+        try {
+            const prompt = `Wygeneruj system prompt dla węzła w flow:
+- Typ węzła: ${nodeType}
+- Intent: ${intentName}
+- Opis: ${description}
+- Cel: Instrukcja systemowa jak AI ma się zachowywać w tym kroku flow
+
+Uwzględnij specyfikę tego typu węzła i jego rolę w flow.
+Zwróć tylko treść promptu, bez dodatkowych komentarzy.`;
+
+            const response = await this.callAIGenerator(prompt);
+            if (response && response.trim()) {
+                textarea.value = response.trim();
+                this.updateNodeProperty('system_prompt', response.trim());
+                this.showNotification('System prompt wygenerowany dla węzła!', 'success');
+            }
+        } catch (error) {
+            console.error('Error generating node system prompt:', error);
+            this.showNotification('Błąd generowania system prompt', 'error');
+        } finally {
+            button.classList.remove('loading');
+            button.innerHTML = '<i class="fas fa-magic"></i>';
+        }
+    }
+
+    async generateNodeUserPrompt() {
+        const button = event.target.closest('.btn-ai-generate');
+        const textarea = document.getElementById('nodeUserPrompt');
+        
+        if (!textarea || !this.selectedNode) return;
+        
+        const node = this.selectedNode;
+        const nodeType = node.data.type || 'unknown';
+        const intentName = node.data.intent_name || 'unknown';
+        const description = node.data.description || '';
+        
+        button.classList.add('loading');
+        button.innerHTML = '<i class="fas fa-spinner"></i>';
+        
+        try {
+            const prompt = `Wygeneruj user prompt template dla węzła w flow:
+- Typ węzła: ${nodeType}
+- Intent: ${intentName}
+- Opis: ${description}
+- Cel: Template wiadomości użytkownika z {{zmiennymi}}
+
+Uwzględnij zmienne jak {{user_message}}, {{user_name}}, {{npc_persona}}, itp.
+Zwróć tylko treść template, bez dodatkowych komentarzy.`;
+
+            const response = await this.callAIGenerator(prompt);
+            if (response && response.trim()) {
+                textarea.value = response.trim();
+                this.updateNodeProperty('user_prompt_template', response.trim());
+                this.showNotification('User prompt template wygenerowany dla węzła!', 'success');
+            }
+        } catch (error) {
+            console.error('Error generating node user prompt:', error);
+            this.showNotification('Błąd generowania user prompt', 'error');
+        } finally {
+            button.classList.remove('loading');
+            button.innerHTML = '<i class="fas fa-magic"></i>';
+        }
+    }
+
+    async generateNodeVariables() {
+        const button = event.target.closest('.btn-ai-generate');
+        const input = document.getElementById('nodeVariables');
+        
+        if (!input || !this.selectedNode) return;
+        
+        const node = this.selectedNode;
+        const nodeType = node.data.type || 'unknown';
+        const intentName = node.data.intent_name || 'unknown';
+        const description = node.data.description || '';
+        
+        button.classList.add('loading');
+        button.innerHTML = '<i class="fas fa-spinner"></i>';
+        
+        try {
+            const prompt = `Wygeneruj listę zmiennych dla węzła w flow:
+- Typ węzła: ${nodeType}
+- Intent: ${intentName}
+- Opis: ${description}
+
+Przykłady zmiennych: user_message, user_name, company_name, npc_persona, rag_context, current_time, step_result
+
+Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy.`;
+
+            const response = await this.callAIGenerator(prompt);
+            if (response && response.trim()) {
+                const variables = response.trim().split(',').map(s => s.trim()).filter(s => s);
+                input.value = variables.join(', ');
+                this.updateNodeProperty('variables', variables);
+                this.showNotification('Zmienne wygenerowane dla węzła!', 'success');
+            }
+        } catch (error) {
+            console.error('Error generating node variables:', error);
+            this.showNotification('Błąd generowania zmiennych', 'error');
+        } finally {
+            button.classList.remove('loading');
+            button.innerHTML = '<i class="fas fa-magic"></i>';
         }
     }
 }

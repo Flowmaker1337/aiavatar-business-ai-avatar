@@ -1076,3 +1076,75 @@
     background: #d97706;
     transform: translateY(-1px);
 }
+
+/* AI Generator Buttons */
+.input-with-ai {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+}
+
+.input-with-ai input,
+.input-with-ai textarea {
+    flex: 1;
+}
+
+.btn-ai-generate {
+    background: linear-gradient(135deg, #8b5cf6, #a855f7);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    height: auto;
+    align-self: stretch;
+}
+
+.btn-ai-generate:hover {
+    background: linear-gradient(135deg, #7c3aed, #9333ea);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.btn-ai-generate:active {
+    transform: translateY(0);
+}
+
+.btn-ai-generate i {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* For textarea in AI input groups */
+.input-with-ai textarea {
+    resize: vertical;
+    min-height: 40px;
+}
+
+/* Loading state for AI buttons */
+.btn-ai-generate.loading {
+    background: #6b7280;
+    cursor: not-allowed;
+}
+
+.btn-ai-generate.loading i {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}

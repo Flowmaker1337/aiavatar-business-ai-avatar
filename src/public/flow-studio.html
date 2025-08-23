@@ -280,17 +280,32 @@
                     <div class="intent-tab-content" id="promptsTab">
                         <div class="form-group">
                             <label for="intentSystemPrompt">System Prompt</label>
-                            <textarea id="intentSystemPrompt" rows="5" placeholder="Instrukcja systemowa dla AI..."></textarea>
+                            <div class="input-with-ai">
+                                <textarea id="intentSystemPrompt" rows="5" placeholder="Instrukcja systemowa dla AI..."></textarea>
+                                <button class="btn-ai-generate" onclick="flowStudio.generateSystemPrompt()" title="Generuj AI">
+                                    <i class="fas fa-magic"></i>
+                                </button>
+                            </div>
                             <small>Jak ma się zachowywać AI dla tego intenta</small>
                         </div>
                         <div class="form-group">
                             <label for="intentUserPrompt">User Prompt Template</label>
-                            <textarea id="intentUserPrompt" rows="4" placeholder="Template dla user message..."></textarea>
+                            <div class="input-with-ai">
+                                <textarea id="intentUserPrompt" rows="4" placeholder="Template dla user message..."></textarea>
+                                <button class="btn-ai-generate" onclick="flowStudio.generateUserPrompt()" title="Generuj AI">
+                                    <i class="fas fa-magic"></i>
+                                </button>
+                            </div>
                             <small>Szablon wiadomości użytkownika z {{zmiennymi}}</small>
                         </div>
                         <div class="form-group">
                             <label for="intentVariables">Zmienne</label>
-                            <input type="text" id="intentVariables" placeholder="np. user_name, company_name">
+                            <div class="input-with-ai">
+                                <input type="text" id="intentVariables" placeholder="np. user_name, company_name">
+                                <button class="btn-ai-generate" onclick="flowStudio.generateVariables()" title="Generuj AI">
+                                    <i class="fas fa-magic"></i>
+                                </button>
+                            </div>
                             <small>Lista zmiennych oddzielonych przecinkami</small>
                         </div>
                     </div>
@@ -299,12 +314,22 @@
                     <div class="intent-tab-content" id="keywordsTab">
                         <div class="form-group">
                             <label for="intentKeywords">Słowa kluczowe</label>
-                            <textarea id="intentKeywords" rows="4" placeholder="cześć, dzień dobry, witaj, hello"></textarea>
+                            <div class="input-with-ai">
+                                <textarea id="intentKeywords" rows="4" placeholder="cześć, dzień dobry, witaj, hello"></textarea>
+                                <button class="btn-ai-generate" onclick="flowStudio.generateKeywords()" title="Generuj AI">
+                                    <i class="fas fa-magic"></i>
+                                </button>
+                            </div>
                             <small>Słowa/frazy wyzwalające intent (oddzielone przecinkami)</small>
                         </div>
                         <div class="form-group">
                             <label for="intentExamples">Przykłady</label>
-                            <textarea id="intentExamples" rows="6" placeholder="Przykład 1&#10;Przykład 2&#10;Przykład 3"></textarea>
+                            <div class="input-with-ai">
+                                <textarea id="intentExamples" rows="6" placeholder="Przykład 1&#10;Przykład 2&#10;Przykład 3"></textarea>
+                                <button class="btn-ai-generate" onclick="flowStudio.generateExamples()" title="Generuj AI">
+                                    <i class="fas fa-magic"></i>
+                                </button>
+                            </div>
                             <small>Przykładowe wypowiedzi użytkownika (jedna na linię)</small>
                         </div>
                     </div>
