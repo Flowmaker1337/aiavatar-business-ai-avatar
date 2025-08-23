@@ -703,3 +703,376 @@
         height: calc(100vh - 140px);
     }
 }
+
+/* ============ INTENT MANAGEMENT STYLES ============ */
+.palette-tabs {
+    display: flex;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    margin-bottom: 16px;
+    padding: 4px;
+}
+
+.tab-button {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.tab-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.tab-button.active {
+    background: #39e575;
+    color: #0d1117;
+}
+
+.tab-content {
+    display: none;
+    height: calc(100% - 60px);
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.intent-search {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.intent-search i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.intent-search input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 10px 12px 10px 36px;
+    color: #ffffff;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.intent-search input:focus {
+    border-color: #39e575;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.intent-categories {
+    margin-bottom: 16px;
+}
+
+.category-header h4 {
+    color: #9ca3af;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 8px 0;
+}
+
+.category-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.category-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #d1d5db;
+    font-size: 13px;
+}
+
+.category-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.category-item.active {
+    background: rgba(57, 229, 117, 0.1);
+    color: #39e575;
+}
+
+.category-item i {
+    margin-right: 8px;
+    width: 16px;
+    text-align: center;
+}
+
+.category-item span {
+    flex: 1;
+}
+
+.category-item .count {
+    background: rgba(255, 255, 255, 0.1);
+    color: #9ca3af;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+}
+
+.category-item.active .count {
+    background: rgba(57, 229, 117, 0.2);
+    color: #39e575;
+}
+
+.intent-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.intent-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.intent-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.intent-item.selected {
+    background: rgba(57, 229, 117, 0.1);
+    border-color: #39e575;
+}
+
+.intent-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.intent-name {
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.intent-badges {
+    display: flex;
+    gap: 4px;
+}
+
+.intent-badge {
+    background: rgba(255, 255, 255, 0.1);
+    color: #9ca3af;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.intent-badge.template {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+}
+
+.intent-badge.flow-specific {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+}
+
+.intent-description {
+    color: #9ca3af;
+    font-size: 12px;
+    line-height: 1.4;
+    margin-bottom: 8px;
+}
+
+.intent-keywords {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.keyword-tag {
+    background: rgba(255, 255, 255, 0.05);
+    color: #d1d5db;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-small {
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-small.btn-primary {
+    background: #39e575;
+    color: #0d1117;
+}
+
+.btn-small.btn-primary:hover {
+    background: #22c55e;
+    transform: translateY(-1px);
+}
+
+/* Intent Editor Modal Styles */
+.intent-modal {
+    max-width: 700px;
+    width: 90vw;
+    max-height: 80vh;
+}
+
+.intent-modal-body {
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.intent-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 4px;
+}
+
+.tab-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #9ca3af;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tab-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+.tab-btn.active {
+    background: #39e575;
+    color: #0d1117;
+}
+
+.intent-tab-content {
+    display: none;
+}
+
+.intent-tab-content.active {
+    display: block;
+}
+
+.intent-tab-content .form-group {
+    margin-bottom: 20px;
+}
+
+.intent-tab-content label {
+    display: block;
+    color: #ffffff;
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+.intent-tab-content input,
+.intent-tab-content textarea,
+.intent-tab-content select {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: #ffffff;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: all 0.3s ease;
+    resize: vertical;
+}
+
+.intent-tab-content input:focus,
+.intent-tab-content textarea:focus,
+.intent-tab-content select:focus {
+    border-color: #39e575;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 3px rgba(57, 229, 117, 0.1);
+}
+
+.intent-tab-content small {
+    display: block;
+    color: #9ca3af;
+    font-size: 12px;
+    margin-top: 4px;
+    line-height: 1.4;
+}
+
+.intent-tab-content input[type="checkbox"] {
+    width: auto;
+    margin-right: 8px;
+    accent-color: #39e575;
+}
+
+.intent-tab-content input[type="number"] {
+    width: 120px;
+}
+
+.btn-warning {
+    background: #f59e0b;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-warning:hover {
+    background: #d97706;
+    transform: translateY(-1px);
+}

@@ -117,6 +117,7 @@ class FlowStudio {
         this.initializeReactFlow();
         this.loadNodePalette();
         this.loadUserFlows();
+        this.loadIntentLibrary();
         
         console.log('🌊 Flow Studio initialized');
     }
@@ -147,14 +148,31 @@ class FlowStudio {
         document.getElementById('modalCloseBtn')?.addEventListener('click', () => this.hideNewFlowModal());
         document.getElementById('modalCancelBtn')?.addEventListener('click', () => this.hideNewFlowModal());
         document.getElementById('modalCreateBtn')?.addEventListener('click', () => this.createNewFlow());
+        
+        // Intent management events
+        document.getElementById('createIntentBtn')?.addEventListener('click', () => this.showCreateIntentModal());
+        document.getElementById('intentSearch')?.addEventListener('input', (e) => this.filterIntents(e.target.value));
+        
+        // Intent modal events
+        document.getElementById('intentModalCloseBtn')?.addEventListener('click', () => this.hideIntentModal());
+        document.getElementById('intentModalCancelBtn')?.addEventListener('click', () => this.hideIntentModal());
+        document.getElementById('saveIntentBtn')?.addEventListener('click', () => this.saveIntent());
+        document.getElementById('deleteIntentBtn')?.addEventListener('click', () => this.deleteIntent());
 
-        // Category selection
+        // Category selection (nodes)
         document.querySelectorAll('.category').forEach(category => {
             category.addEventListener('click', () => {
                 document.querySelectorAll('.category').forEach(c => c.classList.remove('active'));
                 category.classList.add('active');
                 this.loadNodePalette(category.dataset.category);
             });
+        });
+
+        // Intent category selection (will be added dynamically)
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('category-item')) {
+                this.switchIntentCategory(e.target.dataset.category);
+            }
         });
 
         // Node search
@@ -202,19 +220,22 @@ class FlowStudio {
             const onNodesChange = (changes) => {
                 console.log('Nodes changes:', changes);
                 
-                // Handle selection changes
-                changes.forEach(change => {
-                    if (change.type === 'select') {
-                        const node = nodes.find(n => n.id === change.id);
-                        if (node && change.selected) {
-                            console.log('Node selected via onNodesChange:', node);
-                            this.onNodeClick(null, node);
-                        }
-                    }
-                });
-                
-                // Apply changes to nodes
+                // Apply changes first to prevent infinite loops
                 setNodes(nds => window.ReactFlow.applyNodeChanges(changes, nds));
+                
+                // Handle selection changes AFTER applying changes
+                setTimeout(() => {
+                    changes.forEach(change => {
+                        if (change.type === 'select') {
+                            const currentNodes = this.nodes;
+                            const node = currentNodes.find(n => n.id === change.id);
+                            if (node && change.selected) {
+                                console.log('Node selected via onNodesChange:', node);
+                                this.updatePropertiesPanel(node);
+                            }
+                        }
+                    });
+                }, 0);
             };
 
             const onEdgesChange = (changes) => {
@@ -694,8 +715,8 @@ class FlowStudio {
                 this.selectedNode.data.variables = template.variables || this.selectedNode.data.variables;
                 this.selectedNode.data.priority = template.priority || this.selectedNode.data.priority;
 
-                // Refresh properties panel
-                this.updatePropertiesPanel(this.selectedNode);
+                // Refresh specific input values without rebuilding panel
+                this.refreshPropertiesPanelValues();
                 
                 this.showNotification(`Auto-wypełniono prompty dla intent: ${value}`, 'success');
                 return;
@@ -713,6 +734,26 @@ class FlowStudio {
 
         // Update selected node reference
         this.selectedNode.data[property] = value;
+    }
+
+    refreshPropertiesPanelValues() {
+        // Only refresh input values, don't rebuild the entire panel
+        if (!this.selectedNode) return;
+        
+        const node = this.selectedNode;
+        
+        // Update form values without triggering events
+        const systemPrompt = document.getElementById('nodeSystemPrompt');
+        const userPrompt = document.getElementById('nodeUserPrompt'); 
+        const variables = document.getElementById('nodeVariables');
+        const priority = document.getElementById('nodePriority');
+        
+        if (systemPrompt) systemPrompt.value = node.data.system_prompt || '';
+        if (userPrompt) userPrompt.value = node.data.user_prompt_template || '';
+        if (variables) variables.value = (node.data.variables || []).join(', ');
+        if (priority) priority.value = node.data.priority || 5;
+        
+        console.log('🔄 Refreshed properties panel values');
     }
 
     deleteSelectedNode() {
@@ -1407,6 +1448,293 @@ class FlowStudio {
             info: '#3742fa'
         };
         return colors[type] || '#3742fa';
+    }
+
+    // ============ INTENT MANAGEMENT METHODS ============
+
+    switchTab(tabName) {
+        // Switch tab buttons
+        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`[onclick="flowStudio.switchTab('${tabName}')"]`).classList.add('active');
+        
+        // Switch tab content
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        document.getElementById(`${tabName}Tab`).classList.add('active');
+        
+        if (tabName === 'intents') {
+            this.loadIntentLibrary();
+        }
+    }
+
+    async loadIntentLibrary() {
+        try {
+            console.log('🧠 Loading intent library...');
+            
+            // Load intent definitions and prompt templates
+            const [intentResponse, promptResponse] = await Promise.all([
+                fetch('/api/intent-definitions'),
+                fetch('/api/prompt-templates')
+            ]);
+
+            const intentData = await intentResponse.json();
+            const promptData = await promptResponse.json();
+
+            this.intentDefinitions = intentData.intents || [];
+            this.promptTemplates = promptData.templates || [];
+
+            // Combine intents from both sources
+            this.allIntents = [
+                ...this.intentDefinitions.map(intent => ({ ...intent, source: 'definition' })),
+                ...this.promptTemplates.map(template => ({ 
+                    name: template.intent,
+                    description: template.name,
+                    keywords: [],
+                    source: 'template',
+                    template: template
+                }))
+            ];
+
+            this.renderIntentList();
+            this.updateIntentCounts();
+            
+            console.log(`✅ Loaded ${this.allIntents.length} intents`);
+        } catch (error) {
+            console.error('❌ Error loading intent library:', error);
+            this.showNotification('Błąd ładowania biblioteki intentów', 'error');
+        }
+    }
+
+    renderIntentList(category = 'all', searchTerm = '') {
+        const intentList = document.getElementById('intentList');
+        if (!intentList || !this.allIntents) return;
+
+        // Filter intents
+        let filteredIntents = this.allIntents;
+
+        if (category !== 'all') {
+            filteredIntents = filteredIntents.filter(intent => {
+                if (category === 'flow-specific') {
+                    return this.isIntentUsedInCurrentFlow(intent.name);
+                } else if (category === 'templates') {
+                    return intent.source === 'template';
+                }
+                return true;
+            });
+        }
+
+        if (searchTerm) {
+            filteredIntents = filteredIntents.filter(intent => 
+                intent.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                intent.description?.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        // Render intents
+        intentList.innerHTML = filteredIntents.map(intent => `
+            <div class="intent-item" onclick="flowStudio.selectIntent('${intent.name}')" ondblclick="flowStudio.editIntent('${intent.name}')" data-intent="${intent.name}">
+                <div class="intent-header">
+                    <span class="intent-name">${intent.name}</span>
+                    <div class="intent-badges">
+                        <span class="intent-badge ${intent.source}">${intent.source === 'template' ? 'szablon' : 'definicja'}</span>
+                        ${this.isIntentUsedInCurrentFlow(intent.name) ? '<span class="intent-badge flow-specific">w flow</span>' : ''}
+                    </div>
+                </div>
+                ${intent.description ? `<div class="intent-description">${intent.description}</div>` : ''}
+                ${intent.keywords && intent.keywords.length > 0 ? `
+                    <div class="intent-keywords">
+                        ${intent.keywords.slice(0, 5).map(keyword => `<span class="keyword-tag">${keyword}</span>`).join('')}
+                        ${intent.keywords.length > 5 ? `<span class="keyword-tag">+${intent.keywords.length - 5}</span>` : ''}
+                    </div>
+                ` : ''}
+            </div>
+        `).join('');
+    }
+
+    isIntentUsedInCurrentFlow(intentName) {
+        if (!this.nodes || !intentName) return false;
+        return this.nodes.some(node => node.data.intent_name === intentName);
+    }
+
+    updateIntentCounts() {
+        if (!this.allIntents) return;
+
+        const allCount = this.allIntents.length;
+        const flowSpecificCount = this.allIntents.filter(intent => this.isIntentUsedInCurrentFlow(intent.name)).length;
+        const templateCount = this.allIntents.filter(intent => intent.source === 'template').length;
+
+        document.getElementById('allIntentsCount').textContent = allCount;
+        document.getElementById('flowIntentsCount').textContent = flowSpecificCount;
+        document.getElementById('templateIntentsCount').textContent = templateCount;
+    }
+
+    switchIntentCategory(category) {
+        // Update active category
+        document.querySelectorAll('.category-item').forEach(item => item.classList.remove('active'));
+        document.querySelector(`[data-category="${category}"]`).classList.add('active');
+        
+        // Re-render list
+        this.renderIntentList(category);
+    }
+
+    filterIntents(searchTerm) {
+        const activeCategory = document.querySelector('.category-item.active')?.dataset.category || 'all';
+        this.renderIntentList(activeCategory, searchTerm);
+    }
+
+    selectIntent(intentName) {
+        // Update selected intent
+        document.querySelectorAll('.intent-item').forEach(item => item.classList.remove('selected'));
+        document.querySelector(`[data-intent="${intentName}"]`)?.classList.add('selected');
+        
+        // If node is selected, update its intent
+        if (this.selectedNode && this.setNodes) {
+            this.updateNodeProperty('intent_name', intentName);
+        } else {
+            this.showNotification('Wybierz węzeł aby przypisać intent', 'info');
+        }
+    }
+
+    editIntent(intentName) {
+        const intent = this.allIntents?.find(i => i.name === intentName);
+        if (!intent) {
+            this.showNotification('Intent nie został znaleziony', 'error');
+            return;
+        }
+
+        console.log('🎯 Editing intent:', intent);
+        this.currentEditingIntent = intent;
+        
+        // Update modal title
+        document.getElementById('intentModalTitle').textContent = `Edytuj Intent: ${intent.name}`;
+        
+        // Fill basic info
+        document.getElementById('intentName').value = intent.name || '';
+        document.getElementById('intentDescription').value = intent.description || '';
+        document.getElementById('intentPriority').value = intent.priority || 5;
+        document.getElementById('intentRequiresFlow').checked = intent.requires_flow || false;
+        
+        // Fill prompts (from template if available)
+        const template = intent.template || intent;
+        document.getElementById('intentSystemPrompt').value = template.system_prompt || '';
+        document.getElementById('intentUserPrompt').value = template.user_prompt_template || '';
+        document.getElementById('intentVariables').value = Array.isArray(template.variables) ? template.variables.join(', ') : (template.variables || '');
+        
+        // Fill keywords
+        document.getElementById('intentKeywords').value = Array.isArray(intent.keywords) ? intent.keywords.join(', ') : (intent.keywords || '');
+        document.getElementById('intentExamples').value = Array.isArray(intent.examples) ? intent.examples.join('\n') : (intent.examples || '');
+        
+        // Show modal
+        this.showIntentModal();
+    }
+
+    showCreateIntentModal() {
+        this.currentEditingIntent = null;
+        
+        // Update modal title
+        document.getElementById('intentModalTitle').textContent = 'Nowy Intent';
+        
+        // Clear all fields
+        document.getElementById('intentName').value = '';
+        document.getElementById('intentDescription').value = '';
+        document.getElementById('intentPriority').value = 5;
+        document.getElementById('intentRequiresFlow').checked = false;
+        document.getElementById('intentSystemPrompt').value = '';
+        document.getElementById('intentUserPrompt').value = '';
+        document.getElementById('intentVariables').value = '';
+        document.getElementById('intentKeywords').value = '';
+        document.getElementById('intentExamples').value = '';
+        
+        // Hide delete button for new intents
+        document.getElementById('deleteIntentBtn').style.display = 'none';
+        
+        this.showIntentModal();
+    }
+
+    showIntentModal() {
+        const modal = document.getElementById('intentModalOverlay');
+        if (modal) {
+            modal.style.display = 'flex';
+            
+            // Show/hide delete button based on editing state
+            const deleteBtn = document.getElementById('deleteIntentBtn');
+            if (deleteBtn) {
+                deleteBtn.style.display = this.currentEditingIntent ? 'inline-flex' : 'none';
+            }
+            
+            // Setup tab switching
+            this.setupIntentModalTabs();
+        }
+    }
+
+    hideIntentModal() {
+        const modal = document.getElementById('intentModalOverlay');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+        this.currentEditingIntent = null;
+    }
+
+    setupIntentModalTabs() {
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabName = btn.dataset.tab;
+                
+                // Update active tab button
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Update active tab content
+                document.querySelectorAll('.intent-tab-content').forEach(content => content.classList.remove('active'));
+                document.getElementById(`${tabName}Tab`).classList.add('active');
+            });
+        });
+    }
+
+    saveIntent() {
+        const intentData = {
+            name: document.getElementById('intentName').value.trim(),
+            description: document.getElementById('intentDescription').value.trim(),
+            priority: parseInt(document.getElementById('intentPriority').value) || 5,
+            requires_flow: document.getElementById('intentRequiresFlow').checked,
+            system_prompt: document.getElementById('intentSystemPrompt').value.trim(),
+            user_prompt_template: document.getElementById('intentUserPrompt').value.trim(),
+            variables: document.getElementById('intentVariables').value.split(',').map(v => v.trim()).filter(v => v),
+            keywords: document.getElementById('intentKeywords').value.split(',').map(k => k.trim()).filter(k => k),
+            examples: document.getElementById('intentExamples').value.split('\n').map(e => e.trim()).filter(e => e)
+        };
+
+        if (!intentData.name) {
+            this.showNotification('Nazwa intenta jest wymagana', 'error');
+            return;
+        }
+
+        console.log('💾 Saving intent:', intentData);
+        
+        // TODO: Implement actual save to backend
+        if (this.currentEditingIntent) {
+            this.showNotification(`Intent "${intentData.name}" został zaktualizowany`, 'success');
+        } else {
+            this.showNotification(`Intent "${intentData.name}" został utworzony`, 'success');
+        }
+        
+        this.hideIntentModal();
+        this.loadIntentLibrary(); // Refresh the list
+    }
+
+    deleteIntent() {
+        if (!this.currentEditingIntent) return;
+        
+        const intentName = this.currentEditingIntent.name;
+        
+        if (confirm(`Czy na pewno chcesz usunąć intent "${intentName}"?`)) {
+            console.log('🗑️ Deleting intent:', intentName);
+            
+            // TODO: Implement actual delete from backend
+            this.showNotification(`Intent "${intentName}" został usunięty`, 'warning');
+            
+            this.hideIntentModal();
+            this.loadIntentLibrary(); // Refresh the list
+        }
     }
 }
 

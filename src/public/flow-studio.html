@@ -57,15 +57,26 @@
         </header>
 
         <div class="studio-content">
-            <!-- Left Sidebar - Node Palette -->
+            <!-- Left Sidebar - Node Palette & Intent Management -->
             <div class="node-palette">
-                <div class="palette-header">
-                    <h3>Węzły</h3>
-                    <div class="palette-search">
-                        <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Szukaj węzłów..." id="nodeSearch">
-                    </div>
+                <div class="palette-tabs">
+                    <button class="tab-button active" onclick="flowStudio.switchTab('nodes')">
+                        <i class="fas fa-palette"></i> Węzły
+                    </button>
+                    <button class="tab-button" onclick="flowStudio.switchTab('intents')">
+                        <i class="fas fa-brain"></i> Intenty
+                    </button>
                 </div>
+                
+                <!-- Nodes Tab -->
+                <div id="nodesTab" class="tab-content active">
+                    <div class="palette-header">
+                        <h3>Węzły</h3>
+                        <div class="palette-search">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Szukaj węzłów..." id="nodeSearch">
+                        </div>
+                    </div>
                 
                 <div class="palette-categories">
                     <div class="category active" data-category="basic">
@@ -88,6 +99,49 @@
 
                 <div class="palette-nodes" id="paletteNodes">
                     <!-- Nodes will be populated dynamically -->
+                </div>
+                </div>
+                
+                <!-- Intents Tab -->
+                <div id="intentsTab" class="tab-content">
+                    <div class="palette-header">
+                        <h3>Zarządzanie Intentami</h3>
+                        <button class="btn-small btn-primary" id="createIntentBtn">
+                            <i class="fas fa-plus"></i> Nowy Intent
+                        </button>
+                    </div>
+                    
+                    <div class="intent-search">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Szukaj intentów..." id="intentSearch">
+                    </div>
+                    
+                    <div class="intent-categories">
+                        <div class="category-header">
+                            <h4>Kategorie Intentów</h4>
+                        </div>
+                        <div class="category-list">
+                            <div class="category-item active" data-category="all">
+                                <i class="fas fa-list"></i>
+                                <span>Wszystkie</span>
+                                <span class="count" id="allIntentsCount">0</span>
+                            </div>
+                            <div class="category-item" data-category="flow-specific">
+                                <i class="fas fa-project-diagram"></i>
+                                <span>Tego Flow</span>
+                                <span class="count" id="flowIntentsCount">0</span>
+                            </div>
+                            <div class="category-item" data-category="templates">
+                                <i class="fas fa-star"></i>
+                                <span>Szablony</span>
+                                <span class="count" id="templateIntentsCount">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="intent-list" id="intentList">
+                        <!-- Intents will be populated dynamically -->
+                    </div>
                 </div>
             </div>
 
@@ -180,6 +234,87 @@
                         <i class="fas fa-plus"></i>
                         Utwórz Flow
                     </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Intent Editor Modal -->
+        <div class="modal-overlay" id="intentModalOverlay">
+            <div class="modal-content intent-modal">
+                <div class="modal-header">
+                    <h3 id="intentModalTitle">Edytuj Intent</h3>
+                    <button class="modal-close" id="intentModalCloseBtn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body intent-modal-body">
+                    <div class="intent-tabs">
+                        <button class="tab-btn active" data-tab="basic">Podstawowe</button>
+                        <button class="tab-btn" data-tab="prompts">Prompty</button>
+                        <button class="tab-btn" data-tab="keywords">Słowa kluczowe</button>
+                    </div>
+                    
+                    <!-- Basic Tab -->
+                    <div class="intent-tab-content active" id="basicTab">
+                        <div class="form-group">
+                            <label for="intentName">Nazwa intenta</label>
+                            <input type="text" id="intentName" placeholder="np. greeting, ask_question">
+                        </div>
+                        <div class="form-group">
+                            <label for="intentDescription">Opis</label>
+                            <textarea id="intentDescription" rows="3" placeholder="Opisz cel i zastosowanie tego intenta..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="intentPriority">Priorytet</label>
+                            <input type="number" id="intentPriority" min="1" max="10" value="5">
+                            <small>1 = najwyższy, 10 = najniższy</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="intentRequiresFlow">Wymaga flow</label>
+                            <input type="checkbox" id="intentRequiresFlow">
+                            <small>Czy intent automatycznie uruchamia flow</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Prompts Tab -->
+                    <div class="intent-tab-content" id="promptsTab">
+                        <div class="form-group">
+                            <label for="intentSystemPrompt">System Prompt</label>
+                            <textarea id="intentSystemPrompt" rows="5" placeholder="Instrukcja systemowa dla AI..."></textarea>
+                            <small>Jak ma się zachowywać AI dla tego intenta</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="intentUserPrompt">User Prompt Template</label>
+                            <textarea id="intentUserPrompt" rows="4" placeholder="Template dla user message..."></textarea>
+                            <small>Szablon wiadomości użytkownika z {{zmiennymi}}</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="intentVariables">Zmienne</label>
+                            <input type="text" id="intentVariables" placeholder="np. user_name, company_name">
+                            <small>Lista zmiennych oddzielonych przecinkami</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Keywords Tab -->
+                    <div class="intent-tab-content" id="keywordsTab">
+                        <div class="form-group">
+                            <label for="intentKeywords">Słowa kluczowe</label>
+                            <textarea id="intentKeywords" rows="4" placeholder="cześć, dzień dobry, witaj, hello"></textarea>
+                            <small>Słowa/frazy wyzwalające intent (oddzielone przecinkami)</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="intentExamples">Przykłady</label>
+                            <textarea id="intentExamples" rows="6" placeholder="Przykład 1&#10;Przykład 2&#10;Przykład 3"></textarea>
+                            <small>Przykładowe wypowiedzi użytkownika (jedna na linię)</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-secondary" id="intentModalCancelBtn">Anuluj</button>
+                    <button class="btn-warning" id="deleteIntentBtn" style="margin-right: auto;">
+                        <i class="fas fa-trash"></i> Usuń
+                    </button>
+                    <button class="btn-primary" id="saveIntentBtn">Zapisz Intent</button>
                 </div>
             </div>
         </div>
