@@ -27,6 +27,18 @@
                 <div class="header-title">
                     <h1>Flow Studio</h1>
                     <p>Wizualny edytor przepływów rozmowy</p>
+                    
+                    <!-- Flow Type Selector -->
+                    <div class="flow-type-selector">
+                        <button class="flow-type-btn active" data-type="basic" onclick="flowStudio.switchFlowType('basic')">
+                            <i class="fas fa-comments"></i>
+                            Basic Flow
+                        </button>
+                        <button class="flow-type-btn" data-type="advanced" onclick="flowStudio.switchFlowType('advanced')">
+                            <i class="fas fa-cogs"></i>
+                            Advanced Agent
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="header-center">

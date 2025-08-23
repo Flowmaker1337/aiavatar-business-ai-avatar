@@ -1148,3 +1148,111 @@
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
+
+/* Flow Type Selector */
+.flow-type-selector {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.flow-type-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #9ca3af;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+}
+
+.flow-type-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+.flow-type-btn.active {
+    background: linear-gradient(135deg, #39e575, #22c55e);
+    color: #0d1117;
+    font-weight: 600;
+}
+
+.flow-type-btn i {
+    font-size: 14px;
+}
+
+/* Advanced Flow specific styles */
+.flow-studio.advanced-mode .node-palette {
+    /* Enhanced palette for advanced mode */
+}
+
+.flow-studio.advanced-mode .advanced-node-category {
+    display: block;
+}
+
+.flow-studio.basic-mode .advanced-node-category {
+    display: none;
+}
+
+/* Advanced Node Badges */
+.advanced-node {
+    position: relative;
+    border: 2px solid rgba(139, 92, 246, 0.3) !important;
+}
+
+.advanced-node:hover {
+    border-color: rgba(139, 92, 246, 0.6) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+}
+
+.advanced-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: linear-gradient(135deg, #8b5cf6, #a855f7);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 4px;
+    border-radius: 4px;
+    border: 1px solid #ffffff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.category-badge {
+    background: linear-gradient(135deg, #8b5cf6, #a855f7);
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 8px;
+}
+
+/* Advanced mode styling */
+.flow-studio.advanced-mode .header-title {
+    border-left: 4px solid #8b5cf6;
+    padding-left: 12px;
+}
+
+.flow-studio.advanced-mode .node-palette {
+    background: linear-gradient(145deg, 
+        rgba(139, 92, 246, 0.05) 0%, 
+        rgba(59, 130, 246, 0.03) 100%);
+}
+
+.flow-studio.basic-mode .advanced-node {
+    display: none;
+}

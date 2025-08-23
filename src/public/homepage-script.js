@@ -5,7 +5,7 @@ class HomepageApp {
         this.currentPage = 'welcome';
         this.sidebarCollapsed = false;
         this.isMobile = window.innerWidth <= 768;
-        this.isLoggedIn = false;
+        this.isLoggedIn = false; // Initialize as not logged in
         this.currentUser = null;
         
         this.init();
@@ -164,7 +164,6 @@ class HomepageApp {
             'simulation-dashboard': 'Talk Simulator',
             'avatar-creator': 'Avatar Creator',
             'flow-manager': 'Flow Manager',
-            'flow-creator': 'Flow Creator',
             'role-training': 'Role Training',
             'analytics': 'Analityka',
             'reports': 'Raporty',
@@ -185,9 +184,6 @@ class HomepageApp {
         const pageMapping = {
             'dashboard': 'dashboardPage',
             'simulation-dashboard': 'simulationPage',
-            'avatar-creator': 'avatarCreatorPage',
-            'flow-manager': 'flowManagerPage',
-            'flow-creator': 'flowCreatorPage',
             'role-training': 'roleTrainingPage'
         };
 
@@ -197,6 +193,10 @@ class HomepageApp {
             this.showAvatarChat();
         } else if (pageName === 'flow-studio') {
             this.showFlowStudio();
+        } else if (pageName === 'avatar-creator') {
+            this.showEnhancedAvatarBuilder();
+        } else if (pageName === 'flow-manager') {
+            this.showAvatarManager(); // Use the new Avatar Manager for flow management
         } else {
             const targetPageId = pageMapping[pageName];
             if (targetPageId) {
@@ -453,7 +453,7 @@ class HomepageApp {
                 this.navigateToPage('avatar-creator');
                 break;
             case 'new-flow':
-                this.navigateToPage('flow-creator');
+                this.navigateToPage('flow-studio');
                 break;
             case 'quick-chat':
                 this.navigateToPage('simulation-dashboard');
@@ -1130,6 +1130,11 @@ class HomepageApp {
     showFlowStudio() {
         // Redirect to Flow Studio page
         window.location.href = '/flow-studio.html';
+    }
+
+    showEnhancedAvatarBuilder() {
+        // Redirect to Enhanced Avatar Builder page
+        window.location.href = '/enhanced-avatar-builder.html';
     }
 
     initializeAvatarManager() {

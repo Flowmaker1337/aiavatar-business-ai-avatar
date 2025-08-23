@@ -17,7 +17,8 @@ class FlowStudio {
                     icon: 'fas fa-play',
                     color: '#39e575',
                     inputs: 0,
-                    outputs: 1
+                    outputs: 1,
+                    advanced: true
                 },
                 {
                     type: 'message',
@@ -44,7 +45,8 @@ class FlowStudio {
                     icon: 'fas fa-stop',
                     color: '#ef4444',
                     inputs: 1,
-                    outputs: 0
+                    outputs: 0,
+                    advanced: true
                 }
             ],
             logic: [
@@ -55,7 +57,8 @@ class FlowStudio {
                     icon: 'fas fa-code-branch',
                     color: '#8b5cf6',
                     inputs: 1,
-                    outputs: 2
+                    outputs: 2,
+                    advanced: true
                 },
                 {
                     type: 'switch',
@@ -64,7 +67,8 @@ class FlowStudio {
                     icon: 'fas fa-list',
                     color: '#06b6d4',
                     inputs: 1,
-                    outputs: 3
+                    outputs: 3,
+                    advanced: true
                 }
             ],
             ai: [
@@ -75,7 +79,8 @@ class FlowStudio {
                     icon: 'fas fa-robot',
                     color: '#10b981',
                     inputs: 1,
-                    outputs: 1
+                    outputs: 1,
+                    advanced: true
                 },
                 {
                     type: 'intent_check',
@@ -84,7 +89,8 @@ class FlowStudio {
                     icon: 'fas fa-search',
                     color: '#f97316',
                     inputs: 1,
-                    outputs: 2
+                    outputs: 2,
+                    advanced: true
                 }
             ],
             actions: [
@@ -95,7 +101,48 @@ class FlowStudio {
                     icon: 'fas fa-plug',
                     color: '#ec4899',
                     inputs: 1,
-                    outputs: 2
+                    outputs: 2,
+                    advanced: true
+                },
+                {
+                    type: 'tool_execution',
+                    name: 'Narzędzie AI',
+                    description: 'Wykonaj funkcję/narzędzie AI',
+                    icon: 'fas fa-wrench',
+                    color: '#8b5cf6',
+                    inputs: 1,
+                    outputs: 2,
+                    advanced: true
+                },
+                {
+                    type: 'data_transform',
+                    name: 'Transformacja Danych',
+                    description: 'Przetworz i przekształć dane',
+                    icon: 'fas fa-exchange-alt',
+                    color: '#06b6d4',
+                    inputs: 1,
+                    outputs: 1,
+                    advanced: true
+                },
+                {
+                    type: 'parallel_task',
+                    name: 'Zadania Równoległe',
+                    description: 'Wykonaj kilka zadań jednocześnie',
+                    icon: 'fas fa-tasks',
+                    color: '#f59e0b',
+                    inputs: 1,
+                    outputs: 3,
+                    advanced: true
+                },
+                {
+                    type: 'goal_check',
+                    name: 'Sprawdź Cel',
+                    description: 'Weryfikuj osiągnięcie celu agenta',
+                    icon: 'fas fa-bullseye',
+                    color: '#10b981',
+                    inputs: 1,
+                    outputs: 2,
+                    advanced: true
                 },
                 {
                     type: 'delay',
@@ -109,6 +156,7 @@ class FlowStudio {
             ]
         };
         
+        this.currentFlowType = 'basic'; // basic | advanced
         this.init();
     }
 
@@ -395,7 +443,14 @@ class FlowStudio {
     }
 
     getNodeTypeDefinition(type) {
-        for (const category of Object.values(this.nodeDefinitions)) {
+        // First check nodeDefinitions (old structure)
+        for (const category of Object.values(this.nodeDefinitions || {})) {
+            const nodeType = category.find(node => node.type === type);
+            if (nodeType) return nodeType;
+        }
+        
+        // Then check nodeTypes (new structure)
+        for (const category of Object.values(this.nodeTypes || {})) {
             const nodeType = category.find(node => node.type === type);
             if (nodeType) return nodeType;
         }
@@ -406,12 +461,21 @@ class FlowStudio {
         const paletteNodes = document.getElementById('paletteNodes');
         if (!paletteNodes) return;
 
-        const nodes = this.nodeDefinitions[category] || [];
+        const nodes = this.nodeDefinitions[category] || this.nodeTypes[category] || [];
         
-        paletteNodes.innerHTML = nodes.map(node => `
-            <div class="node-item" draggable="true" data-node-type="${node.type}">
+        // Filter nodes based on current flow type
+        const filteredNodes = nodes.filter(node => {
+            if (this.currentFlowType === 'basic') {
+                return !node.advanced; // Show only non-advanced nodes
+            }
+            return true; // Show all nodes in advanced mode
+        });
+        
+        paletteNodes.innerHTML = filteredNodes.map(node => `
+            <div class="node-item ${node.advanced ? 'advanced-node' : ''}" draggable="true" data-node-type="${node.type}">
                 <div class="node-icon" style="background: ${node.color}">
                     <i class="${node.icon}"></i>
+                    ${node.advanced ? '<span class="advanced-badge">AI</span>' : ''}
                 </div>
                 <div class="node-name">${node.name}</div>
                 <div class="node-description">${node.description}</div>
@@ -1959,6 +2023,42 @@ Zwróć każdy przykład w osobnej linii, bez numeracji.`;
 
         const data = await response.json();
         return data.content || data.message || '';
+    }
+
+    // ============ FLOW TYPE SWITCHING ============
+
+    switchFlowType(type) {
+        console.log(`🔄 Switching flow type to: ${type}`);
+        
+        this.currentFlowType = type;
+        
+        // Update UI
+        document.querySelectorAll('.flow-type-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`[data-type="${type}"]`).classList.add('active');
+        
+        // Update main container class for styling
+        const container = document.querySelector('.flow-studio');
+        if (container) {
+            container.classList.remove('basic-mode', 'advanced-mode');
+            container.classList.add(`${type}-mode`);
+        }
+        
+        // Update header description
+        const description = document.querySelector('.header-title p');
+        if (description) {
+            if (type === 'basic') {
+                description.textContent = 'Twórz przepływy konwersacji z prostymi krokami';
+            } else {
+                description.textContent = 'Buduj zaawansowanych AI agentów z narzędziami i logiką';
+            }
+        }
+        
+        // Reload node palette with appropriate nodes
+        this.loadNodePalette();
+        
+        // Show notification
+        const typeName = type === 'basic' ? 'Basic Flow' : 'Advanced Agent';
+        this.showNotification(`Przełączono na tryb: ${typeName}`, 'info');
     }
 
     // ============ NODE AI GENERATOR METHODS ============

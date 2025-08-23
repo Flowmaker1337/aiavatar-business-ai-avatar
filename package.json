@@ -12,7 +12,7 @@
     "dev": "nodemon --exec ts-node src/index.ts",
     "build": "tsc && npm run copy-files",
     "copy-files": "node scripts/copy-config-files.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha 'src/tests/**/*.js'",
     "upload-vectors": "node dist/config/uploadVectorData.js",
     "clear-vectors": "node dist/config/clearVectorData.js clear-all",
     "clear-vectors-preview": "node dist/config/clearVectorData.js preview",
@@ -58,7 +58,10 @@
     "@types/lodash": "^4.14.202",
     "@types/node": "^22.15.3",
     "@types/uuid": "^10.0.0",
+    "chai": "^6.0.1",
+    "mocha": "^11.7.1",
     "nodemon": "^3.1.10",
+    "supertest": "^7.1.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   }
