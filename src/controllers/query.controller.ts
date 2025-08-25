@@ -45,6 +45,66 @@ class QueryController {
   private static readonly NON_RELEVANT_TOPIC_MESSAGE = 'Przepraszam, ale mogę rozmawiać tylko na tematy związane z ofertą naszej firmy.';
   
   /**
+   * Classifies user intent for testing purposes
+   */
+  public async classifyIntent(req: Request, res: Response): Promise<void> {
+    try {
+      const { user_message, avatar_id, avatar_type } = req.body;
+      
+      if (!user_message) {
+        res.status(400).json({ 
+          error: 'user_message is required' 
+        });
+        return;
+      }
+
+      console.log(`🧪 Test Intent Classification for: "${user_message}"`);
+      
+      // Initialize intent classifier
+      const intentClassifier = IntentClassifier.getInstance();
+      
+      // Load appropriate definitions based on avatar type
+      if (avatar_type) {
+        if (avatar_id && avatar_id.length > 10 && avatar_id.includes('-')) {
+          // Custom avatar
+          await intentClassifier.loadCustomIntentsForAvatar(avatar_id);
+        } else {
+          // Standard avatar
+          await intentClassifier.loadIntentDefinitionsForAvatar(avatar_type);
+        }
+      }
+      
+      // Classify intent using the same logic as production
+      const result = await intentClassifier.classifyIntent(
+        user_message,
+        undefined, // no mindState for testing
+        avatar_id || undefined
+      );
+      
+      console.log(`🧪 Test Classification Result:`, result);
+      
+      res.json({
+        status: 'success',
+        intent: result.intent,
+        confidence: result.confidence,
+        entities: result.entities || {},
+        requires_flow: result.requires_flow || false,
+        flow_name: result.flow_name || null,
+        user_message: user_message,
+        avatar_type: avatar_type,
+        avatar_id: avatar_id
+      });
+      
+    } catch (error) {
+      console.error('❌ Error in intent classification:', error);
+      res.status(500).json({ 
+        error: 'Intent classification failed',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+
+  /**
    * Handles user query
    */
   public async handleQuery(req: Request, res: Response): Promise<void> {

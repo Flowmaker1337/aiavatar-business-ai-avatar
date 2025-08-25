@@ -6,6 +6,7 @@ class FlowStudio {
         this.reactFlowInstance = null;
         this.selectedNode = null;
         this.nodeIdCounter = 1;
+        this.isUpdatingProperties = false; // Flag to prevent update loops
         
         // Node definitions
         this.nodeDefinitions = {
@@ -248,11 +249,12 @@ class FlowStudio {
 
             // Store references in class instance
             React.useEffect(() => {
+                console.log('🔗 Updating FlowStudio references - nodes:', nodes.length, 'edges:', edges.length);
                 this.nodes = nodes;
                 this.setNodes = setNodes;
                 this.edges = edges;
                 this.setEdges = setEdges;
-            }, [nodes, setNodes, edges, setEdges]);
+            }, [setNodes, setEdges]); // Remove nodes and edges from dependencies to prevent loops
 
             const onInit = (instance) => {
                 reactFlowInstance.current = instance;
@@ -266,24 +268,44 @@ class FlowStudio {
             };
 
             const onNodesChange = (changes) => {
-                console.log('Nodes changes:', changes);
+                // Debug: Check what types of changes are happening
+                const changeTypes = changes.map(c => c.type);
+                const nonPositionChanges = changes.filter(c => c.type !== 'position');
                 
-                // Apply changes first to prevent infinite loops
-                setNodes(nds => window.ReactFlow.applyNodeChanges(changes, nds));
-                
-                // Handle selection changes AFTER applying changes
-                setTimeout(() => {
-                    changes.forEach(change => {
-                        if (change.type === 'select') {
-                            const currentNodes = this.nodes;
-                            const node = currentNodes.find(n => n.id === change.id);
-                            if (node && change.selected) {
-                                console.log('Node selected via onNodesChange:', node);
-                                this.updatePropertiesPanel(node);
+                if (nonPositionChanges.length > 0) {
+                    console.log('🔄 Non-position changes detected:', changeTypes, nonPositionChanges);
+                    
+                    // Check if it's just initial loading or something else
+                    if (changeTypes.includes('add') || changeTypes.includes('remove')) {
+                        console.log('📝 Node add/remove operation - applying changes');
+                        setNodes(nds => window.ReactFlow.applyNodeChanges(changes, nds));
+                    } else if (changeTypes.includes('select')) {
+                        console.log('👆 Node selection change - applying changes');
+                        setNodes(nds => window.ReactFlow.applyNodeChanges(changes, nds));
+                        
+                        // Handle selection
+                        setTimeout(() => {
+                            if (!this.isUpdatingProperties) {
+                                changes.forEach(change => {
+                                    if (change.type === 'select' && change.selected) {
+                                        const currentNodes = this.reactFlowInstance?.getNodes() || [];
+                                        const node = currentNodes.find(n => n.id === change.id);
+                                        if (node) {
+                                            console.log('👤 Node selected:', node.id);
+                                            this.selectedNode = node;
+                                            this.updatePropertiesPanel(node);
+                                        }
+                                    }
+                                });
                             }
-                        }
-                    });
-                }, 0);
+                        }, 0);
+                    } else {
+                        console.warn('⚠️ Unknown change type, skipping to prevent loop:', changeTypes);
+                    }
+                } else {
+                    // Position changes - apply normally
+                    setNodes(nds => window.ReactFlow.applyNodeChanges(changes, nds));
+                }
             };
 
             const onEdgesChange = (changes) => {
@@ -763,6 +785,9 @@ class FlowStudio {
     updateNodeProperty(property, value) {
         if (!this.selectedNode || !this.setNodes) return;
 
+        // Set flag to prevent update loops
+        this.isUpdatingProperties = true;
+
         // Special handling for intent_name - auto-fill prompts
         if (property === 'intent_name' && value && this.promptTemplates) {
             const template = this.promptTemplates.find(t => t.intent === value);
@@ -798,6 +823,9 @@ class FlowStudio {
                 this.refreshPropertiesPanelValues();
                 
                 this.showNotification(`Auto-wypełniono prompty dla intent: ${value}`, 'success');
+                
+                // Clear flag and return
+                setTimeout(() => { this.isUpdatingProperties = false; }, 100);
                 return;
             }
         }
@@ -813,6 +841,9 @@ class FlowStudio {
 
         // Update selected node reference
         this.selectedNode.data[property] = value;
+        
+        // Clear flag after update
+        setTimeout(() => { this.isUpdatingProperties = false; }, 100);
     }
 
     refreshPropertiesPanelValues() {
@@ -1187,7 +1218,7 @@ class FlowStudio {
             if (inferredIntent && this.promptTemplates) {
                 promptTemplate = this.promptTemplates.find(t => t.intent === inferredIntent);
                 if (promptTemplate) {
-                    console.log(`✅ Mapped step "${step.id}" to intent "${inferredIntent}"`);
+                    // console.log(`✅ Mapped step "${step.id}" to intent "${inferredIntent}"`);
                 }
             }
             
@@ -1542,6 +1573,8 @@ class FlowStudio {
         
         if (tabName === 'intents') {
             this.loadIntentLibrary();
+        } else if (tabName === 'test') {
+            this.initializeTestInterface();
         }
     }
 
@@ -2179,6 +2212,616 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
             button.classList.remove('loading');
             button.innerHTML = '<i class="fas fa-magic"></i>';
         }
+    }
+
+    // ============ FLOW TESTING INTERFACE METHODS ============
+
+    initializeTestInterface() {
+        console.log('🧪 Initializing Test Interface...');
+        
+        // Initialize test session
+        this.testSession = {
+            isActive: false,
+            startTime: null,
+            messages: [],
+            executionSteps: [],
+            intentResults: [],
+            currentStep: null
+        };
+        
+        // Bind test interface events
+        this.bindTestEvents();
+        
+        // Small delay to ensure ReactFlow is loaded
+        setTimeout(() => {
+            console.log('🔄 Checking ReactFlow instance:', this.reactFlowInstance);
+            // Check if we have a valid flow to test
+            this.validateFlowForTesting();
+        }, 500);
+    }
+    
+    bindTestEvents() {
+        // Start Test button
+        const startTestBtn = document.getElementById('startTestBtn');
+        if (startTestBtn) {
+            startTestBtn.addEventListener('click', () => this.startFlowTest());
+        }
+        
+        // Send Test Message button
+        const sendTestBtn = document.getElementById('sendTestMessageBtn');
+        if (sendTestBtn) {
+            sendTestBtn.addEventListener('click', () => this.sendTestMessage());
+        }
+        
+        // Test Message Input (Enter key)
+        const testInput = document.getElementById('testMessageInput');
+        if (testInput) {
+            testInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !testInput.disabled) {
+                    this.sendTestMessage();
+                }
+            });
+        }
+        
+        // Clear Test button
+        const clearTestBtn = document.getElementById('clearTestBtn');
+        if (clearTestBtn) {
+            clearTestBtn.addEventListener('click', () => this.clearTestSession());
+        }
+        
+        // Export Test button
+        const exportTestBtn = document.getElementById('exportTestBtn');
+        if (exportTestBtn) {
+            exportTestBtn.addEventListener('click', () => this.exportTestResults());
+        }
+    }
+    
+    validateFlowForTesting() {
+        const nodes = this.reactFlowInstance?.getNodes() || [];
+        
+        console.log('🔍 Validating flow for testing. Nodes found:', nodes.length, nodes);
+        
+        if (nodes.length === 0) {
+            console.warn('⚠️ No nodes found in flow for testing');
+            this.showTestError('Brak węzłów w flow. Dodaj węzły aby móc testować.');
+            return false;
+        }
+        
+        console.log('✅ Flow validation passed');
+        this.updateTestStatus('Gotowy do testu', 'ready');
+        return true;
+    }
+    
+    startFlowTest() {
+        console.log('🚀 Starting flow test...');
+        
+        if (!this.validateFlowForTesting()) {
+            console.error('❌ Flow validation failed - cannot start test');
+            return;
+        }
+        
+        console.log('✅ Flow validation passed - starting test session');
+        
+        // Initialize test session
+        this.testSession = {
+            isActive: true,
+            startTime: new Date(),
+            messages: [],
+            executionSteps: [],
+            intentResults: [],
+            currentStep: null
+        };
+        
+        // Update UI
+        this.updateTestStatus('Test aktywny', 'testing');
+        
+        const testInput = document.getElementById('testMessageInput');
+        const sendBtn = document.getElementById('sendTestMessageBtn');
+        const startBtn = document.getElementById('startTestBtn');
+        const exportBtn = document.getElementById('exportTestBtn');
+        
+        if (testInput) {
+            testInput.disabled = false;
+            console.log('✅ Test input enabled');
+        } else {
+            console.error('❌ Test input not found');
+        }
+        
+        if (sendBtn) {
+            sendBtn.disabled = false;
+            console.log('✅ Send button enabled');
+        } else {
+            console.error('❌ Send button not found');
+        }
+        
+        if (startBtn) {
+            startBtn.disabled = true;
+            console.log('✅ Start button disabled');
+        }
+        
+        if (exportBtn) {
+            exportBtn.disabled = false;
+            console.log('✅ Export button enabled');
+        }
+        
+        // Clear previous test data
+        this.clearTestDisplays();
+        
+        // Start with greeting
+        this.addTestMessage('bot', 'Test flow rozpoczęty! Napisz wiadomość aby przetestować reakcje avatara.');
+        
+        console.log('🚀 Flow test started successfully');
+    }
+    
+    sendTestMessage() {
+        const input = document.getElementById('testMessageInput');
+        const message = input.value.trim();
+        
+        if (!message || !this.testSession.isActive) {
+            return;
+        }
+        
+        // Add user message to chat
+        this.addTestMessage('user', message);
+        
+        // Clear input
+        input.value = '';
+        
+        // Process message and simulate response
+        this.processTestMessage(message);
+    }
+    
+    async processTestMessage(message) {
+        console.log('🔍 Processing test message:', message);
+        
+        try {
+            // Use REAL intent detection from production system
+            const detectedIntent = await this.classifyIntentWithAPI(message);
+            
+            // Find matching node
+            const nodes = this.reactFlowInstance?.getNodes() || [];
+            const matchingNode = this.findMatchingNode(nodes, message, detectedIntent);
+            
+            if (matchingNode) {
+                setTimeout(() => {
+                    this.executeNode(matchingNode, message);
+                }, 500);
+            } else {
+                setTimeout(() => {
+                    this.addTestMessage('bot', 'Nie znalazłem odpowiedniego węzła dla tej wiadomości. Spróbuj innej frazy.');
+                }, 500);
+            }
+        } catch (error) {
+            console.error('❌ Error processing test message:', error);
+            setTimeout(() => {
+                this.addTestMessage('bot', `Błąd przetwarzania wiadomości: ${error.message}`);
+            }, 500);
+        }
+    }
+    
+    findMatchingNode(nodes, message, detectedIntent) {
+        console.log('🔍 Finding matching node for intent:', detectedIntent);
+        console.log('🔍 Available nodes:', nodes.map(n => ({
+            id: n.id, 
+            type: n.type, 
+            intent_name: n.data?.intent_name,
+            label: n.data?.label
+        })));
+        
+        // Try to find node by intent
+        let matchingNode = nodes.find(node => {
+            const nodeData = node.data || {};
+            return nodeData.intent_name === detectedIntent;
+        });
+        
+        console.log('🔍 Intent match result:', matchingNode?.id || 'none');
+        
+        // If no intent match, try first available message node
+        if (!matchingNode) {
+            matchingNode = nodes.find(node => node.type === 'message');
+            console.log('🔍 Message node fallback:', matchingNode?.id || 'none');
+        }
+        
+        // If still no match, try first node with system_prompt (conversational node)
+        if (!matchingNode) {
+            matchingNode = nodes.find(node => node.data?.system_prompt);
+            console.log('🔍 System prompt fallback:', matchingNode?.id || 'none');
+        }
+        
+        // Last resort - first node
+        if (!matchingNode && nodes.length > 0) {
+            matchingNode = nodes[0];
+            console.log('🔍 First node fallback:', matchingNode?.id || 'none');
+        }
+        
+        return matchingNode;
+    }
+    
+    executeNode(node, userMessage) {
+        console.log(`🎯 Executing node: ${node.id}`, node);
+        
+        // Add execution step
+        const step = {
+            id: `step-${Date.now()}`,
+            nodeId: node.id,
+            nodeName: node.data?.label || node.id,
+            nodeType: node.type,
+            userInput: userMessage,
+            timestamp: new Date(),
+            status: 'completed'
+        };
+        
+        this.testSession.executionSteps.push(step);
+        this.testSession.currentStep = step;
+        
+        // Update execution tracker UI
+        this.updateExecutionTracker();
+        
+        // Simulate node response
+        this.simulateNodeResponse(node);
+        
+        // Update test statistics
+        this.updateTestStatistics();
+    }
+    
+    simulateNodeResponse(node) {
+        const nodeData = node.data || {};
+        let response = '';
+        
+        // Generate response based on node content
+        if (nodeData.system_prompt) {
+            response = `${nodeData.system_prompt}`;
+        } else if (nodeData.message) {
+            response = nodeData.message;
+        } else {
+            response = `Przykładowa odpowiedź z węzła: ${nodeData.label || node.id}`;
+        }
+        
+        // Add bot message to chat
+        this.addTestMessage('bot', response, {
+            nodeId: node.id,
+            nodeType: node.type,
+            executedAt: new Date()
+        });
+    }
+    
+    async classifyIntentWithAPI(input) {
+        console.log('🧪 Using REAL intent classifier for:', input);
+        
+        try {
+            // Get current avatar info from the loaded flow
+            const avatarType = this.currentFlow?.avatar_type || 'networker';
+            const avatarId = this.currentFlow?.avatar_id || null;
+            
+            console.log('🎯 Avatar context:', { avatarType, avatarId });
+            
+            // Call the real intent classification API
+            const response = await fetch('/api/classify-intent', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_message: input,
+                    avatar_type: avatarType,
+                    avatar_id: avatarId
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const result = await response.json();
+            console.log('✅ Real intent classification result:', result);
+            
+            // Add intent result to test session
+            const intentResult = {
+                intent: result.intent,
+                confidence: result.confidence,
+                entities: result.entities || {},
+                requires_flow: result.requires_flow,
+                flow_name: result.flow_name,
+                input: input,
+                timestamp: new Date(),
+                source: 'production_api'
+            };
+            
+            this.testSession.intentResults.push(intentResult);
+            this.updateIntentMonitor();
+            
+            return result.intent;
+            
+        } catch (error) {
+            console.error('❌ Error calling real intent classifier:', error);
+            
+            // Fallback to simulation if API fails
+            console.log('⚠️ Falling back to simulation...');
+            return this.simulateIntentDetection(input);
+        }
+    }
+
+    simulateIntentDetection(input) {
+        let detectedIntent = 'unknown';
+        let confidence = Math.random() * 0.4 + 0.6; // 0.6-1.0
+        
+        // Enhanced intent detection simulation (fallback only)
+        const intentKeywords = {
+            greeting: ['cześć', 'witaj', 'hej', 'hello', 'dzień dobry'],
+            help: ['pomoc', 'help', 'pomóż', 'wsparcie'],
+            question: ['co', 'jak', 'gdzie', 'kiedy', 'dlaczego', '?'],
+            goodbye: ['pa', 'bye', 'żegnaj', 'do widzenia'],
+            thanks: ['dzięki', 'dziękuję', 'thank'],
+            // Business-related intents
+            company_info: ['firma', 'firmie', 'company', 'organizacja', 'przedsiębiorstwo', 'o was', 'o tobie'],
+            services: ['usługi', 'services', 'oferujecie', 'robicie', 'świadczycie'],
+            about: ['opowiedz', 'powiedz', 'przedstaw', 'about', 'kim jesteś', 'czym się zajmujecie'],
+            contact: ['kontakt', 'contact', 'telefon', 'email', 'adres', 'spotkanie'],
+            business_model: ['model', 'działanie', 'business', 'jak działacie', 'sposób pracy']
+        };
+        
+        const lowerInput = input.toLowerCase();
+        
+        for (const [intent, keywords] of Object.entries(intentKeywords)) {
+            if (keywords.some(keyword => lowerInput.includes(keyword))) {
+                detectedIntent = intent;
+                confidence = Math.random() * 0.2 + 0.8; // 0.8-1.0 for matches
+                break;
+            }
+        }
+        
+        // Add intent result
+        const intentResult = {
+            intent: detectedIntent,
+            confidence: confidence,
+            input: input,
+            timestamp: new Date(),
+            source: 'simulation_fallback'
+        };
+        
+        this.testSession.intentResults.push(intentResult);
+        this.updateIntentMonitor();
+        
+        return detectedIntent;
+    }
+    
+    addTestMessage(sender, text, metadata = {}) {
+        const message = {
+            id: `msg-${Date.now()}`,
+            sender: sender,
+            text: text,
+            timestamp: new Date(),
+            metadata: metadata
+        };
+        
+        this.testSession.messages.push(message);
+        this.updateChatDisplay();
+    }
+    
+    updateChatDisplay() {
+        const chatContainer = document.getElementById('testChatMessages');
+        if (!chatContainer) return;
+        
+        // Clear system message if this is first real message
+        if (this.testSession.messages.length === 1) {
+            chatContainer.innerHTML = '';
+        }
+        
+        // Add new messages
+        this.testSession.messages.forEach(message => {
+            if (!chatContainer.querySelector(`[data-message-id="${message.id}"]`)) {
+                const messageElement = this.createMessageElement(message);
+                chatContainer.appendChild(messageElement);
+            }
+        });
+        
+        // Scroll to bottom
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+    
+    createMessageElement(message) {
+        const div = document.createElement('div');
+        div.className = `test-message ${message.sender}`;
+        div.setAttribute('data-message-id', message.id);
+        
+        div.innerHTML = `
+            <p class="message-text">${message.text}</p>
+            <div class="message-meta">
+                ${message.timestamp.toLocaleTimeString()}
+                ${message.metadata?.nodeId ? `• Node: ${message.metadata.nodeId}` : ''}
+            </div>
+        `;
+        
+        return div;
+    }
+    
+    updateExecutionTracker() {
+        const stepsContainer = document.getElementById('executionSteps');
+        if (!stepsContainer) return;
+        
+        if (this.testSession.executionSteps.length === 0) {
+            stepsContainer.innerHTML = `
+                <div class="no-execution">
+                    <i class="fas fa-route"></i>
+                    <p>Brak aktywnego testu</p>
+                </div>
+            `;
+            return;
+        }
+        
+        stepsContainer.innerHTML = '';
+        
+        this.testSession.executionSteps.forEach((step, index) => {
+            const stepElement = document.createElement('div');
+            stepElement.className = 'execution-step';
+            
+            stepElement.innerHTML = `
+                <div class="step-icon completed">
+                    ${index + 1}
+                </div>
+                <div class="step-details">
+                    <p class="step-name">${step.nodeName}</p>
+                    <p class="step-description">
+                        ${step.nodeType} • ${step.timestamp.toLocaleTimeString()}
+                    </p>
+                </div>
+            `;
+            
+            stepsContainer.appendChild(stepElement);
+        });
+        
+        stepsContainer.scrollTop = stepsContainer.scrollHeight;
+    }
+    
+    updateIntentMonitor() {
+        const intentContainer = document.getElementById('intentResults');
+        if (!intentContainer) return;
+        
+        if (this.testSession.intentResults.length === 0) {
+            intentContainer.innerHTML = `
+                <div class="no-intent-data">
+                    <i class="fas fa-brain"></i>
+                    <p>Brak danych o intentach</p>
+                </div>
+            `;
+            return;
+        }
+        
+        intentContainer.innerHTML = '';
+        
+        // Show last 3 intent results
+        const recentIntents = this.testSession.intentResults.slice(-3);
+        
+        recentIntents.forEach(result => {
+            const resultElement = document.createElement('div');
+            resultElement.className = 'intent-result';
+            
+            const confidenceClass = result.confidence > 0.8 ? 'high' : 
+                                  result.confidence > 0.6 ? 'medium' : 'low';
+            
+            const sourceIcon = result.source === 'production_api' ? 
+                '<i class="fas fa-robot" title="Production API" style="color: #00ff88;"></i>' : 
+                '<i class="fas fa-code" title="Simulation Fallback" style="color: #ffa500;"></i>';
+            
+            resultElement.innerHTML = `
+                <div class="intent-name">
+                    ${sourceIcon} ${result.intent}
+                    ${result.requires_flow ? '<i class="fas fa-sitemap" title="Requires Flow" style="margin-left: 5px;"></i>' : ''}
+                </div>
+                <div class="intent-confidence ${confidenceClass}">
+                    ${Math.round(result.confidence * 100)}%
+                </div>
+            `;
+            
+            intentContainer.appendChild(resultElement);
+        });
+    }
+    
+    updateTestStatistics() {
+        document.getElementById('stepsCount').textContent = this.testSession.executionSteps.length;
+        document.getElementById('intentsCount').textContent = this.testSession.intentResults.length;
+        
+        if (this.testSession.startTime) {
+            const duration = Math.round((new Date() - this.testSession.startTime) / 1000);
+            document.getElementById('testDuration').textContent = `${duration}s`;
+        }
+    }
+    
+    clearTestSession() {
+        if (confirm('Czy na pewno chcesz wyczyścić sesję testową?')) {
+            this.testSession = {
+                isActive: false,
+                startTime: null,
+                messages: [],
+                executionSteps: [],
+                intentResults: [],
+                currentStep: null
+            };
+            
+            this.clearTestDisplays();
+            this.updateTestStatus('Gotowy do testu', 'ready');
+            
+            // Reset UI
+            document.getElementById('testMessageInput').disabled = true;
+            document.getElementById('sendTestMessageBtn').disabled = true;
+            document.getElementById('startTestBtn').disabled = false;
+            document.getElementById('exportTestBtn').disabled = true;
+            
+            console.log('🧹 Test session cleared');
+        }
+    }
+    
+    clearTestDisplays() {
+        // Clear chat
+        const chatContainer = document.getElementById('testChatMessages');
+        if (chatContainer) {
+            chatContainer.innerHTML = `
+                <div class="system-message">
+                    <i class="fas fa-info-circle"></i>
+                    <p>Wprowadź wiadomość testową aby przetestować flow</p>
+                </div>
+            `;
+        }
+        
+        // Clear execution tracker
+        this.updateExecutionTracker();
+        
+        // Clear intent monitor
+        this.updateIntentMonitor();
+        
+        // Reset statistics
+        document.getElementById('stepsCount').textContent = '0';
+        document.getElementById('intentsCount').textContent = '0';
+        document.getElementById('testDuration').textContent = '0s';
+    }
+    
+    exportTestResults() {
+        if (!this.testSession.isActive && this.testSession.messages.length === 0) {
+            alert('Brak danych testowych do eksportu.');
+            return;
+        }
+        
+        const testData = {
+            flowName: this.currentFlow?.name || 'Unnamed Flow',
+            testSession: this.testSession,
+            exportedAt: new Date().toISOString(),
+            summary: {
+                totalMessages: this.testSession.messages.length,
+                executionSteps: this.testSession.executionSteps.length,
+                intentResults: this.testSession.intentResults.length,
+                duration: this.testSession.startTime ? 
+                    Math.round((new Date() - this.testSession.startTime) / 1000) : 0
+            }
+        };
+        
+        // Create and download JSON file
+        const blob = new Blob([JSON.stringify(testData, null, 2)], {
+            type: 'application/json'
+        });
+        
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `flow-test-${Date.now()}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        console.log('📤 Test results exported');
+    }
+    
+    updateTestStatus(message, status = 'ready') {
+        const statusElement = document.getElementById('testStatus');
+        if (statusElement) {
+            statusElement.textContent = message;
+            statusElement.className = `status-indicator ${status}`;
+        }
+    }
+    
+    showTestError(message) {
+        this.updateTestStatus(message, 'error');
+        console.error('❌ Test Error:', message);
     }
 }
 

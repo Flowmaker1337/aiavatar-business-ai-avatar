@@ -38,6 +38,9 @@ router.use('/avatars', extendedAvatarRoutes.getRouter());
 // Endpoint for processing queries
 router.post('/query', queryController.handleQuery.bind(queryController));
 
+// Endpoint for intent classification testing
+router.post('/classify-intent', queryController.classifyIntent.bind(queryController));
+
 // Endpoint for processing queries in streaming mode (SSE)
 router.post('/query/stream', queryController.handleStreamingQuery.bind(queryController));
 

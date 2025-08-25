@@ -78,6 +78,9 @@
                     <button class="tab-button" onclick="flowStudio.switchTab('intents')">
                         <i class="fas fa-brain"></i> Intenty
                     </button>
+                    <button class="tab-button" onclick="flowStudio.switchTab('test')">
+                        <i class="fas fa-flask"></i> Test Flow
+                    </button>
                 </div>
                 
                 <!-- Nodes Tab -->
@@ -188,6 +191,96 @@
                         <button class="tool-btn" id="minimapToggle" title="Miniatura">
                             <i class="fas fa-map"></i>
                         </button>
+                    </div>
+                </div>
+                
+                <!-- Test Flow Tab -->
+                <div id="testTab" class="tab-content">
+                    <div class="palette-header">
+                        <h3>🧪 Test Flow</h3>
+                        <button class="btn-small btn-success" id="startTestBtn">
+                            <i class="fas fa-play"></i> Start Test
+                        </button>
+                    </div>
+                    
+                    <div class="test-panel">
+                        <!-- Test Chat Interface -->
+                        <div class="test-chat">
+                            <div class="chat-header">
+                                <h4>Symulacja Konwersacji</h4>
+                                <span class="status-indicator" id="testStatus">Gotowy do testu</span>
+                            </div>
+                            
+                            <div class="chat-messages" id="testChatMessages">
+                                <div class="system-message">
+                                    <i class="fas fa-info-circle"></i>
+                                    <p>Wprowadź wiadomość testową aby przetestować flow</p>
+                                </div>
+                            </div>
+                            
+                            <div class="chat-input">
+                                <input type="text" id="testMessageInput" placeholder="Napisz wiadomość testową..." disabled>
+                                <button id="sendTestMessageBtn" disabled>
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Flow Execution Tracker -->
+                        <div class="flow-tracker">
+                            <div class="tracker-header">
+                                <h4>Śledzenie Wykonania</h4>
+                                <button class="btn-small btn-secondary" id="clearTestBtn">
+                                    <i class="fas fa-trash"></i> Wyczyść
+                                </button>
+                            </div>
+                            
+                            <div class="execution-steps" id="executionSteps">
+                                <div class="no-execution">
+                                    <i class="fas fa-route"></i>
+                                    <p>Brak aktywnego testu</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Intent Confidence Monitor -->
+                        <div class="intent-monitor">
+                            <div class="monitor-header">
+                                <h4>Wykrycie Intentów</h4>
+                            </div>
+                            
+                            <div class="intent-results" id="intentResults">
+                                <div class="no-intent-data">
+                                    <i class="fas fa-brain"></i>
+                                    <p>Brak danych o intentach</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Test Results Export -->
+                        <div class="test-results">
+                            <div class="results-header">
+                                <h4>Wyniki Testu</h4>
+                                <button class="btn-small btn-primary" id="exportTestBtn" disabled>
+                                    <i class="fas fa-download"></i> Eksport
+                                </button>
+                            </div>
+                            
+                            <div class="results-summary" id="resultsSummary">
+                                <div class="summary-item">
+                                    <span class="label">Kroki wykonane:</span>
+                                    <span class="value" id="stepsCount">0</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="label">Intenty wykryte:</span>
+                                    <span class="value" id="intentsCount">0</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="label">Czas testu:</span>
+                                    <span class="value" id="testDuration">0s</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
