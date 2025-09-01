@@ -165,6 +165,8 @@ class HomepageApp {
             'avatar-creator': 'Avatar Creator',
             'flow-manager': 'Flow Manager',
             'role-training': 'Role Training',
+            'company-profile-creator': 'Company Profile Creator',
+            'scene-builder': 'Scene Builder',
             'analytics': 'Analityka',
             'reports': 'Raporty',
             'settings': 'Ustawienia',
@@ -197,6 +199,10 @@ class HomepageApp {
             this.showEnhancedAvatarBuilder();
         } else if (pageName === 'flow-manager') {
             this.showAvatarManager(); // Use the new Avatar Manager for flow management
+        } else if (pageName === 'company-profile-creator') {
+            this.showCompanyProfileCreator();
+        } else if (pageName === 'scene-builder') {
+            this.showSceneBuilder();
         } else {
             const targetPageId = pageMapping[pageName];
             if (targetPageId) {
@@ -1135,6 +1141,16 @@ class HomepageApp {
     showEnhancedAvatarBuilder() {
         // Redirect to Enhanced Avatar Builder page
         window.location.href = '/enhanced-avatar-builder.html';
+    }
+
+    showCompanyProfileCreator() {
+        console.log('🏢 Redirecting to Company Profile Creator');
+        window.location.href = '/company-profile-creator.html';
+    }
+
+    showSceneBuilder() {
+        console.log('🎬 Redirecting to Scene Builder');
+        window.location.href = '/scene-builder.html';
     }
 
     initializeAvatarManager() {

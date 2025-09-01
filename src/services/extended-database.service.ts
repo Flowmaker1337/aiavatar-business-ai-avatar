@@ -548,6 +548,34 @@ class ExtendedDatabaseService {
     return this.companyProfiles!.find({ user_id: userId }).toArray();
   }
 
+  public async getCompanyProfileById(profileId: string): Promise<CompanyProfile | null> {
+    return this.companyProfiles!.findOne({ id: profileId });
+  }
+
+  public async updateCompanyProfile(profileId: string, updateData: Partial<CompanyProfile>): Promise<CompanyProfile | null> {
+    const updatedData = {
+      ...updateData,
+      updated_at: new Date()
+    };
+
+    const result = await this.companyProfiles!.findOneAndUpdate(
+      { id: profileId },
+      { $set: updatedData },
+      { returnDocument: 'after' }
+    );
+
+    return result || null;
+  }
+
+  public async deleteCompanyProfile(profileId: string): Promise<boolean> {
+    const result = await this.companyProfiles!.deleteOne({ id: profileId });
+    return result.deletedCount > 0;
+  }
+
+  public async getCompanyProfileTemplates(): Promise<CompanyProfile[]> {
+    return this.companyProfiles!.find({ is_template: true }).toArray();
+  }
+
   // ============ SIMULATION SCENES ============
 
   public async createSimulationScene(sceneData: Omit<SimulationScene, '_id' | 'id' | 'created_at' | 'updated_at'>): Promise<SimulationScene> {
@@ -567,8 +595,36 @@ class ExtendedDatabaseService {
     return this.simulationScenes!.find({ user_id: userId }).toArray();
   }
 
+  public async getSimulationSceneById(sceneId: string): Promise<SimulationScene | null> {
+    return this.simulationScenes!.findOne({ id: sceneId });
+  }
+
+  public async updateSimulationScene(sceneId: string, updateData: Partial<SimulationScene>): Promise<SimulationScene | null> {
+    const updatedData = {
+      ...updateData,
+      updated_at: new Date()
+    };
+
+    const result = await this.simulationScenes!.findOneAndUpdate(
+      { id: sceneId },
+      { $set: updatedData },
+      { returnDocument: 'after' }
+    );
+
+    return result || null;
+  }
+
+  public async deleteSimulationScene(sceneId: string): Promise<boolean> {
+    const result = await this.simulationScenes!.deleteOne({ id: sceneId });
+    return result.deletedCount > 0;
+  }
+
   public async getTemplateScenes(): Promise<SimulationScene[]> {
     return this.simulationScenes!.find({ is_template: true }).toArray();
+  }
+
+  public async getScenesByCategory(category: string): Promise<SimulationScene[]> {
+    return this.simulationScenes!.find({ category: category as any }).toArray();
   }
 
   // ============ AUDIT LOGGING ============

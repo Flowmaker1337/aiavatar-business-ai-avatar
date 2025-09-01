@@ -12,6 +12,8 @@ import FlowWizardController from '../controllers/flow-wizard.controller';
 import CustomAvatarController from '../controllers/custom-avatar.controller';
 import { ReactiveAvatarController } from '../controllers/reactive-avatar.controller';
 import CompanyProfileController from '../controllers/company-profile.controller';
+import ExtendedCompanyProfileController from '../controllers/extended-company-profile.controller';
+import SceneBuilderController from '../controllers/scene-builder.controller';
 import AuthRoutes from './auth.routes';
 import ExtendedAvatarRoutes from './extended-avatar.routes';
 
@@ -24,6 +26,8 @@ const flowWizardController = new FlowWizardController();
 const customAvatarController = new CustomAvatarController();
 const reactiveAvatarController = new ReactiveAvatarController();
 const companyProfileController = new CompanyProfileController();
+const extendedCompanyProfileController = new ExtendedCompanyProfileController();
+const sceneBuilderController = new SceneBuilderController();
 
 // Initialize auth routes
 const authRoutes = new AuthRoutes();
@@ -260,9 +264,28 @@ router.post('/reactive-avatars/save-generated', reactiveAvatarController.saveGen
 
 // ============ COMPANY PROFILES ENDPOINTS ============
 
-// Company profile endpoints
-router.post('/company-profiles/:companyId', companyProfileController.saveProfile.bind(companyProfileController));
-router.get('/company-profiles/:companyId', companyProfileController.getProfile.bind(companyProfileController));
-router.get('/company-profiles', companyProfileController.getAllProfiles.bind(companyProfileController));
+// Extended Company profile endpoints (new system)
+router.post('/company-profiles', extendedCompanyProfileController.createProfile.bind(extendedCompanyProfileController));
+router.get('/company-profiles/templates', extendedCompanyProfileController.getTemplates.bind(extendedCompanyProfileController));
+router.get('/company-profiles/:profileId', extendedCompanyProfileController.getProfile.bind(extendedCompanyProfileController));
+router.put('/company-profiles/:profileId', extendedCompanyProfileController.updateProfile.bind(extendedCompanyProfileController));
+router.delete('/company-profiles/:profileId', extendedCompanyProfileController.deleteProfile.bind(extendedCompanyProfileController));
+router.get('/company-profiles', extendedCompanyProfileController.getProfiles.bind(extendedCompanyProfileController));
+
+// Legacy Company profile endpoints (old system - for backward compatibility)
+router.post('/company-profiles-legacy/:companyId', companyProfileController.saveProfile.bind(companyProfileController));
+router.get('/company-profiles-legacy/:companyId', companyProfileController.getProfile.bind(companyProfileController));
+router.get('/company-profiles-legacy', companyProfileController.getAllProfiles.bind(companyProfileController));
+
+// ============ SIMULATION SCENES ENDPOINTS ============
+
+// Scene Builder endpoints
+router.post('/simulation-scenes', sceneBuilderController.createScene.bind(sceneBuilderController));
+router.get('/simulation-scenes/templates', sceneBuilderController.getTemplates.bind(sceneBuilderController));
+router.get('/simulation-scenes/:sceneId', sceneBuilderController.getScene.bind(sceneBuilderController));
+router.put('/simulation-scenes/:sceneId', sceneBuilderController.updateScene.bind(sceneBuilderController));
+router.delete('/simulation-scenes/:sceneId', sceneBuilderController.deleteScene.bind(sceneBuilderController));
+router.post('/simulation-scenes/:sceneId/duplicate', sceneBuilderController.duplicateScene.bind(sceneBuilderController));
+router.get('/simulation-scenes', sceneBuilderController.getScenes.bind(sceneBuilderController));
 
 export default router; 
