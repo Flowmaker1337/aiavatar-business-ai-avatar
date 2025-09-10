@@ -1035,7 +1035,7 @@ class FlowStudio {
 
     async loadPromptTemplates() {
         try {
-            const response = await fetch('/api/prompt-templates');
+            const response = await window.authManager.makeAuthenticatedRequest('/api/prompt-templates');
             if (response.ok) {
                 const data = await response.json();
                 this.promptTemplates = data.templates || [];
@@ -1059,7 +1059,7 @@ class FlowStudio {
             // Load flows for each avatar type
             for (const avatarType of avatarTypes) {
                 try {
-                    const response = await fetch(`/api/flows?avatar_type=${avatarType}`);
+                    const response = await window.authManager.makeAuthenticatedRequest(`/api/flows?avatar_type=${avatarType}`);
                     if (response.ok) {
                         const data = await response.json();
                         if (data.status === 'success' && data.flows) {
@@ -1089,7 +1089,7 @@ class FlowStudio {
                         if (avatarsData.success && avatarsData.avatars) {
                             for (const avatar of avatarsData.avatars) {
                                 try {
-                                    const flowsResponse = await fetch(`/api/avatar/${avatar.id}/flow-definitions`);
+                                    const flowsResponse = await window.authManager.makeAuthenticatedRequest(`/api/avatar/${avatar.id}/flow-definitions`);
                                     if (flowsResponse.ok) {
                                         const flowsData = await flowsResponse.json();
                                         if (flowsData.status === 'success' && flowsData.flows) {
@@ -1580,10 +1580,28 @@ class FlowStudio {
         try {
             console.log('🧠 Loading intent library...');
             
+            // Load initial data for selectors
+            try {
+                const [promptsRes, intentsRes] = await Promise.all([
+                    window.authManager.makeAuthenticatedRequest('/api/prompt-templates'),
+                    window.authManager.makeAuthenticatedRequest('/api/intent-definitions')
+                ]);
+
+                if (!promptsRes.ok) throw new Error(`Failed to load prompts: ${promptsRes.statusText}`);
+                if (!intentsRes.ok) throw new Error(`Failed to load intents: ${intentsRes.statusText}`);
+
+                this.promptTemplates = await promptsRes.json();
+                this.intentTemplates = await intentsRes.json();
+            } catch (error) {
+                console.error('Error loading intent templates:', error);
+                this.promptTemplates = [];
+                this.intentTemplates = [];
+            }
+            
             // Load intent definitions and prompt templates
             const [intentResponse, promptResponse] = await Promise.all([
-                fetch('/api/intent-definitions'),
-                fetch('/api/prompt-templates')
+                window.authManager.makeAuthenticatedRequest('/api/intent-definitions'),
+                window.authManager.makeAuthenticatedRequest('/api/prompt-templates')
             ]);
 
             const intentData = await intentResponse.json();
