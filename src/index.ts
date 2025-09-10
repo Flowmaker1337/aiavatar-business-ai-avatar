@@ -5,6 +5,7 @@ import apiRoutes from './routes/api.routes';
 import DatabaseService from './services/database.service';
 import ExtendedDatabaseService from './services/extended-database.service';
 import path from 'path';
+import { authenticate, requireRole, requireAnyRole } from './middleware/enhanced-auth.middleware';
 
 // Check if all required environment variables are set
 if (!validateEnv()) {
@@ -56,7 +57,7 @@ app.use((req: Request, _res: Response, next: NextFunction) => {
   next();
 });
 
-// Serve new Homepage for root path
+// Serve new Homepage for root path (client-side auth check)
 app.get('/', (_req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, 'public', 'homepage.html'));
 });
@@ -89,6 +90,11 @@ app.get('/dashboard', (_req: Request, res: Response) => {
 
 app.get('/react-dashboard', (_req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, 'public', 'react-dashboard.html'));
+});
+
+// Admin dashboard - requires admin role
+app.get('/admin-dashboard', authenticate, requireRole('admin'), (_req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-dashboard.html'));
 });
 
 // Static file handling

@@ -411,6 +411,18 @@ class ExtendedDatabaseService {
     return this.userSessions!.findOne({ token, is_active: true });
   }
 
+  public async getSessionById(sessionId: string): Promise<UserSession | null> {
+    return this.userSessions!.findOne({ id: sessionId, is_active: true });
+  }
+
+  public async updateSessionLastActivity(sessionId: string): Promise<boolean> {
+    const result = await this.userSessions!.updateOne(
+      { id: sessionId },
+      { $set: { last_activity: new Date() } }
+    );
+    return result.modifiedCount > 0;
+  }
+
   public async invalidateSession(sessionId: string): Promise<boolean> {
     const result = await this.userSessions!.updateOne(
       { id: sessionId },

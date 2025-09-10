@@ -17,7 +17,22 @@ import SceneBuilderController from '../controllers/scene-builder.controller';
 import AuthRoutes from './auth.routes';
 import ExtendedAvatarRoutes from './extended-avatar.routes';
 
+// Import enhanced authentication middleware
+import { 
+    authenticate, 
+    requireRole, 
+    requireAnyRole, 
+    requirePermission, 
+    requireOwnership, 
+    optionalAuth,
+    rateLimit 
+} from '../middleware/enhanced-auth.middleware';
+
 const router = Router();
+
+// ============ GLOBAL MIDDLEWARE ============
+// Apply rate limiting to all API routes
+router.use(rateLimit(1000, 15 * 60 * 1000)); // 1000 requests per 15 minutes
 
 // Initialize controllers
 const simulationController = new SimulationController();
@@ -33,78 +48,135 @@ const sceneBuilderController = new SceneBuilderController();
 const authRoutes = new AuthRoutes();
 const extendedAvatarRoutes = new ExtendedAvatarRoutes();
 
-// ============ AUTHENTICATION ROUTES ============
+// ============ PUBLIC ROUTES (NO AUTH REQUIRED) ============
+// Authentication routes - must remain public
 router.use('/auth', authRoutes.getRouter());
 
-// ============ EXTENDED AVATAR ROUTES ============
-router.use('/avatars', extendedAvatarRoutes.getRouter());
-
-// Endpoint for processing queries
-router.post('/query', queryController.handleQuery.bind(queryController));
-
-// Endpoint for intent classification testing
-router.post('/classify-intent', queryController.classifyIntent.bind(queryController));
-
-// Endpoint for processing queries in streaming mode (SSE)
-router.post('/query/stream', queryController.handleStreamingQuery.bind(queryController));
-
-// Endpoint for listening to streaming responses
-router.get('/query/stream/listen', queryController.listenStreamingQuery.bind(queryController));
-
-// User endpoints
-router.post('/users', userController.createUser);
-router.get('/users/:userId', userController.getUser);
-
-// Avatar endpoints
-router.post('/avatars', avatarController.createAvatar);
-router.get('/avatars/:avatarId', avatarController.getAvatar);
-
-// Chat history endpoints - read-only
-router.get('/chat/:sessionId', sessionController.getChatHistory);
-
-// Endpoint for getting session state (MindState & Flow)
-router.get('/state/:sessionId', sessionController.getSessionState.bind(sessionController));
-
-// ============ FLOW ENDPOINTS ============
-
-// Endpoint for getting all flow definitions
-router.get('/flows', flowController.getFlowDefinitions.bind(flowController));
-
-// Endpoint for getting prompt templates
-router.get('/prompt-templates', flowController.getPromptTemplates.bind(flowController));
-
-// Endpoint for getting intent definitions
-router.get('/intent-definitions', flowController.getIntentDefinitions.bind(flowController));
-
-// ============ TEXT-TO-SPEECH ENDPOINTS ============
-
-// Endpoint for checking TTS service health
-router.get('/tts/health', queryController.checkTTSHealth.bind(queryController));
-
-// ============ HEALTH CHECK ENDPOINTS ============
-
-// Endpoint for testing application health
+// Health check endpoints - public for monitoring
 router.get('/health', healthController.getApplicationHealth.bind(healthController));
-
-// Endpoint for checking vector database health
 router.get('/health/vector-database', healthController.getVectorDatabaseHealth.bind(healthController));
-
-// Endpoint for detailed health check of all system components
 router.get('/health/detailed', healthController.getDetailedHealth.bind(healthController));
 
+// ============ PROTECTED ROUTES (AUTHENTICATION REQUIRED) ============
+// All routes below require authentication
+
+// ============ QUERY & CHAT ENDPOINTS ============
+// Core AI interaction endpoints - require authentication and avatar access
+router.post('/query', 
+    authenticate, 
+    requirePermission('read', 'avatars'),
+    queryController.handleQuery.bind(queryController)
+);
+
+router.post('/classify-intent', 
+    authenticate, 
+    requirePermission('read', 'avatars'),
+    queryController.classifyIntent.bind(queryController)
+);
+
+router.post('/query/stream', 
+    authenticate, 
+    requirePermission('read', 'avatars'),
+    queryController.handleStreamingQuery.bind(queryController)
+);
+
+router.get('/query/stream/listen', 
+    authenticate, 
+    requirePermission('read', 'avatars'),
+    queryController.listenStreamingQuery.bind(queryController)
+);
+
+// ============ USER MANAGEMENT ENDPOINTS ============
+router.post('/users', 
+    authenticate, 
+    requireRole('admin'),
+    userController.createUser
+);
+
+router.get('/users/:userId', 
+    authenticate, 
+    requireOwnership('userId'),
+    userController.getUser
+);
+
+// ============ AVATAR ENDPOINTS ============
+// Extended avatar routes with enhanced auth
+router.use('/avatars', authenticate, extendedAvatarRoutes.getRouter());
+
+// Legacy avatar endpoints
+router.post('/avatars', 
+    authenticate, 
+    requirePermission('create', 'avatars'),
+    avatarController.createAvatar
+);
+
+router.get('/avatars/:avatarId', 
+    authenticate, 
+    requirePermission('read', 'avatars'),
+    avatarController.getAvatar
+);
+
+// ============ CHAT & SESSION ENDPOINTS ============
+router.get('/chat/:sessionId', 
+    authenticate, 
+    requireOwnership('sessionId'),
+    sessionController.getChatHistory
+);
+
+router.get('/state/:sessionId', 
+    authenticate, 
+    requireOwnership('sessionId'),
+    sessionController.getSessionState.bind(sessionController)
+);
+
+// ============ FLOW ENDPOINTS ============
+router.get('/flows', 
+    authenticate, 
+    requirePermission('read', 'flows'),
+    flowController.getFlowDefinitions.bind(flowController)
+);
+
+router.get('/prompt-templates', 
+    authenticate, 
+    requirePermission('read', 'flows'),
+    flowController.getPromptTemplates.bind(flowController)
+);
+
+router.get('/intent-definitions', 
+    authenticate, 
+    requirePermission('read', 'intents'),
+    flowController.getIntentDefinitions.bind(flowController)
+);
+
+// ============ TEXT-TO-SPEECH ENDPOINTS ============
+router.get('/tts/health', 
+    authenticate,
+    queryController.checkTTSHealth.bind(queryController)
+);
+
 // ============ KNOWLEDGE PREPARATION ENGINE ENDPOINTS ============
+router.post('/knowledge/process', 
+    authenticate, 
+    requirePermission('create', 'avatars'),
+    knowledgePrepareController.processTrainingFile.bind(knowledgePrepareController)
+);
 
-// Endpoint for processing training materials
-router.post('/knowledge/process', knowledgePrepareController.processTrainingFile.bind(knowledgePrepareController));
+router.get('/knowledge/flows/:courseId', 
+    authenticate, 
+    requirePermission('read', 'flows'),
+    knowledgePrepareController.getProcessedFlows.bind(knowledgePrepareController)
+);
 
-// Endpoint for getting processed flows
-router.get('/knowledge/flows/:courseId', knowledgePrepareController.getProcessedFlows.bind(knowledgePrepareController));
+router.post('/knowledge/test-12archetypes', 
+    authenticate, 
+    requireRole('admin'),
+    knowledgePrepareController.test12Archetypes.bind(knowledgePrepareController)
+);
 
-// Test endpoint for 12 Archetypes processing
-router.post('/knowledge/test-12archetypes', knowledgePrepareController.test12Archetypes.bind(knowledgePrepareController));
-
-// Health check for Knowledge Preparation Engine
-router.get('/knowledge/health', knowledgePrepareController.healthCheck.bind(knowledgePrepareController));
+router.get('/knowledge/health', 
+    authenticate,
+    knowledgePrepareController.healthCheck.bind(knowledgePrepareController)
+);
 
 // ============ SIMULATION ENDPOINTS ============
 

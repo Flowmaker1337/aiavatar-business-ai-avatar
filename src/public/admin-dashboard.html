@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administratora - AI Avatar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .admin-dashboard {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .admin-header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .admin-header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .admin-nav {
+            background: #f8f9fa;
+            padding: 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .admin-nav-tabs {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .admin-nav-tab {
+            flex: 1;
+        }
+
+        .admin-nav-link {
+            display: block;
+            padding: 20px;
+            text-decoration: none;
+            color: #495057;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .admin-nav-link:hover,
+        .admin-nav-link.active {
+            background: white;
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .admin-content {
+            padding: 30px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .data-table {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .data-table-header {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .data-table-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .data-table-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th,
+        .table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-primary {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6c757d;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-color: #28a745;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border-color: #dc3545;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-color: #ffc107;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-color: #17a2b8;
+        }
+
+        @media (max-width: 768px) {
+            .admin-nav-tabs {
+                flex-direction: column;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .data-table {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-dashboard">
+        <div class="admin-container">
+            <!-- Header -->
+            <div class="admin-header">
+                <h1><i class="fas fa-shield-alt"></i> Panel Administratora</h1>
+                <p>Zarządzanie użytkownikami, rolami i uprawnieniami systemu</p>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="admin-nav">
+                <ul class="admin-nav-tabs">
+                    <li class="admin-nav-tab">
+                        <a href="#" class="admin-nav-link active" data-tab="overview">
+                            <i class="fas fa-chart-line"></i> Przegląd
+                        </a>
+                    </li>
+                    <li class="admin-nav-tab">
+                        <a href="#" class="admin-nav-link" data-tab="users">
+                            <i class="fas fa-users"></i> Użytkownicy
+                        </a>
+                    </li>
+                    <li class="admin-nav-tab">
+                        <a href="#" class="admin-nav-link" data-tab="roles">
+                            <i class="fas fa-user-shield"></i> Role i Uprawnienia
+                        </a>
+                    </li>
+                    <li class="admin-nav-tab">
+                        <a href="#" class="admin-nav-link" data-tab="audit">
+                            <i class="fas fa-history"></i> Logi Audytu
+                        </a>
+                    </li>
+                    <li class="admin-nav-tab">
+                        <a href="#" class="admin-nav-link" data-tab="settings">
+                            <i class="fas fa-cog"></i> Ustawienia
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Content -->
+            <div class="admin-content">
+                <!-- Overview Tab -->
+                <div id="overview" class="tab-content active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalUsers">-</div>
+                            <div class="stat-label">Użytkownicy</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="activeUsers">-</div>
+                            <div class="stat-label">Aktywni</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalAvatars">-</div>
+                            <div class="stat-label">Avatary</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalSimulations">-</div>
+                            <div class="stat-label">Symulacje</div>
+                        </div>
+                    </div>
+
+                    <div class="data-table">
+                        <div class="data-table-header">
+                            <h3 class="data-table-title">Ostatnia Aktywność</h3>
+                        </div>
+                        <div id="recentActivity" class="loading">
+                            <div class="loading-spinner"></div>
+                            <p>Ładowanie aktywności...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users Tab -->
+                <div id="users" class="tab-content">
+                    <div class="data-table">
+                        <div class="data-table-header">
+                            <h3 class="data-table-title">Zarządzanie Użytkownikami</h3>
+                            <div class="data-table-actions">
+                                <button class="btn btn-primary" onclick="adminApp.showCreateUserModal()">
+                                    <i class="fas fa-plus"></i> Dodaj Użytkownika
+                                </button>
+                                <button class="btn btn-secondary" onclick="adminApp.refreshUsers()">
+                                    <i class="fas fa-refresh"></i> Odśwież
+                                </button>
+                            </div>
+                        </div>
+                        <div id="usersTable" class="loading">
+                            <div class="loading-spinner"></div>
+                            <p>Ładowanie użytkowników...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Roles Tab -->
+                <div id="roles" class="tab-content">
+                    <div class="data-table">
+                        <div class="data-table-header">
+                            <h3 class="data-table-title">Role i Uprawnienia</h3>
+                            <div class="data-table-actions">
+                                <button class="btn btn-primary" onclick="adminApp.showPermissionsAnalytics()">
+                                    <i class="fas fa-chart-bar"></i> Analiza Uprawnień
+                                </button>
+                            </div>
+                        </div>
+                        <div id="rolesContent" class="loading">
+                            <div class="loading-spinner"></div>
+                            <p>Ładowanie ról i uprawnień...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audit Tab -->
+                <div id="audit" class="tab-content">
+                    <div class="data-table">
+                        <div class="data-table-header">
+                            <h3 class="data-table-title">Logi Audytu</h3>
+                            <div class="data-table-actions">
+                                <button class="btn btn-secondary" onclick="adminApp.refreshAuditLogs()">
+                                    <i class="fas fa-refresh"></i> Odśwież
+                                </button>
+                                <button class="btn btn-warning" onclick="adminApp.exportAuditLogs()">
+                                    <i class="fas fa-download"></i> Eksportuj
+                                </button>
+                            </div>
+                        </div>
+                        <div id="auditLogs" class="loading">
+                            <div class="loading-spinner"></div>
+                            <p>Ładowanie logów audytu...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Tab -->
+                <div id="settings" class="tab-content">
+                    <div class="data-table">
+                        <div class="data-table-header">
+                            <h3 class="data-table-title">Ustawienia Systemu</h3>
+                        </div>
+                        <div id="systemSettings">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Informacja:</strong> Ustawienia systemu będą dostępne w przyszłych wersjach.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Modal -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="userModalTitle">Dodaj Użytkownika</h3>
+                <button class="modal-close" onclick="adminApp.closeModal('userModal')">&times;</button>
+            </div>
+            <form id="userForm">
+                <div class="form-group">
+                    <label class="form-label">Imię</label>
+                    <input type="text" class="form-control" id="userFirstName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Nazwisko</label>
+                    <input type="text" class="form-control" id="userLastName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" id="userEmail" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Rola</label>
+                    <select class="form-select" id="userRole" required>
+                        <option value="user">Użytkownik</option>
+                        <option value="admin">Administrator</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" id="userStatus" required>
+                        <option value="active">Aktywny</option>
+                        <option value="inactive">Nieaktywny</option>
+                        <option value="suspended">Zawieszony</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Zapisz
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="adminApp.closeModal('userModal')">
+                        <i class="fas fa-times"></i> Anuluj
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Security Scripts -->
+    <script src="js/auth-manager.js"></script>
+    <script src="js/page-security.js"></script>
+    <script src="admin-dashboard-script.js"></script>
+</body>
+</html>

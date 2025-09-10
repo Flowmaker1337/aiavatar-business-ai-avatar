@@ -52,12 +52,10 @@ class AvatarChatDashboard {
     async loadAvailableAvatars() {
         try {
             // Load custom avatars only if user is logged in
-            const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-            if (token) {
+            // Use AuthManager for authenticated requests
+            if (window.authManager && window.authManager.isAuthenticated()) {
                 try {
-                    const response = await fetch('/api/avatars', {
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    });
+                    const response = await window.authManager.makeAuthenticatedRequest('/api/avatars');
                     
                     if (response.ok) {
                         const data = await response.json();
@@ -162,11 +160,7 @@ class AvatarChatDashboard {
         } else if (avatarId.startsWith('custom_')) {
             // Load custom avatar details
             const customId = avatarId.replace('custom_', '');
-            const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-            
-            const response = await fetch(`/api/avatars/${customId}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await window.authManager.makeAuthenticatedRequest(`/api/avatars/${customId}`);
             
             if (response.ok) {
                 const data = await response.json();
@@ -189,11 +183,11 @@ class AvatarChatDashboard {
             
             if (avatarId === 'networker' || avatarId === 'trainer') {
                 // Load predefined flows
-                flowsResponse = await fetch(`/api/flows?avatar_type=${avatarId}`);
+                flowsResponse = await window.authManager.makeAuthenticatedRequest(`/api/flows?avatar_type=${avatarId}`);
             } else if (avatarId.startsWith('custom_')) {
                 // Load custom avatar flows
                 const customId = avatarId.replace('custom_', '');
-                flowsResponse = await fetch(`/api/avatar/${customId}/flow-definitions`);
+                flowsResponse = await window.authManager.makeAuthenticatedRequest(`/api/avatar/${customId}/flow-definitions`);
             }
             
             if (flowsResponse && flowsResponse.ok) {
@@ -361,27 +355,12 @@ class AvatarChatDashboard {
         // Add /api prefix if not already present
         const url = endpoint.startsWith('/api/') ? endpoint : `/api${endpoint}`;
         
-        // Add authorization token if available
-        const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-        const headers = {
-            'Content-Type': 'application/json',
-            ...options.headers
-        };
-        
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-        }
-        
-        const config = {
+        // Use AuthManager for authenticated requests
+        const response = await window.authManager.makeAuthenticatedRequest(url, {
             method: options.method || 'GET',
-            headers: headers
-        };
-
-        if (options.body) {
-            config.body = JSON.stringify(options.body);
-        }
-
-        const response = await fetch(url, config);
+            body: options.body ? JSON.stringify(options.body) : undefined,
+            headers: options.headers
+        });
         
         if (!response.ok) {
             const error = await response.json().catch(() => ({ 

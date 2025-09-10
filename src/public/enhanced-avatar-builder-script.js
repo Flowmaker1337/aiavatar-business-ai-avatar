@@ -547,11 +547,7 @@ class EnhancedAvatarBuilder {
         generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generuję...';
 
         try {
-            // Get auth token
-            const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-            if (!token) {
-                throw new Error('Authentication required');
-            }
+            // Authentication handled by AuthManager
 
             // Prepare context for AI
             const context = {
@@ -563,13 +559,9 @@ class EnhancedAvatarBuilder {
                 background: this.avatarData.background
             };
 
-            // Make API call
-            const response = await fetch('/api/flow-wizard/generate-avatar-field', {
+            // Make API call using AuthManager
+            const response = await window.authManager.makeAuthenticatedRequest('/api/flow-wizard/generate-avatar-field', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
                 body: JSON.stringify({
                     fieldName: fieldType,
                     context: context
@@ -741,18 +733,9 @@ class EnhancedAvatarBuilder {
             };
 
             // Get auth token
-            const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-            if (!token) {
-                throw new Error('Authentication required');
-            }
-
-            // Create avatar
-            const response = await fetch('/api/avatars', {
+            // Create avatar using AuthManager
+            const response = await window.authManager.makeAuthenticatedRequest('/api/avatars', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
                 body: JSON.stringify(avatarData)
             });
 

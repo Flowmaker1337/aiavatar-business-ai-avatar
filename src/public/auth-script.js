@@ -1,10 +1,21 @@
 // ============ AUTHENTICATION JAVASCRIPT - AIWAVE INSPIRED ============
 
-class AuthManager {
+class AuthPageManager {
     constructor() {
         this.apiBaseUrl = '/api/auth';
         this.currentPage = this.detectCurrentPage();
-        this.init();
+        
+        // Wait for global auth manager to be ready
+        this.waitForAuthManager().then(() => {
+            this.init();
+        });
+    }
+
+    async waitForAuthManager() {
+        while (typeof window.authManager === 'undefined') {
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        console.log('✅ AuthManager ready for auth page');
     }
 
     init() {
@@ -239,35 +250,24 @@ class AuthManager {
         this.setButtonLoading('loginButton', true);
 
         try {
-            const response = await fetch(`${this.apiBaseUrl}/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    email,
-                    password
-                })
-            });
+            // Use global AuthManager for login
+            const result = await window.authManager.login(email, password);
 
-            const data = await response.json();
-
-            if (data.success) {
-                // Store tokens
-                this.storeTokens(data.data.access_token, data.data.refresh_token, rememberMe);
-                
-                // Store user info
-                this.storeUserInfo(data.data.user);
-                
+            if (result.success) {
                 this.showSuccess('Logowanie pomyślne! Przekierowywanie...');
+                
+                // Check for intended destination
+                const intendedDestination = sessionStorage.getItem('intended_destination');
+                const redirectUrl = intendedDestination || '/';
+                sessionStorage.removeItem('intended_destination');
                 
                 // Redirect after short delay
                 setTimeout(() => {
-                    window.location.href = '/';
+                    window.location.href = redirectUrl;
                 }, 1500);
                 
             } else {
-                this.showError(data.error || 'Błąd logowania');
+                this.showError(result.error || 'Błąd logowania');
             }
 
         } catch (error) {
@@ -316,31 +316,18 @@ class AuthManager {
         try {
             const selectedPlan = localStorage.getItem('selectedPlan') || 'free';
             
-            const response = await fetch(`${this.apiBaseUrl}/register`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    first_name: firstName,
-                    last_name: lastName,
-                    email,
-                    password,
-                    company,
-                    newsletter,
-                    plan: selectedPlan
-                })
+            // Use global AuthManager for registration
+            const result = await window.authManager.register({
+                first_name: firstName,
+                last_name: lastName,
+                email,
+                password,
+                company,
+                newsletter,
+                plan: selectedPlan
             });
 
-            const data = await response.json();
-
-            if (data.success) {
-                // Store tokens (auto-login after registration)
-                this.storeTokens(data.data.access_token, data.data.refresh_token, true);
-                
-                // Store user info
-                this.storeUserInfo(data.data.user);
-                
+            if (result.success) {
                 this.showSuccess('Konto utworzone pomyślnie! Przekierowywanie...');
                 
                 // Redirect after short delay
@@ -349,7 +336,7 @@ class AuthManager {
                 }, 1500);
                 
             } else {
-                this.showError(data.error || 'Błąd rejestracji');
+                this.showError(result.error || 'Błąd podczas tworzenia konta');
             }
 
         } catch (error) {
@@ -614,7 +601,7 @@ class AuthUtils {
 let authManager;
 
 document.addEventListener('DOMContentLoaded', () => {
-    authManager = new AuthManager();
+    window.authPageManager = new AuthPageManager();
 });
 
 // Export for global access

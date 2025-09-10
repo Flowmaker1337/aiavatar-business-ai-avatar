@@ -92,6 +92,17 @@ export interface RolePermission {
   permissions: string[]; // Permission IDs
 }
 
+// ============ JWT & TOKEN MANAGEMENT ============
+
+export interface JWTPayload {
+  userId: string;
+  email: string;
+  role: UserRole;
+  sessionId: string;
+  iat?: number;
+  exp?: number;
+}
+
 // ============ SESSION MANAGEMENT ============
 
 export interface UserSession {

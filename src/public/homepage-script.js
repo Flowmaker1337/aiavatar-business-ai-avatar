@@ -7,8 +7,22 @@ class HomepageApp {
         this.isMobile = window.innerWidth <= 768;
         this.isLoggedIn = false; // Initialize as not logged in
         this.currentUser = null;
+        this.allAvatars = [];
+        this.currentAvatars = [];
+        this.currentCategory = 'all';
+        this.searchQuery = '';
         
-        this.init();
+        // Wait for auth manager to be ready
+        this.waitForAuthManager().then(() => {
+            this.init();
+        });
+    }
+
+    async waitForAuthManager() {
+        while (typeof window.authManager === 'undefined') {
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        console.log('✅ AuthManager ready for homepage');
     }
 
     init() {
@@ -733,25 +747,51 @@ class HomepageApp {
     // ============ AUTHENTICATION METHODS ============
 
     checkAuthentication() {
-        // Check if user is logged in
-        const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-        const userInfo = localStorage.getItem('userInfo');
+        // Use AuthManager for authentication check
+        this.isLoggedIn = window.authManager.isAuthenticated();
+        this.currentUser = window.authManager.getUser();
         
-        if (token && userInfo) {
-            try {
-                this.currentUser = JSON.parse(userInfo);
-                this.isLoggedIn = true;
-                this.updateUIForLoggedInUser();
-                console.log('✅ User is logged in:', this.currentUser);
-            } catch (error) {
-                console.error('Error parsing user info:', error);
-                this.handleLogout();
-            }
+        console.log('🔍 Authentication check:', {
+            isLoggedIn: this.isLoggedIn,
+            user: this.currentUser
+        });
+        
+        // Setup auth event listeners
+        this.setupAuthEventListeners();
+        
+        if (this.isLoggedIn) {
+            this.updateUIForLoggedInUser();
+            console.log('✅ User is logged in:', this.currentUser);
         } else {
-            this.isLoggedIn = false;
             this.updateUIForLoggedOutUser();
             console.log('❌ User is not logged in');
         }
+    }
+
+    setupAuthEventListeners() {
+        // Listen for authentication events
+        window.addEventListener('auth:login', (e) => {
+            console.log('🔐 Login event received');
+            this.isLoggedIn = true;
+            this.currentUser = e.detail.user;
+            this.updateUIForLoggedInUser();
+            this.loadAvatars();
+        });
+
+        window.addEventListener('auth:logout', () => {
+            console.log('🚪 Logout event received');
+            this.isLoggedIn = false;
+            this.currentUser = null;
+            this.allAvatars = [];
+            this.currentAvatars = [];
+            this.updateUIForLoggedOutUser();
+            this.navigateToPage('welcome');
+        });
+
+        window.addEventListener('auth:token-refreshed', () => {
+            console.log('🔄 Token refreshed event received');
+            // Token refreshed, continue normal operation
+        });
     }
 
     updateUIForLoggedInUser() {
@@ -1058,56 +1098,33 @@ class HomepageApp {
         }, 100);
     }
 
-    handleLogout() {
+    async handleLogout() {
         if (confirm('Czy na pewno chcesz się wylogować?')) {
-            // Clear auth data
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            localStorage.removeItem('tokenExpiry');
-            localStorage.removeItem('userInfo');
-            sessionStorage.removeItem('accessToken');
-            sessionStorage.removeItem('refreshToken');
-            sessionStorage.removeItem('tokenExpiry');
-
-            this.showNotification('Wylogowano pomyślnie', 'success');
-
-            // Redirect to login page after short delay
-            setTimeout(() => {
-                window.location.href = '/login.html';
-            }, 1500);
+            try {
+                // Use AuthManager for logout
+                await window.authManager.logout();
+                this.showNotification('Wylogowano pomyślnie', 'success');
+                
+                // Redirect to login page after short delay
+                setTimeout(() => {
+                    window.location.href = '/login.html';
+                }, 1500);
+            } catch (error) {
+                console.error('Logout error:', error);
+                this.showNotification('Błąd podczas wylogowywania', 'error');
+            }
         }
     }
 
     async makeAuthenticatedRequest(url, options = {}) {
-        const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-        
-        if (!token) {
-            this.handleLogout();
-            throw new Error('No authentication token');
-        }
-
-        const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-            ...options.headers
-        };
-
         try {
-            const response = await fetch(url, {
-                ...options,
-                headers
-            });
-
-            // If token expired, redirect to login
-            if (response.status === 401) {
-                this.showNotification('Sesja wygasła. Zaloguj się ponownie.', 'warning');
-                this.handleLogout();
-                throw new Error('Authentication failed');
-            }
-
-            return response;
+            // Use AuthManager for authenticated requests
+            return await window.authManager.makeAuthenticatedRequest(url, options);
         } catch (error) {
             console.error('Authenticated request failed:', error);
+            if (error.message === 'Authentication failed') {
+                this.showNotification('Sesja wygasła. Zaloguj się ponownie.', 'warning');
+            }
             throw error;
         }
     }

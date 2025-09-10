@@ -1080,11 +1080,9 @@ class FlowStudio {
             // Also load custom avatar flows (if any)
             try {
                 // Get list of custom avatars first
-                const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-                if (token) {
-                    const avatarsResponse = await fetch('/api/avatars', {
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    });
+                // Use AuthManager for authenticated requests
+                if (window.authManager && window.authManager.isAuthenticated()) {
+                    const avatarsResponse = await window.authManager.makeAuthenticatedRequest('/api/avatars');
                     
                     if (avatarsResponse.ok) {
                         const avatarsData = await avatarsResponse.json();
@@ -2037,13 +2035,9 @@ Zwróć każdy przykład w osobnej linii, bez numeracji.`;
     }
 
     async callAIGenerator(prompt) {
-        // Use existing OpenAI endpoint for content generation
-        const response = await fetch('/api/personas/generate-content', {
+        // Use AuthManager for authenticated requests
+        const response = await window.authManager.makeAuthenticatedRequest('/api/personas/generate-content', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
             body: JSON.stringify({
                 prompt: prompt,
                 type: 'intent_content'
