@@ -239,61 +239,61 @@ function getUserPermissions(role: string): string[] {
 }
 
 // For HTML routes - redirects to login page
-export const authenticateHTML = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-        const authHeader = req.headers['authorization'];
-        const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
-
-        if (!token) {
-            // Redirect to login page for HTML routes
-            res.redirect('/login.html');
-            return;
-        }
-
-        // Use same JWT verification logic as authenticate
-        jwt.verify(token, config.JWT_SECRET, async (err, decoded) => {
-            if (err) {
-                console.error('JWT verification failed:', err.message);
-                res.redirect('/login.html');
-                return;
-            }
-
-            const payload = decoded as JWTPayload;
-            
-            // Verify session is active
-            try {
-                const session = await db.getSessionById(payload.sessionId);
-                if (!session || !session.is_active || session.user_id !== payload.userId) {
-                    res.redirect('/login.html');
-                    return;
-                }
-
-                // Update session activity
-                await db.updateSessionLastActivity(payload.sessionId);
-
-                // Set user info on request
-                req.user = {
-                    userId: payload.userId,
-                    email: payload.email,
-                    role: payload.role,
-                    sessionId: payload.sessionId
-                };
-
-                // Set permissions
-                req.permissions = getUserPermissions(payload.role);
-
-                next();
-            } catch (sessionError) {
-                console.error('Session verification error:', sessionError);
-                res.redirect('/login.html');
-                return;
-            }
-        });
-    } catch (error) {
-        console.error('Authentication error:', error);
-        res.redirect('/login.html');
-        return;
-    }
-};
+// export const authenticateHTML = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+//     try {
+//         const authHeader = req.headers['authorization'];
+//         const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+//
+//         if (!token) {
+//             // Redirect to login page for HTML routes
+//             res.redirect('/login.html');
+//             return;
+//         }
+//
+//         // Use same JWT verification logic as authenticate
+//         jwt.verify(token, config.JWT_SECRET, async (err, decoded) => {
+//             if (err) {
+//                 console.error('JWT verification failed:', err.message);
+//                 res.redirect('/login.html');
+//                 return;
+//             }
+//
+//             const payload = decoded as JWTPayload;
+//
+//             // Verify session is active
+//             try {
+//                 const session = await db.getSessionById(payload.sessionId);
+//                 if (!session || !session.is_active || session.user_id !== payload.userId) {
+//                     res.redirect('/login.html');
+//                     return;
+//                 }
+//
+//                 // Update session activity
+//                 await db.updateSessionLastActivity(payload.sessionId);
+//
+//                 // Set user info on request
+//                 req.user = {
+//                     userId: payload.userId,
+//                     email: payload.email,
+//                     role: payload.role,
+//                     sessionId: payload.sessionId
+//                 };
+//
+//                 // Set permissions
+//                 req.permissions = getUserPermissions(payload.role);
+//
+//                 next();
+//             } catch (sessionError) {
+//                 console.error('Session verification error:', sessionError);
+//                 res.redirect('/login.html');
+//                 return;
+//             }
+//         });
+//     } catch (error) {
+//         console.error('Authentication error:', error);
+//         res.redirect('/login.html');
+//         return;
+//     }
+// };
 
 console.log('🛡️ Simplified Enhanced Auth Middleware loaded');
