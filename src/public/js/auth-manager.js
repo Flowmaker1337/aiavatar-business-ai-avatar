@@ -251,25 +251,26 @@ class AuthManager {
 
     async makeAuthenticatedRequest(url, options = {}) {
         // Ensure we have a valid token
-        if (!this.isAuthenticated()) {
-            throw new Error('Not authenticated');
-        }
+        // if (!this.isAuthenticated()) {
+        //     throw new Error('Not authenticated');
+        // }
+        //
+        // // Check if token needs refresh
+        // if (this.tokenExpiresAt && new Date() >= new Date(this.tokenExpiresAt.getTime() - 60000)) {
+        //     const refreshed = await this.refreshTokens();
+        //     if (!refreshed) {
+        //         throw new Error('Token refresh failed');
+        //     }
+        // }
+        //
+        // // Add authorization header
+        // const headers = {
+        //     'Authorization': `Bearer ${this.token}`,
+        //     'Content-Type': 'application/json',
+        //     ...options.headers
+        // };
 
-        // Check if token needs refresh
-        if (this.tokenExpiresAt && new Date() >= new Date(this.tokenExpiresAt.getTime() - 60000)) {
-            const refreshed = await this.refreshTokens();
-            if (!refreshed) {
-                throw new Error('Token refresh failed');
-            }
-        }
-
-        // Add authorization header
-        const headers = {
-            'Authorization': `Bearer ${this.token}`,
-            'Content-Type': 'application/json',
-            ...options.headers
-        };
-
+        const headers = {};
         const response = await fetch(url, {
             ...options,
             headers
@@ -290,7 +291,7 @@ class AuthManager {
             }
             
             console.log('🚫 Authentication failed, logging out');
-            this.logout();
+            await this.logout();
             throw new Error('Authentication failed');
         }
 

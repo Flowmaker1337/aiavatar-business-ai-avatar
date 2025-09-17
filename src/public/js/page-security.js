@@ -108,19 +108,19 @@ class PageSecurity {
 
     redirectToLogin(reason = 'Authentication required') {
         console.log('🚫 Access denied:', reason);
-        
+
         // Show notification if available
         if (typeof showNotification === 'function') {
             showNotification(reason, 'warning');
         }
-        
+
         // Store intended destination
         sessionStorage.setItem('intended_destination', window.location.href);
-        
-        // Redirect to login
-        setTimeout(() => {
-            window.location.href = '/login.html';
-        }, 1000);
+        //
+        // // Redirect to login
+        // setTimeout(() => {
+        //     window.location.href = '/login.html';
+        // }, 1000);
     }
 
     onPageAccessGranted() {
