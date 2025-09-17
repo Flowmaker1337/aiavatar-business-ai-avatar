@@ -1,7 +1,17 @@
 import { Request, Response } from 'express';
 import openaiService from '../services/openai.service';
 import goalService from '../services/goal.service';
-import {AnalysisResult, ChatHistory, UserQuery, UserStreamingQuery, BusinessAvatar, IntentClassificationResult, MindStateStack, FlowExecution} from '../models/types';
+import {
+  AnalysisResult,
+  ChatHistory,
+  UserQuery,
+  UserStreamingQuery,
+  BusinessAvatar,
+  IntentClassificationResult,
+  MindStateStack,
+  FlowExecution,
+  SystemPrompt, UserPrompt
+} from '../models/types';
 import sessionService from "../services/session.service";
 import DatabaseService from "../services/database.service";
 import vectorDatabaseService from '../services/vector-database.service';
@@ -835,8 +845,8 @@ class QueryController {
    * Generates response (streaming or non-streaming based on callback presence)
    */
   private async generateResponse(
-    userMessage: string, 
-    contextKnowledge: string[], 
+    userMessage: string,
+    contextKnowledge: string[],
     sessionContext: SessionContext,
     onStreamingChunk?: (chunk: string) => void
   ): Promise<string> {
@@ -846,24 +856,26 @@ class QueryController {
       sessionContext.chatHistory,
       sessionContext.avatarName
     );
-    
+
+    const systemPrompt = openaiService.generateLeasingAdvisorSystemPrompt();
     if (onStreamingChunk) {
       // Streaming response
       console.log('\n[STREAMING RESPONSE GENERATION] Generating response...');
       let fullResponse = '';
-      
+
       await openaiService.generateStreamingResponse(userPrompt, (chunk: string) => {
         fullResponse += chunk;
         console.log('[RESPONSE GENERATION] Generated response chunk:', chunk);
         onStreamingChunk(chunk);
-      });
-      
+      }, systemPrompt);
+
       console.log('[RESPONSE GENERATION] Generated response:', fullResponse);
       return fullResponse;
     } else {
       // Regular response
       console.log('\n[RESPONSE GENERATION] Generating response...');
-      const response = await openaiService.generateResponse(userPrompt);
+
+      const response = await openaiService.generateResponse(userPrompt, systemPrompt);
       console.log('[RESPONSE GENERATION] Generated response:', response);
       return response;
     }
@@ -1152,33 +1164,27 @@ class QueryController {
    * Generates response using system and user prompts
    */
   private async generateResponseWithPrompts(
-    systemPrompt: any,
-    userPrompt: any,
+    systemPrompt: SystemPrompt,
+    userPrompt: UserPrompt,
     onStreamingChunk?: (chunk: string) => void
   ): Promise<string> {
     console.log('\n[RESPONSE GENERATION] Generating response with new prompt system...');
-    
-    // Użyj standardowej metody generateResponse z OpenAI service
-    const combinedPrompt = {
-      role: 'user' as const,
-      content: `${systemPrompt.content}\n\n${userPrompt.content}`
-    };
-    
+
     if (onStreamingChunk) {
       // Streaming response
       let fullResponse = '';
       
-      await openaiService.generateStreamingResponse(combinedPrompt, (chunk: string) => {
+      await openaiService.generateStreamingResponse(userPrompt, (chunk: string) => {
         fullResponse += chunk;
         console.log('[RESPONSE GENERATION] Generated response chunk:', chunk);
         onStreamingChunk(chunk);
-      });
+      }, systemPrompt);
       
       console.log('[RESPONSE GENERATION] Generated response:', fullResponse);
       return fullResponse;
     } else {
       // Regular response
-      const response = await openaiService.generateResponse(combinedPrompt);
+      const response = await openaiService.generateResponse(userPrompt, systemPrompt);
       console.log('[RESPONSE GENERATION] Generated response:', response);
       return response;
     }
@@ -1377,7 +1383,7 @@ class QueryController {
       console.log('🧠 [TRAINER RAG] Using vector embeddings search (PROPER!)');
       
       // Generate embedding for user query
-      const queryEmbedding = await openaiService.generateEmbeddings(userMessage);
+      // const queryEmbedding = await openaiService.generateEmbeddings(userMessage);
       
       // Search in vector database with trainer filter
       const searchResults = await vectorDatabaseService.queryKnowledgeBase(userMessage);

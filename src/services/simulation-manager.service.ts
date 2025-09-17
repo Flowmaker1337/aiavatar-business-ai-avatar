@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import {v4 as uuidv4} from 'uuid';
 import {
     SimulationExecution,
     SimulationScenario,
@@ -13,8 +13,8 @@ import sessionService from './session.service';
 import openAIService from './openai.service';
 import IntentClassifier from './intent-classifier.service';
 import FlowManager from './flow-manager.service';
-import { ConversationAnalyzerService } from './conversation-analyzer.service';
-import { ExecutionTimerService } from './execution-timer.service';
+import {ConversationAnalyzerService} from './conversation-analyzer.service';
+import {ExecutionTimerService} from './execution-timer.service';
 import DatabaseService from './database.service';
 
 /**
@@ -57,18 +57,18 @@ export class SimulationManager {
 
         try {
             const simulationId = uuidv4();
-            
+
             // Utworz sesje dla każdego uczestnika
             const participantSessions = new Map<string, string>();
-            
+
             for (const participant of scenario.participants) {
                 const sessionId = uuidv4();
-                
+
                 // Załaduj odpowiednie flow definitions dla typu avatara
                 await this.flowManager.loadFlowDefinitionsForAvatar(participant.avatarType);
-                
+
                 participantSessions.set(participant.id, sessionId);
-                
+
                 console.log(`✅ Created session ${sessionId} for participant ${participant.id} (${participant.avatarType})`);
             }
 
@@ -94,7 +94,7 @@ export class SimulationManager {
 
             timer.stop();
             console.log(`🚀 Started simulation ${simulationId} with ${scenario.participants.length} participants`);
-            
+
             return simulation;
         } catch (error) {
             timer.stop();
@@ -118,9 +118,9 @@ export class SimulationManager {
         try {
             // Wybierz conversation starter
             const starterMessage = this.selectConversationStarter(simulation.scenario);
-            
+
             // Rozpocznij od pierwszego uczestnika (zazwyczaj teacher/seller)
-            const initiatingParticipant = simulation.scenario.participants.find(p => 
+            const initiatingParticipant = simulation.scenario.participants.find(p =>
                 ['teacher', 'seller', 'interviewer'].includes(p.role)
             ) || simulation.scenario.participants[0];
 
@@ -135,7 +135,7 @@ export class SimulationManager {
             // Główna pętla konwersacji
             while (simulation.current_turn < simulation.max_turns && simulation.status === 'running') {
                 await this.executeConversationTurn(simulationId, config);
-                
+
                 // Opcjonalna analiza w czasie rzeczywistym
                 if (config.enable_real_time_analysis && simulation.current_turn % 5 === 0) {
                     await this.updateRealTimeAnalysis(simulationId);
@@ -187,7 +187,7 @@ export class SimulationManager {
 
             // Przygotuj kontekst konwersacji
             const conversationContext = this.buildConversationContext(simulation, respondingParticipant);
-            
+
             // Sklasyfikuj intencję ostatniej wiadomości
             const intentResult = await this.intentClassifier.classifyIntent(
                 lastMessage.content
@@ -231,48 +231,49 @@ export class SimulationManager {
         conversationContext: string,
         intentResult: IntentClassificationResult
     ): Promise<string> {
-        
+
         // Zbuduj prompt specyficzny dla roli uczestnika
         const rolePrompt = this.buildRoleSpecificPrompt(participant, intentResult);
-        
+
         // Pobierz historię konwersacji
-        const simulation = this.activeSimulations.get(participant.id.split('_')[0]) || 
-                          Array.from(this.activeSimulations.values())[0];
+        const simulation = this.activeSimulations.get(participant.id.split('_')[0]) ||
+            Array.from(this.activeSimulations.values())[0];
         const conversationHistory = simulation ? this.buildConversationHistory(simulation) : '';
 
         // Zbuduj pełny prompt z instrukcjami przeciw powtarzaniu powitań
-        const systemContext = `Jesteś ${participant.persona.name}, ${participant.persona.background}. 
-Odpowiadaj w naturalny sposób zgodnie ze swoją rolą: ${participant.role}.
-Styl komunikacji: ${participant.persona.communication_style}.
-Cechy osobowości: ${participant.persona.personality_traits.join(', ')}.
+        const systemPrompt = {
+            role: 'system' as const,
+            content:
+                `Jesteś ${participant.persona.name}, ${participant.persona.background}. 
+                Odpowiadaj w naturalny sposób zgodnie ze swoją rolą: ${participant.role}.
+                Styl komunikacji: ${participant.persona.communication_style}.
+                Cechy osobowości: ${participant.persona.personality_traits.join(', ')}.
+                
+                WAŻNE INSTRUKCJE:
+                - NIE powtarzaj powitań (dzień dobry, witam, cześć) jeśli już się przywitałeś
+                - Prowadź naturalną konwersację kontynuując poprzednie wątki
+                - Odpowiadaj na konkretne pytania i komentarze rozmówcy
+                - Nie zaczynaj od nowa - to kontynuacja rozmowy`
+        };
 
-WAŻNE INSTRUKCJE:
-- NIE powtarzaj powitań (dzień dobry, witam, cześć) jeśli już się przywitałeś
-- Prowadź naturalną konwersację kontynuując poprzednie wątki
-- Odpowiadaj na konkretne pytania i komentarze rozmówcy
-- Nie zaczynaj od nowa - to kontynuacja rozmowy
-
-${rolePrompt}
-
-HISTORIA KONWERSACJI:
-${conversationHistory}
-
-KONTEKST KONWERSACJI:
-${conversationContext}
-
-OSTATNIA WIADOMOŚĆ OD ROZMÓWCY:
-"${inputMessage}"
-
-TWOJA ODPOWIEDŹ (jako ${participant.persona.name}, KONTYNUUJ rozmowę, NIE witaj się ponownie):`;
-
-        // Wygeneruj odpowiedź przez OpenAI używając istniejącej metody
         const userPrompt = {
             role: 'user' as const,
-            content: systemContext
-        };
-        
-        const response = await this.openAIService.generateResponse(userPrompt);
+            content:
+                `${rolePrompt}
 
+                HISTORIA KONWERSACJI:
+                ${conversationHistory}
+                
+                KONTEKST KONWERSACJI:
+                ${conversationContext}
+                
+                OSTATNIA WIADOMOŚĆ OD ROZMÓWCY:
+                "${inputMessage}"
+                
+                TWOJA ODPOWIEDŹ (jako ${participant.persona.name}, KONTYNUUJ rozmowę, NIE witaj się ponownie):`
+        };
+
+        const response = await this.openAIService.generateResponse(userPrompt, systemPrompt);
         return response.trim();
     }
 
@@ -286,7 +287,7 @@ TWOJA ODPOWIEDŹ (jako ${participant.persona.name}, KONTYNUUJ rozmowę, NIE wita
 
         // Pokaż ostatnie 5 wiadomości dla kontekstu
         const recentMessages = simulation.messages.slice(-5);
-        
+
         return recentMessages.map(message => {
             const participant = simulation.scenario.participants.find(p => p.id === message.participant_id);
             const speakerName = participant?.persona.name || 'Nieznany';
@@ -298,11 +299,11 @@ TWOJA ODPOWIEDŹ (jako ${participant.persona.name}, KONTYNUUJ rozmowę, NIE wita
      * Buduje prompt specyficzny dla roli uczestnika
      */
     private buildRoleSpecificPrompt(
-        participant: SimulationParticipant, 
+        participant: SimulationParticipant,
         intentResult: IntentClassificationResult
     ): string {
         const persona = participant.persona;
-        
+
         let rolePrompt = `TWOJA ROLA: ${participant.role}
 POZIOM DOŚWIADCZENIA: ${persona.expertise_level}
 BRANŻA: ${persona.industry}
@@ -325,7 +326,7 @@ ${persona.challenges.map(challenge => `- ${challenge}`).join('\n')}`;
 - Bądź skeptyczny ale konstruktywny
 - Żądaj konkretnych przykładów i dowodów`;
                 break;
-                
+
             case 'seller':
             case 'teacher':
                 rolePrompt += `\n\nJAKO ${participant.role.toUpperCase()}:
@@ -335,7 +336,7 @@ ${persona.challenges.map(challenge => `- ${challenge}`).join('\n')}`;
 - Buduj zaufanie i rapport
 - Prowadź rozmowę w kierunku zamknięcia/zrozumienia`;
                 break;
-                
+
             case 'interviewee':
                 rolePrompt += `\n\nJAKO KANDYDAT:
 - Odpowiadaj na pytania szczerze ale pozytywnie
@@ -343,7 +344,7 @@ ${persona.challenges.map(challenge => `- ${challenge}`).join('\n')}`;
 - Zadawaj przemyślane pytania o firmę/stanowisko
 - Pokazuj zaangażowanie i motywację`;
                 break;
-                
+
             case 'interviewer':
                 rolePrompt += `\n\nJAKO REKRUTER:
 - Zadawaj pytania sprawdzające kompetencje
@@ -366,11 +367,11 @@ ODPOWIEDZ W SPOSÓB ODPOWIADAJĄCY TEJ INTENCJI.`;
      * Buduje kontekst konwersacji dla uczestnika
      */
     private buildConversationContext(
-        simulation: SimulationExecution, 
+        simulation: SimulationExecution,
         participant: SimulationParticipant
     ): string {
         const recentMessages = simulation.messages.slice(-6); // Ostatnie 6 wiadomości
-        
+
         let context = `SCENARIUSZ: ${simulation.scenario.name}
 CEL ROZMOWY: ${simulation.scenario.objective}
 BRANŻA: ${simulation.scenario.context.industry}
@@ -393,7 +394,7 @@ HISTORIA ROZMOWY:`;
     private getNextRespondingParticipant(simulation: SimulationExecution): SimulationParticipant | null {
         if (simulation.messages.length === 0) {
             // Pierwsza wiadomość - wybierz initiating participant
-            return simulation.scenario.participants.find(p => 
+            return simulation.scenario.participants.find(p =>
                 ['teacher', 'seller', 'interviewer'].includes(p.role)
             ) || simulation.scenario.participants[0];
         }
@@ -405,7 +406,7 @@ HISTORIA ROZMOWY:`;
         const participants = simulation.scenario.participants;
         const lastIndex = participants.findIndex(p => p.id === lastParticipantId);
         const nextIndex = (lastIndex + 1) % participants.length;
-        
+
         return participants[nextIndex];
     }
 
@@ -439,7 +440,7 @@ HISTORIA ROZMOWY:`;
         };
 
         simulation.messages.push(message);
-        
+
         // Aktualizuj analizę
         this.updateMessageAnalysis(simulation, message);
 
@@ -459,26 +460,26 @@ HISTORIA ROZMOWY:`;
      */
     private updateMessageAnalysis(simulation: SimulationExecution, message: SimulationMessage): void {
         const analysis = simulation.analysis;
-        
+
         // Aktualizuj dystrybucję intencji
         const currentCount = analysis.intent_distribution.get(message.intent) || 0;
         analysis.intent_distribution.set(message.intent, currentCount + 1);
-        
+
         // Aktualizuj metryki czasu odpowiedzi
         if (message.response_time_ms > 0) {
             const times = analysis.response_times;
             times.min = Math.min(times.min, message.response_time_ms);
             times.max = Math.max(times.max, message.response_time_ms);
-            
+
             // Przelicz średnią
             const totalMessages = simulation.messages.length;
             const totalTime = (times.average * (totalMessages - 1)) + message.response_time_ms;
             times.average = totalTime / totalMessages;
         }
-        
+
         // Aktualizuj metryki konwersacji
         analysis.conversation_metrics.total_turns = simulation.messages.length;
-        analysis.conversation_metrics.avg_message_length = 
+        analysis.conversation_metrics.avg_message_length =
             simulation.messages.reduce((sum, msg) => sum + msg.content.length, 0) / simulation.messages.length;
     }
 
@@ -529,7 +530,7 @@ HISTORIA ROZMOWY:`;
         const keyIntents = ['solution_presentation', 'meeting_arrangement', 'purchase_decision'];
         const presentIntents = Array.from(simulation.analysis.intent_distribution.keys());
         const matchedIntents = keyIntents.filter(intent => presentIntents.includes(intent));
-        
+
         return matchedIntents.length / keyIntents.length;
     }
 
@@ -559,8 +560,8 @@ HISTORIA ROZMOWY:`;
 
         // Partial analysis update
         const partialAnalysis = await this.conversationAnalyzer.analyzeConversationPartial(simulation);
-        simulation.analysis = { ...simulation.analysis, ...partialAnalysis };
-        
+        simulation.analysis = {...simulation.analysis, ...partialAnalysis};
+
         console.log(`📈 Real-time analysis updated for simulation ${simulationId}`);
     }
 
@@ -660,7 +661,7 @@ HISTORIA ROZMOWY:`;
             // Load simulation avatars config
             const simulationAvatarsConfig = await this.loadSimulationAvatarsConfig();
             const avatarData = simulationAvatarsConfig.simulation_avatars[avatarId];
-            
+
             if (!avatarData) {
                 throw new Error(`Avatar ${avatarId} not found in simulation config`);
             }
@@ -676,8 +677,8 @@ HISTORIA ROZMOWY:`;
 
             // Build role-specific system prompt
             const systemPrompt = customPrompts?.system_prompt || this.buildDefaultReactiveSystemPrompt(
-                avatarData, 
-                avatarId, 
+                avatarData,
+                avatarId,
                 userRole,
                 userCompany,
                 companyProfile
@@ -699,15 +700,12 @@ HISTORIA ROZMOWY:`;
                 .replace(/\{\{avatar_name\}\}/g, `${avatarData.firstName} ${avatarData.lastName}`)
                 .replace(/\{\{user_role\}\}/g, userRole === 'trainer' ? 'TRENER' : 'SPRZEDAWCA');
 
-            // Generate response using OpenAI
-            const openAIMessages = [
-                { role: 'system', content: systemPrompt },
-                { role: 'user', content: finalUserPrompt }
-            ];
-
             const response = await this.openAIService.generateResponse({
                 role: 'user',
-                content: JSON.stringify(openAIMessages)
+                content: finalUserPrompt
+            }, {
+                role: 'system',
+                content: systemPrompt
             });
 
             timer.stop();
@@ -785,22 +783,22 @@ HISTORIA ROZMOWY:`;
      * Build default system prompt for reactive avatar
      */
     private buildDefaultReactiveSystemPrompt(
-        avatarData: any, 
-        avatarId: 'client' | 'student', 
+        avatarData: any,
+        avatarId: 'client' | 'student',
         userRole: 'trainer' | 'seller',
         userCompany: string = 'aureus',
         companyProfile: any = null
     ): string {
         // Get company info for context
         const companyInfo = this.getCompanyInfo(userCompany);
-        
+
         // Build company context from profile or defaults
         let companyContext = companyProfile?.company_context || companyInfo.services.join(', ');
         let roleDescription = companyProfile?.your_role_description || `${userRole === 'trainer' ? 'Trener' : 'Sprzedawca'} z firmy ${companyInfo.name}`;
         let currentSituation = companyProfile?.current_situation || 'Prezentacja rozwiązań biznesowych';
         let goalsObjectives = companyProfile?.goals_objectives || 'Znalezienie najlepszego rozwiązania dla klienta';
         let keyChallenges = companyProfile?.key_challenges || 'Budżet i czas implementacji';
-        
+
         const basePrompt = `Jesteś ${avatarData.firstName} ${avatarData.lastName}, ${avatarData.position} w firmie ${avatarData.company.name}.
 
 ROZMAWASZ Z: ${roleDescription}

@@ -106,7 +106,9 @@ class PromptBuilder {
         } else if (context.avatar_id) {
             console.log(`🎯 PromptBuilder: Skipping default system prompt (custom avatar detected)`);
         }
-        
+
+      console.log(`PromptBuilder: systemPrompt = ${systemPrompt}`);
+        console.log(`PromptBuilder: userPrompt = ${userPrompt}`);
         timer.stop();
         return { systemPrompt, userPrompt };
     }

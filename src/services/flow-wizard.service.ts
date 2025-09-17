@@ -949,9 +949,10 @@ Odpowiedz tylko nazwą branży, bez dodatkowych komentarzy.`;
 
             const response = await this.openAIService.generateResponse({
                 role: 'user',
-                content: `SYSTEM: Jesteś ekspertem od tworzenia profili biznesowych. Generujesz precyzyjne, profesjonalne opisy zgodnie z instrukcjami.
-
-USER: ${prompt}`
+                content: `USER: ${prompt}`
+            }, {
+                role: 'system',
+                content: 'Jesteś ekspertem od tworzenia profili biznesowych. Generujesz precyzyjne, profesjonalne opisy zgodnie z instrukcjami.'
             });
 
             return response.trim();

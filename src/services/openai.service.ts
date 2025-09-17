@@ -104,7 +104,7 @@ class OpenAIService {
     /**
      * Generates response to user query
      */
-    public async generateResponse(userPrompt: UserPrompt) {
+    public async generateResponse(userPrompt: UserPrompt, systemPrompt: SystemPrompt | null = null) {
         // For testing purposes, if no API key, return test response
         if (!OPENAI_API_KEY || OPENAI_API_KEY === 'your_openai_api_key_here') {
             console.log('No OpenAI API key. Returning test response.');
@@ -115,7 +115,11 @@ class OpenAIService {
         const executionTimerService = new ExecutionTimerService('generateResponse in OpenAIService');
         executionTimerService.start();
 
-        const messages = this.generatePrompts(userPrompt);
+        let messages: Prompt[] = [userPrompt];
+        if (systemPrompt) {
+          messages.push(systemPrompt);
+        }
+        // const messages = this.generatePrompts(userPrompt);
         try {
             const response = await this.client.chat.completions.create({
                 // model: 'gpt-4o',
@@ -136,7 +140,7 @@ class OpenAIService {
 
     private generatePrompts(userPrompt: UserPrompt): Prompt[] {
         const messages: Prompt[] = [];
-        messages.push(this.generateSystemPrompt());
+        messages.push(this.generateLeasingAdvisorSystemPrompt());
         messages.push(userPrompt);
 
         console.log('Prompts:');
@@ -148,7 +152,7 @@ class OpenAIService {
         return messages;
     }
 
-    private generateSystemPrompt(): SystemPrompt {
+    public generateLeasingAdvisorSystemPrompt(): SystemPrompt {
         return {
             role: 'system',
             content: `Jesteś Doradcą Leasingowym firmy Aureus, ekspertem w dziedzinie leasingu i finansowania biznesu.
@@ -205,7 +209,8 @@ class OpenAIService {
 
     public async generateStreamingResponse(
         userPrompt: UserPrompt,
-        onChunk: (chunk: string) => void
+        onChunk: (chunk: string) => void,
+        systemPrompt: SystemPrompt | null = null
     ) {
         // For testing purposes, if no API key, return test response in chunks
         if (!OPENAI_API_KEY || OPENAI_API_KEY === 'your_openai_api_key_here') {
@@ -224,7 +229,11 @@ class OpenAIService {
         const executionTimerService = new ExecutionTimerService('generateStreamingResponse in OpenAIService');
         executionTimerService.start();
 
-        const messages = this.generatePrompts(userPrompt);
+        // const messages = this.generatePrompts(userPrompt);
+        let messages: Prompt[] = [userPrompt];
+        if (systemPrompt) {
+            messages.push(systemPrompt);
+        }
 
         try {
             // Create stream for completion
