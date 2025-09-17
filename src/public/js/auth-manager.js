@@ -270,7 +270,10 @@ class AuthManager {
         //     ...options.headers
         // };
 
-        const headers = {};
+        const headers = {
+            'Content-Type': 'application/json',
+            ...options.headers
+        };
         const response = await fetch(url, {
             ...options,
             headers
