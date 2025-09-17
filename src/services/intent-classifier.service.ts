@@ -380,11 +380,12 @@ Zwróć TYLKO nazwę intencji, nic więcej.`;
             const customIntents = this.customIntentDefinitions.get(avatarId)!;
             
             // Basic system intents that every avatar needs
-            const basicSystemIntents = ['greeting', 'email_provided', 'email_promise', 'conversation_redirect'];
-            const systemIntents = this.intentDefinitions.filter(intent => 
-                basicSystemIntents.includes(intent.name)
-            );
-            
+            // const basicSystemIntents = ['greeting', 'email_provided', 'email_promise', 'conversation_redirect'];
+            // const systemIntents = this.intentDefinitions.filter(intent =>
+            //     basicSystemIntents.includes(intent.name)
+            // );
+
+          const systemIntents = this.intentDefinitions;
             const combinedIntents = [...systemIntents, ...customIntents];
             console.log(`🎯 IntentClassifier: Using ${systemIntents.length} system + ${customIntents.length} custom intents for avatar ${avatarId}`);
             return combinedIntents;
