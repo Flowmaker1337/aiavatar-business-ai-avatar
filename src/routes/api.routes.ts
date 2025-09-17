@@ -183,6 +183,9 @@ router.get('/knowledge/health',
 // Create new simulation
 router.post('/simulation/create', simulationController.createSimulation.bind(simulationController));
 
+// Get all active simulations - MUST be before /:id routes
+router.get('/simulation/active', simulationController.getActiveSimulations.bind(simulationController));
+
 // Get simulation info
 router.get('/simulation/:id', simulationController.getSimulation.bind(simulationController));
 
@@ -198,10 +201,7 @@ router.post('/simulation/:id/pause', simulationController.pauseSimulation.bind(s
 // Resume simulation
 router.post('/simulation/:id/resume', simulationController.resumeSimulation.bind(simulationController));
 
-// Get all active simulations
-router.get('/simulation/active', simulationController.getActiveSimulations.bind(simulationController));
-
-// Get scenario templates
+// Get scenario templates - specific routes before parametrized routes
 router.get('/simulation/templates/scenarios', simulationController.getScenarioTemplates.bind(simulationController));
 
 // Get persona templates
@@ -212,7 +212,7 @@ router.post('/simulation/export/:id', simulationController.exportSimulation.bind
 
 // ============ SIMULATION CHAT MODE ENDPOINTS ============
 
-// Start simulation chat session
+// Start simulation chat session - specific routes before parametrized routes
 router.post('/simulation/start', simulationController.startChatSimulation.bind(simulationController));
 
 // Send message in simulation chat
