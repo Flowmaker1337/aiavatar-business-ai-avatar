@@ -1,6 +1,32 @@
 {
   "flows": [
     {
+      "id": "greeting_flow",
+      "name": "Powitanie i nawiązanie kontaktu",
+      "description": "Proces powitania i zbudowania pierwszego kontaktu z użytkownikiem",
+      "entry_intents": ["greeting"],
+      "priority": 10,
+      "steps": [
+        {
+          "id": "initial_greeting",
+          "name": "Powitanie",
+          "description": "Ciepłe powitanie użytkownika",
+          "required": true,
+          "next_steps": ["conversation_opener"]
+        },
+        {
+          "id": "conversation_opener",
+          "name": "Otwarcie rozmowy",
+          "description": "Zaproszenie do rozmowy o potrzebach",
+          "required": true,
+          "next_steps": ["completed"]
+        }
+      ],
+      "success_criteria": ["initial_greeting", "conversation_opener"],
+      "max_duration": 300,
+      "repeatable": false
+    },
+    {
       "id": "theory_introduction_flow", 
       "name": "Wprowadzenie teorii",
       "description": "Systematyczne przedstawienie teoretycznych podstaw tematu z definicjami i wyjaśnieniami",

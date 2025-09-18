@@ -2,13 +2,12 @@
   "intents": [
     {
       "name": "greeting",
-      "description": "Rozpoczęcie rozmowy z użytkownikiem w uprzejmy, profesjonalny sposób",
+      "description": "Użytkownika wita się",
       "keywords": ["cześć", "dzień dobry", "witaj", "hello", "hej", "miło poznać"],
       "examples": [
         "Dzień dobry, miło mi poznać",
         "Cześć, jak się masz?",
-        "Witam, jestem...",
-        "Hello, nice to meet you"
+        "Witam, jestem..."
       ],
       "requires_flow": true,
       "flow_name": "greeting_flow",

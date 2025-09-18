@@ -1,6 +1,20 @@
 {
   "intents": [
     {
+      "name": "greeting",
+      "description": "Użytkownika wita się",
+      "keywords": ["cześć", "dzień dobry", "witaj", "hello", "hej", "miło poznać"],
+      "examples": [
+        "Dzień dobry, miło mi poznać",
+        "Cześć, jak się masz?",
+        "Witam, jestem..."
+      ],
+      "requires_flow": true,
+      "flow_name": "greeting_flow",
+      "repeatable": true,
+      "priority": 10
+    },
+    {
       "name": "theory_request",
       "description": "Prośba o wyjaśnienie teorii, definicji lub koncepcji",
       "keywords": ["wyjaśnij", "teoria", "definicja", "koncepcja", "podstawy", "czym jest"],
@@ -335,6 +349,20 @@
       "flow_name": "next_steps_flow",
       "repeatable": true,
       "priority": 5
+    },
+    {
+      "name": "user_comments",
+      "description": "Komentarze i luźne wypowiedzi użytkownika",
+      "keywords": ["eh", "ale", "hmm", "ciekawe", "fajnie", "super"],
+      "examples": [
+        "Ale dziś mam ciężki dzień...",
+        "Hmm, ciekawe podejście",
+        "Fajnie, że tak myślicie",
+        "Super, bardzo mi się podoba"
+      ],
+      "requires_flow": false,
+      "repeatable": true,
+      "priority": 3
     }
   ],
   "intent_categories": {

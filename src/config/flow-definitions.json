@@ -31,7 +31,7 @@
       ],
       "success_criteria": ["initial_greeting", "company_introduction", "conversation_opener"],
       "max_duration": 300,
-      "repeatable": true
+      "repeatable": false
     },
     {
       "id": "company_presentation_flow",

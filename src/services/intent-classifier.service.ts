@@ -193,56 +193,24 @@ class IntentClassifier {
     private createClassificationPrompt(avatarId?: string): string {
         const allIntents = this.getIntentDefinitionsForAvatar(avatarId);
         console.log(`🔧 IntentClassifier: Creating prompt for ${allIntents.length} intents:`, allIntents.map(i => i.name).join(', '));
-        const intentList = allIntents.map(intent => `- ${intent.name}`).join('\n');
+        let intentList = '';
+        for (const intent of allIntents) {
+            intentList += `Opis intencji: ${intent.description}\n`;
+
+            const examples = intent.examples.map(example => `- ${example}`).join('\n');
+            if (examples.length > 0) {
+                intentList += `Przykłady:\n`;
+                intentList += examples;
+                intentList += '\n';
+            }
+
+            intentList += `Nazwa intencji: ${intent.name}\n\n`;
+        }
 
         return `Zadanie: Na podstawie wypowiedzi użytkownika, wybierz najbardziej pasującą intencję spośród poniższych:
 
-${intentList}
-
-Przykład:
-Użytkownik: "Chciałbym dowiedzieć się czym się zajmujecie."
-Odpowiedź: ask_about_npc_firm
-
-Użytkownik: "Potrzebuję wsparcia w marketingu."
-Odpowiedź: user_needs
-
-Użytkownik: "Nasza firma zajmuje się produkcją."
-Odpowiedź: user_firm_info
-
-Użytkownik: "O szczegółach najlepiej gdybyś porozmawiał z moim zespołem."
-Odpowiedź: conversation_redirect
-
-Użytkownik: "Skontaktuj się z naszym zespołem."
-Odpowiedź: conversation_redirect
-
-Użytkownik: "jan.kowalski@firma.pl"
-Odpowiedź: email_provided
-
-Użytkownik: "Mój email to kowalski@example.com"
-Odpowiedź: email_provided
-
-Użytkownik: "kowalski@gmail.com to jego email"
-Odpowiedź: email_provided
-
-Użytkownik: "Podam Ci mail do kierownika"
-Odpowiedź: email_promise
-
-Użytkownik: "Dam Ci jego email"
-Odpowiedź: email_promise
-
-Użytkownik: "To brzmi interesująco, mogłoby nam się przydać"
-Odpowiedź: npc_interest_in_user_offer
-
-Użytkownik: "Jesteśmy zainteresowani Twoim rozwiązaniem"
-Odpowiedź: npc_interest_in_user_offer
-
-Użytkownik: "Oferujemy rozwiązania z zakresu automatyzacji"
-Odpowiedź: user_presenting_offer
-
-Użytkownik: "Specjalizujemy się w systemach CRM"
-Odpowiedź: user_presenting_offer
-
-Zwróć TYLKO nazwę intencji, nic więcej.`;
+        ${intentList}
+        Zwróć TYLKO nazwę intencji, nic więcej.`;
     }
 
     /**
