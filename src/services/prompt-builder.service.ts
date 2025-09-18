@@ -213,7 +213,9 @@ WAŻNE! Odpowiadaj krótkimi zdaniami w maksymalnej ilości 3 zdań i cała odpo
 
         // Zamień placeholdery
         systemPrompt = this.replacePlaceholders(systemPrompt, context);
-        console.log('🔧 PromptBuilder: Final system prompt content:', systemPrompt.substring(0, 100) + '...');
+        systemPrompt += '\nZakaz używania: formatowania tekstu, znaków końca linii, znaków wcięć, znaków tabulacji, list wypunktowanych i numerycznych, wyliczeń, akapitów.\nWAŻNE! Odpowiadaj krótkimi zdaniami w maksymalnej ilości 3 zdań i cała odpowiedź ma mieć maksymalnie 350 znaków.';
+        // console.log('🔧 PromptBuilder: Final system prompt content:', systemPrompt.substring(0, 100) + '...');
+        console.log('🔧 PromptBuilder: Final system prompt content:', systemPrompt);
 
         return {
             role: 'system',
@@ -226,7 +228,8 @@ WAŻNE! Odpowiadaj krótkimi zdaniami w maksymalnej ilości 3 zdań i cała odpo
      */
     private buildUserPrompt(template: PromptTemplate, context: PromptContext): UserPrompt {
         console.log(`🔧 PromptBuilder: Building user prompt for template '${template.id}' (${template.intent})`);
-        console.log(`🔧 PromptBuilder: Template content preview: ${template.user_prompt_template.substring(0, 100)}...`);
+        // console.log(`🔧 PromptBuilder: Template content preview: ${template.user_prompt_template.substring(0, 100)}...`);
+        // console.log(`🔧 PromptBuilder: Template content preview: ${template.user_prompt_template}`);
         
         let userPrompt = template.user_prompt_template;
 
@@ -236,7 +239,8 @@ WAŻNE! Odpowiadaj krótkimi zdaniami w maksymalnej ilości 3 zdań i cała odpo
         // Dodaj kontekst
         userPrompt = this.addContextToPrompt(userPrompt, context);
 
-        console.log(`🔧 PromptBuilder: Final user prompt preview: ${userPrompt.substring(0, 200)}...`);
+        // console.log(`🔧 PromptBuilder: Final user prompt preview: ${userPrompt.substring(0, 200)}...`);
+        console.log(`🔧 PromptBuilder: Final user prompt content: ${userPrompt}`);
 
         return {
             role: 'user',
@@ -247,7 +251,7 @@ WAŻNE! Odpowiadaj krótkimi zdaniami w maksymalnej ilości 3 zdań i cała odpo
     /**
      * Zamienia placeholdery w tekście
      */
-    private replacePlaceholders(text: string, context: PromptContext): string {
+    public replacePlaceholders(text: string, context: PromptContext): string {
         let result = text;
 
         // Podstawowe placeholdery
@@ -260,10 +264,12 @@ WAŻNE! Odpowiadaj krótkimi zdaniami w maksymalnej ilości 3 zdań i cała odpo
         if (context.avatar) {
             result = result.replace(/\{\{npc_persona\.firstName\}\}/g, context.avatar.firstName || '');
             result = result.replace(/\{\{npc_persona\.lastName\}\}/g, context.avatar.lastName || '');
+            result = result.replace(/\{\{npc_persona\.tone\}\}/g, context.avatar.personality.tone || '');
             result = result.replace(/\{\{npc_company\.name\}\}/g, context.avatar.company?.name || '');
             result = result.replace(/\{\{npc_company\.specialization\}\}/g, context.avatar.company?.specializations?.join(', ') || '');
             result = result.replace(/\{\{npc_company\.services\}\}/g, context.avatar.company?.offer?.join(', ') || '');
             result = result.replace(/\{\{npc_company\.mission\}\}/g, context.avatar.company?.mission || '');
+            result = result.replace(/\{\{suggested_topics\}\}/g, context.avatar.suggested_topics?.join(', ') || '');
         }
 
         // User company placeholdery (domyślne wartości jeśli nie ma danych)
@@ -392,6 +398,30 @@ WAŻNE! Odpowiadaj krótkimi zdaniami w maksymalnej ilości 3 zdań i cała odpo
         };
 
         return await this.buildPrompt(context);
+    }
+
+    public createPromptContext(
+        intent: string,
+        userMessage: string,
+        avatar: BusinessAvatar,
+        mindState: MindStateStack,
+        ragContext?: string,
+        chatHistory?: string,
+        flowContext?: Record<string, any>,
+        avatarId?: string
+    ): PromptContext {
+        return {
+            user_message: userMessage,
+            chat_history: chatHistory || '',
+            mind_state: mindState,
+            avatar,
+            current_intent: intent,
+            current_flow: mindState.current_flow,
+            current_flow_step: mindState.current_flow_step,
+            rag_context: ragContext,
+            flow_context: flowContext,
+            avatar_id: avatarId // Dodaj avatarId do context
+        };
     }
 
     /**

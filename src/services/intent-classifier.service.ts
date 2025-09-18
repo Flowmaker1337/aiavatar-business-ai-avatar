@@ -1,9 +1,18 @@
 import fs from 'fs';
 import path from 'path';
 import openAIService from './openai.service';
-import { IntentClassificationResult, IntentDefinition, MindStateStack, UserPrompt, CustomAvatar, CustomIntent } from '../models/types';
-import { ExecutionTimerService } from './execution-timer.service';
+import {
+    IntentClassificationResult,
+    IntentDefinition,
+    MindStateStack,
+    UserPrompt,
+    CustomAvatar,
+    CustomIntent, PromptContext
+} from '../models/types';
+import {ExecutionTimerService} from './execution-timer.service';
 import CustomAvatarService from './custom-avatar.service';
+import PromptBuilder from "./prompt-builder.service";
+import PromptBuilderService from "./prompt-builder.service";
 
 /**
  * IntentClassifier - klasyfikuje intencje użytkownika na podstawie jego wiadomości
@@ -42,7 +51,7 @@ class IntentClassifier {
 
             this.intentDefinitions = data.intents;
             this.initialized = true;
-            
+
             console.log(`✅ IntentClassifier initialized with ${this.intentDefinitions.length} intent definitions`);
         } catch (error) {
             console.error('❌ Failed to initialize IntentClassifier:', error);
@@ -56,18 +65,18 @@ class IntentClassifier {
     public async loadIntentDefinitionsForAvatar(avatarType: string): Promise<void> {
         try {
             let fileName = 'intent-definitions.json'; // Default networker
-            
+
             if (avatarType === 'trainer') {
                 fileName = 'training-intent-definitions.json';
             }
-            
+
             const filePath = path.resolve(__dirname, `../config/${fileName}`);
             const rawData = fs.readFileSync(filePath, 'utf-8');
             const data = JSON.parse(rawData);
 
             this.intentDefinitions = data.intents;
             this.initialized = true; // Mark as initialized after loading avatar-specific definitions
-            
+
             console.log(`✅ IntentClassifier loaded ${this.intentDefinitions.length} intent definitions for avatar type: ${avatarType}`);
         } catch (error) {
             console.error(`❌ Failed to load intent definitions for avatar type ${avatarType}:`, error);
@@ -86,7 +95,7 @@ class IntentClassifier {
      */
     public async classifyIntent(
         userMessage: string,
-        mindState?: MindStateStack,
+        context: PromptContext,
         avatarId?: string
     ): Promise<IntentClassificationResult> {
         if (!this.initialized) {
@@ -99,8 +108,7 @@ class IntentClassifier {
         }
 
         // Użyj OpenAI do klasyfikacji - bez keyword matching!
-        const aiResult = await this.classifyWithOpenAI(userMessage, mindState, avatarId);
-        return aiResult;
+        return await this.classifyWithOpenAI(userMessage, context, avatarId);
     }
 
     /**
@@ -108,39 +116,45 @@ class IntentClassifier {
      */
     private async classifyWithOpenAI(
         userMessage: string,
-        mindState?: MindStateStack,
+        context: PromptContext,
         avatarId?: string
     ): Promise<IntentClassificationResult> {
         const timer = new ExecutionTimerService('classifyIntent in IntentClassifier');
         timer.start();
-        
+
         console.log(`🔍 Intent classification for: "${userMessage}"`);
 
         try {
             // Sprawdź czy mamy API key
             const apiKey = openAIService.getClient().apiKey;
             console.log(`🔑 API Key check: ${apiKey ? 'Present' : 'Missing'} (${apiKey?.substring(0, 10)}...)`);
-            
+
             if (!apiKey || apiKey === 'fake-api-key') {
                 console.log('❌ No OpenAI API key. Using keyword matching fallback.');
                 timer.stop();
                 return this.fallbackToKeywordMatching(userMessage);
             }
 
-            const systemPrompt = this.createClassificationPrompt(avatarId);
-            const userPrompt = this.createUserPrompt(userMessage, mindState);
-            
+            const systemPrompt = this.createClassificationPrompt(context, avatarId);
+            const userPrompt = this.createUserPrompt(userMessage, context.mind_state);
+
+            // console.log(`Check intent system prompt content: ${systemPrompt}`);
+            // console.log(`Check intent user prompt content: ${userPrompt}`);
+
             console.log(`📤 Sending to OpenAI...`);
 
             // Bezpośrednie użycie OpenAI API
             const response = await openAIService.getClient().chat.completions.create({
                 model: 'gpt-3.5-turbo',
                 messages: [
-                    { role: 'system', content: systemPrompt },
-                    { role: 'user', content: userPrompt }
+                    {role: 'system', content: systemPrompt},
+                    {role: 'user', content: userPrompt}
                 ],
-                max_tokens: 20,
-                temperature: 0.1
+                // max_tokens: 20,
+                temperature: 0,
+                top_p: 1,
+                frequency_penalty: 0,
+                presence_penalty: 0
             });
 
             timer.stop();
@@ -152,19 +166,31 @@ class IntentClassifier {
 
             const intentName = content.trim();
             console.log(`✅ OpenAI classified intent: "${intentName}" for message: "${userMessage}"`);
-            
+            // console.log(JSON.stringify(response, null, 2));
+
+            if (intentName === 'unknown') {
+                return {
+                    intent: 'unknown',
+                    confidence: 0.3,
+                    entities: {},
+                    requires_flow: false,
+                    flow_name: '',
+                    is_continuation: false
+                };
+            }
+
             // Znajdź definicję intencji (w standard + custom intents)
             const allIntents = this.getIntentDefinitionsForAvatar(avatarId);
             const intentDef = allIntents.find(def => def.name === intentName);
             if (!intentDef) {
-                console.warn(`⚠️ Unknown intent returned by OpenAI: ${intentName}, falling back to user_comments`);
-                const fallbackDef = allIntents.find(def => def.name === 'user_comments');
+                console.warn(`⚠️ Unknown intent returned by OpenAI: ${intentName}, falling back to unknown`);
+                // const fallbackDef = allIntents.find(def => def.name === 'user_comments');
                 return {
-                    intent: 'user_comments',
+                    intent: 'unknown',
                     confidence: 0.3,
                     entities: {},
-                    requires_flow: fallbackDef?.requires_flow || false,
-                    flow_name: fallbackDef?.flow_name,
+                    requires_flow: false,
+                    flow_name: '',
                     is_continuation: false
                 };
             }
@@ -181,7 +207,7 @@ class IntentClassifier {
         } catch (error) {
             timer.stop();
             console.error('❌ Error in OpenAI intent classification:', error);
-            
+
             // Fallback do keyword matching
             return this.fallbackToKeywordMatching(userMessage);
         }
@@ -190,7 +216,7 @@ class IntentClassifier {
     /**
      * Tworzy system prompt dla klasyfikacji intencji
      */
-    private createClassificationPrompt(avatarId?: string): string {
+    private createClassificationPrompt(context: PromptContext, avatarId?: string): string {
         const allIntents = this.getIntentDefinitionsForAvatar(avatarId);
         console.log(`🔧 IntentClassifier: Creating prompt for ${allIntents.length} intents:`, allIntents.map(i => i.name).join(', '));
         let intentList = '';
@@ -207,10 +233,14 @@ class IntentClassifier {
             intentList += `Nazwa intencji: ${intent.name}\n\n`;
         }
 
-        return `Zadanie: Na podstawie wypowiedzi użytkownika, wybierz najbardziej pasującą intencję spośród poniższych:
-
+        const avatarInfoTemplate = `Jesteś profesjonalnym ambasadorem firmy {{npc_company.name}}, specjalizującej się w: {{npc_company.specialization}} i twoją misją jest: {{npc_company.mission}}.`;
+        const avatarInfo = PromptBuilder.getInstance().replacePlaceholders(avatarInfoTemplate, context);
+        return `${avatarInfo}
+        Zadanie: Na podstawie wypowiedzi użytkownika, wybierz najbardziej pasującą intencję spośród poniższych:';        
+        
         ${intentList}
-        Zwróć TYLKO nazwę intencji, nic więcej.`;
+        Zwróć TYLKO nazwę intencji, nic więcej.
+        Ważne! Jeśli wypowiedź użytkownika jest niezgodna z twoją specjalizacją i misją, to koniecznie zwróć nazwę intencji "unknown", której nie ma na liście.`;
     }
 
     /**
@@ -224,8 +254,8 @@ class IntentClassifier {
                 .slice(-3)
                 .map(item => item.intent)
                 .join(', ');
-            
-            prompt += `\n\nKontekst ostatnich intencji: ${recentIntents}`;
+
+            prompt += `\nKontekst ostatnich intencji: ${recentIntents}`;
         }
 
         return prompt;
@@ -326,13 +356,13 @@ class IntentClassifier {
             }
 
             // Konwertuj CustomIntent[] na IntentDefinition[]
-            const customIntentDefinitions: IntentDefinition[] = customAvatar.intents.map(customIntent => 
+            const customIntentDefinitions: IntentDefinition[] = customAvatar.intents.map(customIntent =>
                 this.convertCustomIntentToDefinition(customIntent)
             );
 
             // Zapisz custom intents dla tego avatara
             this.customIntentDefinitions.set(avatarId, customIntentDefinitions);
-            
+
             console.log(`✅ IntentClassifier loaded ${customIntentDefinitions.length} custom intents for avatar: ${customAvatar.name} (${avatarId})`);
         } catch (error) {
             console.error(`❌ Failed to load custom intents for avatar ${avatarId}:`, error);
@@ -346,14 +376,14 @@ class IntentClassifier {
         // If custom avatar ID provided and has custom intents, combine with basic system intents
         if (avatarId && this.customIntentDefinitions.has(avatarId)) {
             const customIntents = this.customIntentDefinitions.get(avatarId)!;
-            
+
             // Basic system intents that every avatar needs
             // const basicSystemIntents = ['greeting', 'email_provided', 'email_promise', 'conversation_redirect'];
             // const systemIntents = this.intentDefinitions.filter(intent =>
             //     basicSystemIntents.includes(intent.name)
             // );
 
-          const systemIntents = this.intentDefinitions;
+            const systemIntents = this.intentDefinitions;
             const combinedIntents = [...systemIntents, ...customIntents];
             console.log(`🎯 IntentClassifier: Using ${systemIntents.length} system + ${customIntents.length} custom intents for avatar ${avatarId}`);
             return combinedIntents;

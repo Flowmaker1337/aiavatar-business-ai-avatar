@@ -189,9 +189,14 @@ export class SimulationManager {
             const conversationContext = this.buildConversationContext(simulation, respondingParticipant);
 
             // Sklasyfikuj intencję ostatniej wiadomości
-            const intentResult = await this.intentClassifier.classifyIntent(
-                lastMessage.content
-            );
+            // const intentResult = await this.intentClassifier.classifyIntent(
+            //     lastMessage.content
+            // );
+
+            const intentResult:IntentClassificationResult = {
+                intent: '',
+                confidence: 0
+            };
 
             // Wygeneruj odpowiedź
             const response = await this.generateParticipantResponse(

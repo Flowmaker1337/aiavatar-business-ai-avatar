@@ -333,6 +333,7 @@ export interface BusinessAvatar extends Avatar {
     mindState?: MindStateStack;
     active_flows: string[];
     last_interaction?: number;
+    suggested_topics?: string[];
 }
 
 // ============ CUSTOM AVATAR INTERFACES ============

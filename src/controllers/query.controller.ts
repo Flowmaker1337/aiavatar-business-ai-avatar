@@ -29,7 +29,7 @@ interface SessionContext {
   sessionId: string;
   chatHistory: ChatHistory[];
   avatarName: string | null;
-  businessAvatar: BusinessAvatar | null;
+  businessAvatar: BusinessAvatar;
   mindState: MindStateStack;
 }
 
@@ -54,66 +54,6 @@ class QueryController {
   // Message constants
   private static readonly NON_RELEVANT_TOPIC_MESSAGE = 'Przepraszam, ale mogę rozmawiać tylko na tematy związane z ofertą naszej firmy.';
   
-  /**
-   * Classifies user intent for testing purposes
-   */
-  public async classifyIntent(req: Request, res: Response): Promise<void> {
-    try {
-      const { user_message, avatar_id, avatar_type } = req.body;
-      
-      if (!user_message) {
-        res.status(400).json({ 
-          error: 'user_message is required' 
-        });
-        return;
-      }
-
-      console.log(`🧪 Test Intent Classification for: "${user_message}"`);
-      
-      // Initialize intent classifier
-      const intentClassifier = IntentClassifier.getInstance();
-      
-      // Load appropriate definitions based on avatar type
-      if (avatar_type) {
-        if (avatar_id && avatar_id.length > 10 && avatar_id.includes('-')) {
-          // Custom avatar
-          await intentClassifier.loadCustomIntentsForAvatar(avatar_id);
-        } else {
-          // Standard avatar
-          await intentClassifier.loadIntentDefinitionsForAvatar(avatar_type);
-        }
-      }
-      
-      // Classify intent using the same logic as production
-      const result = await intentClassifier.classifyIntent(
-        user_message,
-        undefined, // no mindState for testing
-        avatar_id || undefined
-      );
-      
-      console.log(`🧪 Test Classification Result:`, result);
-      
-      res.json({
-        status: 'success',
-        intent: result.intent,
-        confidence: result.confidence,
-        entities: result.entities || {},
-        requires_flow: result.requires_flow || false,
-        flow_name: result.flow_name || null,
-        user_message: user_message,
-        avatar_type: avatar_type,
-        avatar_id: avatar_id
-      });
-      
-    } catch (error) {
-      console.error('❌ Error in intent classification:', error);
-      res.status(500).json({ 
-        error: 'Intent classification failed',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      });
-    }
-  }
-
   /**
    * Handles user query
    */
@@ -396,7 +336,8 @@ class QueryController {
       experience_years: 12,
       specializations: ["International Expansion", "Market Analysis", "Supply Chain Management"],
       active_flows: [],
-      last_interaction: Date.now()
+      last_interaction: Date.now(),
+        suggested_topics: ["Szukanie punktów wspólnych z firmą klienta"],
     };
   }
 
@@ -433,45 +374,8 @@ class QueryController {
       experience_years: 15,
       specializations: ["Personality Archetypes", "Business Psychology", "Adult Learning"],
       active_flows: [],
-      last_interaction: Date.now()
-    };
-  }
-
-  /**
-   * Creates mock BusinessAvatar from regular Avatar (temporary solution)
-   */
-  private async createMockBusinessAvatar(avatar: any): Promise<BusinessAvatar> {
-    // Tymczasowe rozwiązanie - tworzymy mock BusinessAvatar
-    return {
-      _id: avatar._id,
-      firstName: avatar.firstName,
-      lastName: avatar.lastName,
-      company: {
-        name: "AI Innovation Solutions",
-        industry: "Technologie AI",
-        location: "Warszawa",
-        size: "średnia",
-        mission: "Dostarczanie innowacyjnych rozwiązań AI dla biznesu",
-        offer: ["Systemy AI", "Automatyzacja procesów", "Doradztwo technologiczne"],
-        use_cases: ["Chatboty", "Analiza danych", "Personalizacja"],
-        strategic_goals: ["Ekspansja na rynki europejskie", "Rozwój produktów AI"],
-        business_needs: ["Partnerzy technologiczni", "Klienci enterprise"],
-        specializations: ["Machine Learning", "NLP", "Computer Vision"]
-      },
-      personality: {
-        style: "Profesjonalny i przyjazny",
-        tone: "Ekspercki ale przystępny",
-        business_motivation: "Pomaganie firmom w transformacji cyfrowej",
-        communication_style: "Bezpośredni i konkretny",
-        emotional_traits: ["Empatyczny", "Cierpliwy", "Entuzjastyczny"],
-        strengths: ["Znajomość technologii", "Umiejętności komunikacyjne"],
-        weaknesses: ["Czasem zbyt techniczny", "Perfekcjonizm"]
-      },
-      position: "Senior AI Consultant",
-      experience_years: 8,
-      specializations: ["AI Strategy", "ML Implementation", "Tech Leadership"],
-      active_flows: [],
-      last_interaction: Date.now()
+      last_interaction: Date.now(),
+        suggested_topics: ["Ćwiczenie z archetypów"],
     };
   }
 
@@ -554,7 +458,14 @@ class QueryController {
     // 1. Klasyfikacja intencji
     const intentClassifier = IntentClassifier.getInstance();
     const avatarIdForIntent = (avatarType && avatarType.length > 10 && avatarType.includes('-')) ? avatarType : undefined;
-    let intentResult = await intentClassifier.classifyIntent(userMessage, sessionContext.mindState, avatarIdForIntent);
+      const promptContext = PromptBuilder.getInstance().createPromptContext(
+          '',
+          userMessage,
+          sessionContext.businessAvatar,
+          sessionContext.mindState
+      );
+
+    let intentResult = await intentClassifier.classifyIntent(userMessage, promptContext, avatarIdForIntent);
     
     // Specjalna logika: jeśli użytkownik przedstawia ofertę, NPC może wyrazić zainteresowanie
     if (intentResult.intent === 'user_presenting_offer') {
@@ -632,14 +543,16 @@ class QueryController {
       // Fallback do general_questions
       intentResult.intent = 'general_questions';
     }
-    
-    // Push nową intencję na stos
-    await memoryManager.pushIntent(
-      sessionContext.sessionId,
-      intentResult.intent,
-      intentResult.confidence,
-      { user_message: userMessage }
-    );
+
+    if (intentResult.intent !== 'unknown') {
+        // Push nową intencję na stos
+        await memoryManager.pushIntent(
+            sessionContext.sessionId,
+            intentResult.intent,
+            intentResult.confidence,
+            { user_message: userMessage }
+        );
+    }
     
     // 4. Pobierz kontekst z RAG jeśli potrzeba
     let ragContext = '';

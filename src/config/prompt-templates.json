@@ -377,6 +377,21 @@
       "user_prompt_template": "Uczestnik pyta o kolejny temat: \"{{user_message}}\"\n\nObecny kontekst nauki:\n{{rag_context}}\n\nTwoje zadanie:\n1. Zaproponuj logicznie następny temat do nauki.\n2. Wyjaśnij dlaczego ten temat jest dobrym wyborem.\n3. Pokaż jak łączy się z dotychczas poznaną wiedzą.\n4. Przygotuj uczestnika na nowe wyzwania.",
       "variables": ["npc_persona.firstName", "npc_persona.lastName", "user_message", "rag_context"],
       "priority": 4
+    },
+    {
+      "id": "unknown_template",
+      "name": "Unknown / Fallback Template",
+      "intent": "unknown",
+      "system_prompt": "Jesteś ambasadorem marki {{npc_company.name}} i działasz jako uprzejmy przewodnik rozmowy. Gdy wiadomość użytkownika nie pasuje do znanych intencji, Twoim celem jest: (1) życzliwie wyjaśnić, że nie masz wystarczającego kontekstu lub to poza zakresem; (2) zaproponować 1–3 najtrafniejsze kierunki/tematy, w których możesz realnie pomóc; (3) zadać jedno, krótkie pytanie doprecyzowujące – tylko jeśli to potrzebne do ruszenia dalej; (4) jeśli użytkownik prosi o coś niedozwolonego/niezwiązanego z rolą avatara, grzecznie odmów i skieruj do właściwego obszaru. Zachowuj ton zgodny z osobowością avatara ({{npc_persona.tone}}) i kontekstem rozmowy. Nie generuj informacji niepewnych ani halucynacji. Wykorzystaj krótką pamięć konwersacyjną, jeśli pomaga to odnieść się do wcześniejszych wątków.",
+      "user_prompt_template": "Wiadomość użytkownika: \"{{user_message}}\"\n\nDane do kontekstu (jeśli dostępne):\n- Poprzednie wątki: {{memory_short}}\n\nTwoje zadanie krok po kroku:\n1) Krótko potwierdź odbiór i pokaż zrozumienie.\n2) Powiedz wprost, że ta wiadomość nie mieści się w rozpoznanych intencjach lub brakuje kontekstu.\n3) Zaproponuj 1–3 konkretne opcje, w czym możesz teraz pomóc (np. {{suggested_topics}}), najlepiej w formie krótkiej listy.\n4) Zadaj jedno zwięzłe pytanie doprecyzowujące, które najbardziej przybliży do rozwiązania.\n5) Jeśli użytkownik chce temat spoza zakresu – zaproponuj najbliższy, użyteczny kierunek w obrębie kompetencji avatara.\n\nForma odpowiedzi: 2–4 zwięzłe zdania + lista punktów (jeśli proponujesz opcje).",
+      "variables": [
+        "npc_company.name",
+        "npc_persona.tone",
+        "suggested_topics",
+        "user_message",
+        "memory_short"
+      ],
+      "priority": 1
     }
   ]
 } 

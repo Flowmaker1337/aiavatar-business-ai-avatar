@@ -68,13 +68,7 @@ router.post('/query',
     queryController.handleQuery.bind(queryController)
 );
 
-router.post('/classify-intent', 
-    authenticate, 
-    requirePermission('read', 'avatars'),
-    queryController.classifyIntent.bind(queryController)
-);
-
-router.post('/query/stream', 
+router.post('/query/stream',
     authenticate, 
     requirePermission('read', 'avatars'),
     queryController.handleStreamingQuery.bind(queryController)
