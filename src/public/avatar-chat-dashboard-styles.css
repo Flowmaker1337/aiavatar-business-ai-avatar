@@ -573,15 +573,8 @@
     border-radius: 8px;
     padding: 16px;
     margin-bottom: 12px;
-    cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
-}
-
-.flow-item:hover {
-    border-color: #39e575;
-    background: rgba(57, 229, 117, 0.05);
-    transform: translateY(-1px);
 }
 
 .flow-item.active {

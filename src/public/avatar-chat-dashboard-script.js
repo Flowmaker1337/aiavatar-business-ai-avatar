@@ -240,7 +240,7 @@ class AvatarChatDashboard {
 
         // Generate flows HTML
         const flowsHtml = this.availableFlows.map(flow => `
-            <div class="flow-item ${flow.status}" onclick="avatarDashboard.selectFlow('${flow.id}')">
+            <div class="flow-item ${flow.status}">
                 <div class="flow-status"></div>
                 <div class="flow-name">${flow.name}</div>
                 <div class="flow-description">${flow.description || 'Brak opisu'}</div>
@@ -604,7 +604,14 @@ class AvatarChatDashboard {
         const progressText = document.querySelector('.progress-text');
         
         if (!flowInfo || !flowInfo.current_flow) {
-            // No active flow
+            // No active flow - reset all flows to available status
+            this.availableFlows.forEach(f => {
+                f.status = 'available';
+            });
+            
+            // Update the flow panel to reflect visual changes
+            this.updateFlowPanel();
+            
             if (currentFlowContent) {
                 currentFlowContent.innerHTML = `
                     <div class="no-active-flow">
@@ -622,6 +629,14 @@ class AvatarChatDashboard {
         // Find the active flow
         const activeFlow = this.availableFlows.find(f => f.id === flowInfo.current_flow);
         if (!activeFlow) return;
+
+        // Update visual status of flows (set active flow and make others available)
+        this.availableFlows.forEach(f => {
+            f.status = f.id === flowInfo.current_flow ? 'active' : 'available';
+        });
+        
+        // Update the flow panel to reflect visual changes
+        this.updateFlowPanel();
 
         // Update progress text
         if (progressText) {
@@ -767,7 +782,14 @@ class AvatarChatDashboard {
         
         this.showLoading('Odświeżanie flows...');
         await this.loadAvatarFlows(this.currentAvatar.id);
-        this.updateFlowPanel();
+        
+        // After refreshing flows, restore the active flow state from session
+        if (this.currentSession) {
+            await this.refreshFlowState();
+        } else {
+            this.updateFlowPanel();
+        }
+        
         this.hideLoading();
         this.showNotification('Flows odświeżone', 'success');
     }
