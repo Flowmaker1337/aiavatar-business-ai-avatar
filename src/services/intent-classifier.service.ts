@@ -13,6 +13,7 @@ import {ExecutionTimerService} from './execution-timer.service';
 import CustomAvatarService from './custom-avatar.service';
 import PromptBuilder from "./prompt-builder.service";
 import PromptBuilderService from "./prompt-builder.service";
+import {UtilsService} from "./utils.service";
 
 /**
  * IntentClassifier - klasyfikuje intencje użytkownika na podstawie jego wiadomości
@@ -45,11 +46,7 @@ class IntentClassifier {
         }
 
         try {
-            const filePath = path.resolve(__dirname, '../config/intent-definitions.json');
-            const rawData = fs.readFileSync(filePath, 'utf-8');
-            const data = JSON.parse(rawData);
-
-            this.intentDefinitions = data.intents;
+            this.intentDefinitions = UtilsService.loadJsonFromFile('../config/intent-definitions.json').intents;
             this.initialized = true;
 
             console.log(`✅ IntentClassifier initialized with ${this.intentDefinitions.length} intent definitions`);
@@ -70,11 +67,7 @@ class IntentClassifier {
                 fileName = 'training-intent-definitions.json';
             }
 
-            const filePath = path.resolve(__dirname, `../config/${fileName}`);
-            const rawData = fs.readFileSync(filePath, 'utf-8');
-            const data = JSON.parse(rawData);
-
-            this.intentDefinitions = data.intents;
+            this.intentDefinitions = UtilsService.loadJsonFromFile(`../config/${fileName}`).intents;
             this.initialized = true; // Mark as initialized after loading avatar-specific definitions
 
             console.log(`✅ IntentClassifier loaded ${this.intentDefinitions.length} intent definitions for avatar type: ${avatarType}`);

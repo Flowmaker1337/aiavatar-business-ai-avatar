@@ -3,6 +3,7 @@ import {QDRANT_URL, QDRANT_COLLECTION_NAME, QDRANT_API_KEY, getVectorDatabaseNam
 import {VectorData} from '../models/types';
 import {BaseVectorDatabaseService} from './base-vector-database.service';
 import vectorConfigService from './vector-config.service';
+import {QdrantClientParams} from "@qdrant/js-client-rest/dist/types/qdrant-client";
 
 /**
  * Qdrant Vector Database Service
@@ -14,12 +15,13 @@ class QdrantService extends BaseVectorDatabaseService {
 
     constructor() {
         super();
-
-        // Initialize official Qdrant client
-        this.client = new QdrantClient({
+        const clientConfig: QdrantClientParams = {
             url: QDRANT_URL,
+            checkCompatibility: true,
             ...(QDRANT_API_KEY && {apiKey: QDRANT_API_KEY})
-        });
+        };
+        console.log(clientConfig);
+        this.client = new QdrantClient(clientConfig);
     }
 
     /**

@@ -1,3 +1,6 @@
+import path from "path";
+import fs from "fs";
+
 export class UtilsService {
     static formatStringMap(map?: Record<string, string>): string {
         if (!map || Object.keys(map).length === 0) {
@@ -11,5 +14,11 @@ export class UtilsService {
 
     static isIntegerString(str: string) {
         return /^-?\d+$/.test(str);
+    }
+
+    static loadJsonFromFile(projectRelativePath: string) {
+        const filePath = path.resolve(__dirname, projectRelativePath);
+        const rawData = fs.readFileSync(filePath, 'utf-8');
+        return JSON.parse(rawData);
     }
 }

@@ -484,6 +484,7 @@ export interface PromptContext {
     session_context?: Record<string, any>;
     flow_context?: Record<string, any>;
     avatar_id?: string; // UUID dla custom avatarów
+    avatarType?: string;
 }
 
 export interface PromptTemplate {

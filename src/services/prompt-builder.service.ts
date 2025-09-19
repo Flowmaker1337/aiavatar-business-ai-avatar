@@ -10,6 +10,7 @@ import {
 } from '../models/types';
 import {ExecutionTimerService} from './execution-timer.service';
 import IntentClassifier from './intent-classifier.service';
+import {UtilsService} from "./utils.service";
 
 /**
  * PromptBuilder - buduje prompty na podstawie intencji, kontekstu i szablonów
@@ -19,6 +20,8 @@ class PromptBuilder {
     private static instance: PromptBuilder;
     private templates: PromptTemplate[] = [];
     private defaultSystemPrompt: PromptTemplate | null = null;
+    private networkerTemplates: PromptTemplate[] = [];
+    private trainerTemplates: PromptTemplate[] = [];
     private initialized = false;
     private intentClassifier: IntentClassifier;
 
@@ -42,11 +45,9 @@ class PromptBuilder {
         }
 
         try {
-            const filePath = path.resolve(__dirname, '../config/prompt-templates.json');
-            const rawData = fs.readFileSync(filePath, 'utf-8');
-            const data = JSON.parse(rawData);
-
-            this.templates = data.templates;
+            this.templates = UtilsService.loadJsonFromFile('../config/prompt-templates.json').templates;
+            this.networkerTemplates = UtilsService.loadJsonFromFile('../config/networker-prompt-templates.json').templates;
+            this.trainerTemplates = UtilsService.loadJsonFromFile('../config/trainer-prompt-templates.json').templates;
             this.defaultSystemPrompt = this.templates.find(t => t.id === 'system_prompt_default') || null;
             this.initialized = true;
 
@@ -73,21 +74,38 @@ class PromptBuilder {
 
         // Najpierw sprawdź czy istnieje template dla aktualnego kroku flow
         let template: PromptTemplate | null = null;
-        if (context.current_flow_step) {
-            template = this.findTemplateForFlowStep(context.current_flow_step);
-        }
+        // if (context.current_flow_step) {
+        //     template = this.findTemplateForFlowStep(context.current_flow_step);
+        // }
 
         // Jeśli nie znaleziono template'a dla kroku, sprawdź custom intent lub użyj standard template
-        if (!template) {
-            // Sprawdź czy to custom intent z własnym prompt
-            const customTemplate = await this.findCustomIntentTemplate(context.current_intent, context.avatar_id);
-            if (customTemplate) {
-                console.log(`🎯 PromptBuilder: Using custom template for intent '${context.current_intent}'`);
-                template = customTemplate;
-            } else {
-                console.log(`🎯 PromptBuilder: Using standard template for intent '${context.current_intent}'`);
-                template = this.findTemplate(context.current_intent);
+        // if (!template) {
+        //     // Sprawdź czy to custom intent z własnym prompt
+        //     const customTemplate = await this.findCustomIntentTemplate(context.current_intent, context.avatar_id);
+        //     if (customTemplate) {
+        //         console.log(`🎯 PromptBuilder: Using custom template for intent '${context.current_intent}'`);
+        //         template = customTemplate;
+        //     } else {
+        //         console.log(`🎯 PromptBuilder: Using standard template for intent '${context.current_intent}'`);
+        //         template = this.findTemplate(context.current_intent);
+        //     }
+        // }
+
+        if (context.avatarType === 'networker') {
+            template = this.networkerTemplates.find(template => template.intent === context.current_intent) || null;
+            if (template) {
+                console.log(`🎯 PromptBuilder: Using networker template for intent '${context.current_intent}'`);
             }
+        } else if (context.avatarType === 'trainer') {
+            template = this.trainerTemplates.find(template => template.intent === context.current_intent) || null;
+            if (template) {
+                console.log(`🎯 PromptBuilder: Using trainer template for intent '${context.current_intent}'`);
+            }
+        }
+
+        if (!template) {
+            console.log(`🎯 PromptBuilder: Using standard template for intent '${context.current_intent}'`);
+            template = this.findTemplate(context.current_intent);
         }
 
         if (!template) {
@@ -213,7 +231,9 @@ WAŻNE! Odpowiadaj krótkimi zdaniami w maksymalnej ilości 3 zdań i cała odpo
 
         // Zamień placeholdery
         systemPrompt = this.replacePlaceholders(systemPrompt, context);
-        systemPrompt += '\nZakaz używania: formatowania tekstu, znaków końca linii, znaków wcięć, znaków tabulacji, list wypunktowanych i numerycznych, wyliczeń, akapitów.\nWAŻNE! Odpowiadaj krótkimi zdaniami w maksymalnej ilości 3 zdań i cała odpowiedź ma mieć maksymalnie 350 znaków.';
+        if (context?.avatarType !== 'trainer') {
+            systemPrompt += '\nZakaz używania: formatowania tekstu, znaków końca linii, znaków wcięć, znaków tabulacji, list wypunktowanych i numerycznych, wyliczeń, akapitów.\nWAŻNE! Odpowiadaj krótkimi zdaniami w maksymalnej ilości 3 zdań i cała odpowiedź ma mieć maksymalnie 350 znaków.';
+        }
         // console.log('🔧 PromptBuilder: Final system prompt content:', systemPrompt.substring(0, 100) + '...');
         console.log('🔧 PromptBuilder: Final system prompt content:', systemPrompt);
 
@@ -273,10 +293,10 @@ WAŻNE! Odpowiadaj krótkimi zdaniami w maksymalnej ilości 3 zdań i cała odpo
         }
 
         // User company placeholdery (domyślne wartości jeśli nie ma danych)
-        result = result.replace(/\{\{user_company\.name\}\}/g, 'Twoja firma');
-        result = result.replace(/\{\{user_company\.industry\}\}/g, 'Twoja branża');
-        result = result.replace(/\{\{user_company\.needs\}\}/g, 'potrzeby biznesowe');
-        result = result.replace(/\{\{user_company\.strategic_goals\}\}/g, 'cele strategiczne');
+        result = result.replace(/\{\{user_company\.name\}\}/g, 'CampusAI');
+        result = result.replace(/\{\{user_company\.industry\}\}/g, 'Edukacja na temat sztucznej inteligencji');
+        result = result.replace(/\{\{user_company\.needs\}\}/g, 'Docieranie na nowe rynki i nowych grup klientów');
+        result = result.replace(/\{\{user_company\.strategic_goals\}\}/g, 'Globalna ekspansja na co najmniej 40 krajów');
 
         // Memory placeholdery
         const memoryShort = this.getMemoryShort(context.mind_state);
@@ -382,7 +402,8 @@ WAŻNE! Odpowiadaj krótkimi zdaniami w maksymalnej ilości 3 zdań i cała odpo
         ragContext?: string,
         chatHistory?: string,
         flowContext?: Record<string, any>,
-        avatarId?: string
+        avatarId?: string,
+        avatarType?: string
     ): Promise<{ systemPrompt: SystemPrompt; userPrompt: UserPrompt }> {
         const context: PromptContext = {
             user_message: userMessage,
@@ -394,7 +415,8 @@ WAŻNE! Odpowiadaj krótkimi zdaniami w maksymalnej ilości 3 zdań i cała odpo
             current_flow_step: mindState.current_flow_step,
             rag_context: ragContext,
             flow_context: flowContext,
-            avatar_id: avatarId // Dodaj avatarId do context
+            avatar_id: avatarId, // Dodaj avatarId do context
+            avatarType
         };
 
         return await this.buildPrompt(context);

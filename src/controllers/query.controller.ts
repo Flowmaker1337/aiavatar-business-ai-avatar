@@ -241,7 +241,7 @@ class QueryController {
             return this.createTrainerBusinessAvatar();
         } else {
             console.log('✅ QueryController: Creating networker avatar (default)');
-            return this.createNetworkerBusinessAvatar();
+            return this.createMarketingDirectorBusinessAvatar();
         }
     }
 
@@ -257,7 +257,7 @@ class QueryController {
 
         if (!customAvatar) {
             console.warn(`❌ Custom avatar ${avatarId} not found, falling back to networker`);
-            return this.createNetworkerBusinessAvatar();
+            return this.createMarketingDirectorBusinessAvatar();
         }
 
         // Convert CustomAvatar to BusinessAvatar
@@ -341,41 +341,180 @@ class QueryController {
         };
     }
 
+    private createMarketingDirectorBusinessAvatar(): BusinessAvatar {
+        return {
+            _id: new ObjectId(),
+            firstName: "Marek",
+            lastName: "Nowicki",
+            company: {
+                name: "CreativeMind Agency",
+                industry: "Marketing i Reklama",
+                location: "Warszawa",
+                size: "duża",
+                mission: "Tworzenie innowacyjnych kampanii, które łączą marki z ich odbiorcami",
+                offer: [
+                    "Kampanie 360°",
+                    "Strategie digital",
+                    "Content marketing",
+                    "Performance marketing",
+                    "Branding i rebranding"
+                ],
+                use_cases: [
+                    "Wprowadzanie nowych produktów na rynek",
+                    "Budowanie świadomości marki",
+                    "Generowanie leadów B2B i B2C",
+                    "Optymalizacja kampanii digital"
+                ],
+                strategic_goals: [
+                    "Rozwój portfela globalnych klientów",
+                    "Automatyzacja działań marketingowych",
+                    "Budowanie silnych marek w kanałach online i offline"
+                ],
+                business_needs: [
+                    "Partnerzy technologiczni (AI, analityka, automatyzacja)",
+                    "Nowi klienci z branży FMCG, fintech i e-commerce",
+                    "Specjaliści od danych i badań rynku"
+                ],
+                specializations: [
+                    "Strategia komunikacji",
+                    "Budowanie marek",
+                    "Integracja kampanii digital i offline"
+                ]
+            },
+            personality: {
+                style: "Kreatywny i wizjonerski",
+                tone: "Inspirujący, pełen energii",
+                business_motivation: "Budowanie marek, które wyróżniają się na rynku i angażują ludzi",
+                communication_style: "Storytelling, używa przykładów z kampanii i case studies",
+                emotional_traits: ["Charyzmatyczny", "Dynamiczny", "Empatyczny"],
+                strengths: [
+                    "Kreatywność",
+                    "Umiejętność łączenia strategii z danymi",
+                    "Budowanie relacji z klientami"
+                ],
+                weaknesses: [
+                    "Czasem skupia się bardziej na wizji niż szczegółach",
+                    "Może działać zbyt szybko, zanim pojawi się pełna analiza"
+                ]
+            },
+            position: "Dyrektor Marketingu",
+            experience_years: 14,
+            specializations: [
+                "Brand Strategy",
+                "Digital Marketing",
+                "Integrated Campaigns"
+            ],
+            active_flows: [],
+            last_interaction: Date.now(),
+            suggested_topics: ["Możliwości współpracy przy kampanii marketingowej", "Trendy w digital marketingu"],
+        };
+    }
+
     /**
      * Creates Trainer BusinessAvatar (Prof. Anna Kowalska)
      */
+    // private createTrainerBusinessAvatar(): BusinessAvatar {
+    //     return {
+    //         _id: new ObjectId(),
+    //         firstName: "Prof. Anna",
+    //         lastName: "Kowalska",
+    //         company: {
+    //             name: "Instytut Archetypów Osobowości",
+    //             industry: "Edukacja i Rozwój Osobisty",
+    //             location: "Warszawa",
+    //             size: "średnia",
+    //             mission: "Wspieranie rozwoju osobistego przez zrozumienie archetypów osobowości",
+    //             offer: ["Szkolenia z archetypów", "Coaching biznesowy", "Warsztat rozwoju osobistego", "Analiza zespołowa"],
+    //             use_cases: ["Leadership development", "Team building", "Personal branding", "Career coaching"],
+    //             strategic_goals: ["Digitalizacja szkoleń", "Ekspansja metodyki", "Rozwój narzędzi diagnostycznych"],
+    //             business_needs: ["Partnerzy edukacyjni", "Klienci korporacyjni", "Platformy e-learningowe"],
+    //             specializations: ["12 Archetypów Osobowości", "Psychologia biznesu", "Metodyki szkoleniowe"]
+    //         },
+    //         personality: {
+    //             style: "Ciepły i empatyczny pedagog",
+    //             tone: "Mądry mentor z dużym doświadczeniem",
+    //             business_motivation: "Pomaganie ludziom w odkrywaniu swojego potencjału",
+    //             communication_style: "Używa metafor, przykładów z kultury, zadaje pytania refleksyjne",
+    //             emotional_traits: ["Empatyczny", "Cierpliwy", "Inspirujący"],
+    //             strengths: ["Głęboka wiedza psychologiczna", "Umiejętności dydaktyczne", "Doświadczenie coachingowe"],
+    //             weaknesses: ["Czasem zbyt teoretyczny", "Długie wyjaśnienia"]
+    //         },
+    //         position: "Psycholog Biznesu i Trener Rozwoju Osobistego",
+    //         experience_years: 15,
+    //         specializations: ["Personality Archetypes", "Business Psychology", "Adult Learning"],
+    //         active_flows: [],
+    //         last_interaction: Date.now(),
+    //         suggested_topics: ["Ćwiczenie z archetypów"],
+    //     };
+    // }
+
     private createTrainerBusinessAvatar(): BusinessAvatar {
         return {
             _id: new ObjectId(),
-            firstName: "Prof. Anna",
-            lastName: "Kowalska",
+            firstName: "Dr. Michał",
+            lastName: "Nowak",
             company: {
-                name: "Instytut Archetypów Osobowości",
-                industry: "Edukacja i Rozwój Osobisty",
+                name: "CampusAI Academy",
+                industry: "Edukacja Technologiczna i AI",
                 location: "Warszawa",
                 size: "średnia",
-                mission: "Wspieranie rozwoju osobistego przez zrozumienie archetypów osobowości",
-                offer: ["Szkolenia z archetypów", "Coaching biznesowy", "Warsztat rozwoju osobistego", "Analiza zespołowa"],
-                use_cases: ["Leadership development", "Team building", "Personal branding", "Career coaching"],
-                strategic_goals: ["Digitalizacja szkoleń", "Ekspansja metodyki", "Rozwój narzędzi diagnostycznych"],
-                business_needs: ["Partnerzy edukacyjni", "Klienci korporacyjni", "Platformy e-learningowe"],
-                specializations: ["12 Archetypów Osobowości", "Psychologia biznesu", "Metodyki szkoleniowe"]
+                mission: "Demokratyzacja wiedzy o sztucznej inteligencji poprzez praktyczne szkolenia",
+                offer: [
+                    "Szkolenia z AI i narzędzi generatywnych",
+                    "Warsztaty prompt engineering",
+                    "Kursy ChatGPT dla biznesu",
+                    "Implementacja AI w firmach"
+                ],
+                use_cases: [
+                    "AI transformation",
+                    "Employee upskilling",
+                    "Digital literacy",
+                    "Innovation workshops"
+                ],
+                strategic_goals: [
+                    "Skalowanie platformy edukacyjnej",
+                    "Rozwój certyfikacji AI",
+                    "Budowanie ekosystemu partnerów"
+                ],
+                business_needs: [
+                    "Klienci korporacyjni",
+                    "Instytucje edukacyjne",
+                    "Platformy technologiczne"
+                ],
+                specializations: [
+                    "Sztuczna Inteligencja",
+                    "Praktyczne zastosowania AI",
+                    "Transformacja cyfrowa"
+                ]
             },
             personality: {
-                style: "Ciepły i empatyczny pedagog",
-                tone: "Mądry mentor z dużym doświadczeniem",
-                business_motivation: "Pomaganie ludziom w odkrywaniu swojego potencjału",
-                communication_style: "Używa metafor, przykładów z kultury, zadaje pytania refleksyjne",
-                emotional_traits: ["Empatyczny", "Cierpliwy", "Inspirujący"],
-                strengths: ["Głęboka wiedza psychologiczna", "Umiejętności dydaktyczne", "Doświadczenie coachingowe"],
-                weaknesses: ["Czasem zbyt teoretyczny", "Długie wyjaśnienia"]
+                style: "Energiczny i praktyczny innowator",
+                tone: "Entuzjastyczny ekspert łączący teorię z praktyką",
+                business_motivation: "Przygotowywanie ludzi na przyszłość zdominowaną przez AI",
+                communication_style: "Używa konkretnych przykładów, case studies, interaktywnych demonstracji",
+                emotional_traits: ["Pasjonujący", "Przystępny", "Wizjonerski"],
+                strengths: [
+                    "Głęboka wiedza techniczna",
+                    "Umiejętność upraszczania",
+                    "Doświadczenie praktyczne"
+                ],
+                weaknesses: [
+                    "Czasem zbyt techniczny",
+                    "Może przytłoczyć ilością informacji"
+                ]
             },
-            position: "Psycholog Biznesu i Trener Rozwoju Osobistego",
-            experience_years: 15,
-            specializations: ["Personality Archetypes", "Business Psychology", "Adult Learning"],
+            position: "AI Trainer i Konsultant Transformacji Cyfrowej",
+            experience_years: 12,
+            specializations: [
+                "Artificial Intelligence",
+                "Generative AI Applications",
+                "Digital Transformation"
+            ],
             active_flows: [],
             last_interaction: Date.now(),
-            suggested_topics: ["Ćwiczenie z archetypów"],
+            suggested_topics: [
+                "Wprowadzenie do AI w biznesie"
+            ]
         };
     }
 
@@ -556,21 +695,22 @@ class QueryController {
 
         // 4. Pobierz kontekst z RAG jeśli potrzeba
         let ragContext = '';
-        const trainerIntents = ['theory_request', 'show_me_how', 'ask_question', 'practice_together', 'test_me', 'summarize_learning', 'what_next'];
+        const trainerIntents = ['what_is', 'theory_request', 'show_me_how', 'ask_question', 'practice_together', 'test_me', 'summarize_learning', 'what_next'];
         const networkerIntents = ['general_questions', 'solution_presentation'];
 
         if (networkerIntents.includes(intentResult.intent) || trainerIntents.includes(intentResult.intent)) {
             console.log('\n[KNOWLEDGE BASE] Searching for information in knowledge base...');
 
             let contextKnowledge: string[] = [];
+            contextKnowledge = await vectorDatabaseService.queryKnowledgeBase(userMessage);
 
-            if (trainerIntents.includes(intentResult.intent) && avatarType === 'trainer') {
-                // Use trainer knowledge base
-                contextKnowledge = await this.getTrainerKnowledgeContext(userMessage);
-            } else {
-                // Use networker knowledge base (vector database)
-                contextKnowledge = await vectorDatabaseService.queryKnowledgeBase(userMessage);
-            }
+            // if (trainerIntents.includes(intentResult.intent) && avatarType === 'trainer') {
+            //     // Use trainer knowledge base
+            //     contextKnowledge = await this.getTrainerKnowledgeContext(userMessage);
+            // } else {
+            //     // Use networker knowledge base (vector database)
+            //     contextKnowledge = await vectorDatabaseService.queryKnowledgeBase(userMessage);
+            // }
 
             ragContext = contextKnowledge.join('\n');
             console.log('[KNOWLEDGE BASE] Found context:', contextKnowledge.length > 0 ? 'Found' : 'None');
@@ -604,7 +744,8 @@ class QueryController {
             ragContext,
             this.formatChatHistory(sessionContext.chatHistory),
             flowContext,
-            avatarIdForPrompt
+            avatarIdForPrompt,
+            avatarType
         );
 
         // 6. Generowanie odpowiedzi

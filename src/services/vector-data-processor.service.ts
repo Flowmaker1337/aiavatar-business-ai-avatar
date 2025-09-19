@@ -336,7 +336,8 @@ class VectorDataProcessorService {
      * Get default knowledge file path
      */
     public getDefaultKnowledgeFilePath(): string {
-        return path.join(__dirname, '../config/leasing-knowledge.json');
+        // return path.join(__dirname, '../config/leasing-knowledge.json');
+        return path.join(__dirname, '../config/trainer-knowledge.json');
     }
 
     /**

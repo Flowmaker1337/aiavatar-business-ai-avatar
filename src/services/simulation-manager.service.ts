@@ -841,7 +841,9 @@ JAKO BUYER:
 - Bądź skeptyczny ale konstruktywny
 - Żądaj konkretnych przykładów i dowodów
 
-Odpowiadaj w charakterze dla tej osoby, używając jej stylu komunikacji: ${avatarData.personality.communication_style}`;
+Odpowiadaj w charakterze dla tej osoby, używając jej stylu komunikacji: ${avatarData.personality.communication_style}
+Zakaz używania: formatowania tekstu, znaków końca linii, znaków wcięć, znaków tabulacji, list wypunktowanych i numerycznych, wyliczeń, akapitów.
+        WAŻNE! Odpowiadaj krótkimi zdaniami w maksymalnej ilości 3 zdań i cała odpowiedź ma mieć maksymalnie 350 znaków.`;
         } else {
             return basePrompt + `
 
@@ -864,7 +866,9 @@ JAKO LEARNER:
 - Bądź chętny do nauki
 - Proś o feedback i wskazówki
 
-Odpowiadaj w charakterze dla tej osoby, używając jej stylu komunikacji: ${avatarData.personality.communication_style}`;
+Odpowiadaj w charakterze dla tej osoby, używając jej stylu komunikacji: ${avatarData.personality.communication_style}
+Zakaz używania: formatowania tekstu, znaków końca linii, znaków wcięć, znaków tabulacji, list wypunktowanych i numerycznych, wyliczeń, akapitów.
+        WAŻNE! Odpowiadaj krótkimi zdaniami w maksymalnej ilości 3 zdań i cała odpowiedź ma mieć maksymalnie 350 znaków.`;
         }
     }
 
