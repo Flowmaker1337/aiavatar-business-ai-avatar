@@ -13,13 +13,13 @@ class AvatarChatDashboard {
 
     async init() {
         console.log('🚀 Avatar Chat Dashboard initialized');
-        
+
         // Load available avatars
         await this.loadAvailableAvatars();
-        
+
         // Setup event listeners
         this.setupEventListeners();
-        
+
         // Check for URL parameters (avatar selection)
         this.checkUrlParameters();
     }
@@ -56,7 +56,7 @@ class AvatarChatDashboard {
             if (window.authManager && window.authManager.isAuthenticated()) {
                 try {
                     const response = await window.authManager.makeAuthenticatedRequest('/api/avatars');
-                    
+
                     if (response.ok) {
                         const data = await response.json();
                         if (data.success && data.avatars) {
@@ -105,7 +105,7 @@ class AvatarChatDashboard {
 
         try {
             this.showLoading('Ładowanie avatara...');
-            
+
             this.currentAvatar = {
                 id: avatarId,
                 type: avatarId.startsWith('custom_') ? 'custom' : 'predefined'
@@ -113,26 +113,26 @@ class AvatarChatDashboard {
 
             // Load avatar details
             await this.loadAvatarDetails(avatarId);
-            
+
             // Load available flows for this avatar
             await this.loadAvatarFlows(avatarId);
-            
+
             // Update UI
             this.updateAvatarInfo();
             this.updateFlowPanel();
-            
+
             // Clear previous chat
             this.clearChat();
-            
+
             // Add welcome message
             this.addWelcomeMessage();
-            
+
             // Enable controls
             this.enableControls();
-            
+
             this.hideLoading();
             this.showNotification(`Avatar ${this.currentAvatar.name} załadowany!`, 'success');
-            
+
         } catch (error) {
             console.error('Error selecting avatar:', error);
             this.hideLoading();
@@ -161,7 +161,7 @@ class AvatarChatDashboard {
             // Load custom avatar details
             const customId = avatarId.replace('custom_', '');
             const response = await window.authManager.makeAuthenticatedRequest(`/api/avatars/${customId}`);
-            
+
             if (response.ok) {
                 const data = await response.json();
                 if (data.success) {
@@ -180,7 +180,7 @@ class AvatarChatDashboard {
     async loadAvatarFlows(avatarId) {
         try {
             let flowsResponse;
-            
+
             if (avatarId === 'networker' || avatarId === 'trainer') {
                 // Load predefined flows
                 flowsResponse = await window.authManager.makeAuthenticatedRequest(`/api/flows?avatar_type=${avatarId}`);
@@ -189,7 +189,7 @@ class AvatarChatDashboard {
                 const customId = avatarId.replace('custom_', '');
                 flowsResponse = await window.authManager.makeAuthenticatedRequest(`/api/avatar/${customId}/flow-definitions`);
             }
-            
+
             if (flowsResponse && flowsResponse.ok) {
                 const data = await flowsResponse.json();
                 if (data.status === 'success' && data.flows) {
@@ -221,7 +221,7 @@ class AvatarChatDashboard {
     updateFlowPanel() {
         const flowContent = document.getElementById('flowContent');
         const totalFlows = document.getElementById('totalFlows');
-        
+
         if (!flowContent) return;
 
         if (this.availableFlows.length === 0) {
@@ -265,10 +265,10 @@ class AvatarChatDashboard {
 
         this.activeFlow = flow;
         this.updateFlowPanel();
-        
+
         // Show intent overlay
         this.showIntentInfo(flow.entry_intents?.[0] || 'unknown', flow.name);
-        
+
         this.showNotification(`Aktywowany flow: ${flow.name}`, 'info');
     }
 
@@ -276,14 +276,14 @@ class AvatarChatDashboard {
         if (!this.currentAvatar) return;
 
         const welcomeText = `Cześć! Jestem ${this.currentAvatar.name}, ${this.currentAvatar.description.toLowerCase()}. Specjalizuję się w ${this.currentAvatar.specialization}. Jak mogę Ci pomóc?`;
-        
+
         this.addMessage('bot', welcomeText);
     }
 
     async sendMessage() {
         const input = document.getElementById('messageInput');
         const message = input?.value?.trim();
-        
+
         if (!message || this.isProcessing || !this.currentAvatar) return;
 
         // Add user message
@@ -297,10 +297,10 @@ class AvatarChatDashboard {
         try {
             // Send to backend
             const response = await this.sendToBackend(message);
-            
+
             // Add bot response
             this.addMessage('bot', response.message);
-            
+
             // Update flow status if needed
             if (response.flow_info) {
                 this.updateFlowStatus(response.flow_info);
@@ -318,7 +318,7 @@ class AvatarChatDashboard {
     async sendToBackend(message) {
         try {
             const startTime = Date.now();
-            
+
             const response = await this.apiCall('/api/query', {
                 method: 'POST',
                 body: {
@@ -328,23 +328,23 @@ class AvatarChatDashboard {
                     avatar_id: this.currentAvatar.type === 'custom' ? this.currentAvatar.id.replace('custom_', '') : null
                 }
             });
-            
+
             const endTime = Date.now();
             console.log(`API call took ${endTime - startTime}ms`);
             console.log('API Response:', response);
-            
+
             // Update session
             this.currentSession = response.session_id;
-            
+
             // Get real flow info from session state (like classic dashboard)
             await this.refreshFlowState();
-            
+
             return {
                 message: response.message,
                 analysis: response.analysis,
                 flow_info: response.flow_info
             };
-            
+
         } catch (error) {
             console.error('API call failed:', error);
             throw new Error(`Błąd komunikacji z serwerem: ${error.message}`);
@@ -354,17 +354,17 @@ class AvatarChatDashboard {
     async apiCall(endpoint, options = {}) {
         // Add /api prefix if not already present
         const url = endpoint.startsWith('/api/') ? endpoint : `/api${endpoint}`;
-        
+
         // Use AuthManager for authenticated requests
         const response = await window.authManager.makeAuthenticatedRequest(url, {
             method: options.method || 'GET',
             body: options.body ? JSON.stringify(options.body) : undefined,
             headers: options.headers
         });
-        
+
         if (!response.ok) {
-            const error = await response.json().catch(() => ({ 
-                message: `HTTP ${response.status}: ${response.statusText}` 
+            const error = await response.json().catch(() => ({
+                message: `HTTP ${response.status}: ${response.statusText}`
             }));
             throw new Error(error.message || `HTTP ${response.status}`);
         }
@@ -377,40 +377,40 @@ class AvatarChatDashboard {
             console.log('No session - cannot refresh flow state');
             return;
         }
-        
+
         try {
             console.log(`🔄 Refreshing flow state for session: ${this.currentSession}`);
-            const response = await this.apiCall(`/state/${this.currentSession}`, { method: 'GET' });
-            
+            const response = await this.apiCall(`/state/${this.currentSession}`, {method: 'GET'});
+
             if (response.status === 'success' && response.activeFlow) {
                 console.log('✅ Active flow received from session state:', response.activeFlow);
-                
+
                 // Convert activeFlow to our flow_info format
                 const flowInfo = {
                     current_flow: response.activeFlow.flow_id,
-                    detected_intent: response.activeFlow.triggered_intent || 
-                                   response.activeFlow.context?.intent || 
-                                   response.mindState?.stack?.[response.mindState.stack.length - 1]?.intent ||
-                                   'unknown',
+                    detected_intent: response.activeFlow.triggered_intent ||
+                        response.activeFlow.context?.intent ||
+                        response.mindState?.stack?.[response.mindState.stack.length - 1]?.intent ||
+                        'unknown',
                     current_step: response.activeFlow.current_step,
                     current_step_index: response.activeFlow.step_index || 1,
                     completed_steps: response.activeFlow.completed_steps || [],
                     status: response.activeFlow.status
                 };
-                
+
                 console.log('🔍 Intent sources:', {
                     triggered_intent: response.activeFlow.triggered_intent,
                     context_intent: response.activeFlow.context?.intent,
                     mindstate_intent: response.mindState?.stack?.[response.mindState.stack.length - 1]?.intent,
                     final_intent: flowInfo.detected_intent
                 });
-                
+
                 this.updateCurrentFlow(flowInfo);
             } else {
                 console.log('ℹ️ No active flow in session state');
                 this.clearCurrentFlow();
             }
-            
+
         } catch (error) {
             console.error('❌ Error refreshing flow state:', error);
             // Fallback to inference if session state fails
@@ -421,7 +421,7 @@ class AvatarChatDashboard {
     clearCurrentFlow() {
         const currentFlowContent = document.getElementById('currentFlowContent');
         const flowStepsContainer = document.getElementById('flowStepsContainer');
-        
+
         if (currentFlowContent) {
             currentFlowContent.innerHTML = `
                 <div class="no-active-flow">
@@ -431,7 +431,7 @@ class AvatarChatDashboard {
                 </div>
             `;
         }
-        
+
         if (flowStepsContainer) {
             flowStepsContainer.style.display = 'none';
         }
@@ -440,7 +440,7 @@ class AvatarChatDashboard {
     tryExtractFlowInfo(response) {
         // Try to create flow_info from available response data
         let flowInfo = {};
-        
+
         // Check if we have analysis data
         if (response.analysis) {
             console.log('Analysis data (full object):', JSON.stringify(response.analysis, null, 2));
@@ -451,29 +451,29 @@ class AvatarChatDashboard {
                 flowInfo.current_flow = response.analysis.current_flow;
             }
             if (response.analysis.flow_execution) {
-                flowInfo = { ...flowInfo, ...response.analysis.flow_execution };
+                flowInfo = {...flowInfo, ...response.analysis.flow_execution};
             }
         }
 
         // Try to infer flow from bot response content
         const botMessage = response.message || '';
         console.log('Bot message for flow inference:', botMessage);
-        
+
         // Analyze bot response to infer current flow
         const inferredFlow = this.inferFlowFromResponse(botMessage);
         if (inferredFlow) {
-            flowInfo = { ...flowInfo, ...inferredFlow };
+            flowInfo = {...flowInfo, ...inferredFlow};
             console.log('Inferred flow from response:', inferredFlow);
         }
 
         // Fallback for first message
         if (Object.keys(flowInfo).length === 0 && (!this.chatHistory || this.chatHistory.length <= 2)) {
-            const greetingFlow = this.availableFlows.find(f => 
-                f.id === 'greeting_flow' || 
+            const greetingFlow = this.availableFlows.find(f =>
+                f.id === 'greeting_flow' ||
                 f.name.toLowerCase().includes('powitanie') ||
                 f.entry_intents?.includes('greeting')
             );
-            
+
             if (greetingFlow) {
                 flowInfo = {
                     current_flow: greetingFlow.id,
@@ -495,7 +495,7 @@ class AvatarChatDashboard {
 
     inferFlowFromResponse(botMessage) {
         const message = botMessage.toLowerCase();
-        
+
         // Keywords that suggest specific flows (matching our actual flow IDs)
         const flowKeywords = {
             'greeting_flow': ['witaj', 'cześć', 'dzień dobry', 'powitanie', 'jak mogę', 'widzę że twoja firma'],
@@ -547,10 +547,10 @@ class AvatarChatDashboard {
 
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${sender}`;
-        
-        const timestamp = new Date().toLocaleTimeString('pl-PL', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
+
+        const timestamp = new Date().toLocaleTimeString('pl-PL', {
+            hour: '2-digit',
+            minute: '2-digit'
         });
 
         messageDiv.innerHTML = `
@@ -602,16 +602,16 @@ class AvatarChatDashboard {
         const currentFlowContent = document.getElementById('currentFlowContent');
         const flowStepsContainer = document.getElementById('flowStepsContainer');
         const progressText = document.querySelector('.progress-text');
-        
+
         if (!flowInfo || !flowInfo.current_flow) {
             // No active flow - reset all flows to available status
             this.availableFlows.forEach(f => {
                 f.status = 'available';
             });
-            
+
             // Update the flow panel to reflect visual changes
             this.updateFlowPanel();
-            
+
             if (currentFlowContent) {
                 currentFlowContent.innerHTML = `
                     <div class="no-active-flow">
@@ -634,7 +634,7 @@ class AvatarChatDashboard {
         this.availableFlows.forEach(f => {
             f.status = f.id === flowInfo.current_flow ? 'active' : 'available';
         });
-        
+
         // Update the flow panel to reflect visual changes
         this.updateFlowPanel();
 
@@ -671,26 +671,26 @@ class AvatarChatDashboard {
         const flowSteps = document.getElementById('flowSteps');
         const currentStepNumber = document.getElementById('currentStepNumber');
         const totalSteps = document.getElementById('totalSteps');
-        
+
         if (!flowStepsContainer || !flowSteps) return;
 
         const steps = flow.steps || [];
         const currentStepId = flowInfo.current_step;
-        
+
         // Update counters
         if (currentStepNumber) currentStepNumber.textContent = flowInfo.current_step_index || 0;
         if (totalSteps) totalSteps.textContent = steps.length;
-        
+
         // Generate steps HTML
         const stepsHtml = steps.map((step, index) => {
             let stepClass = 'flow-step pending';
-            
+
             if (flowInfo.completed_steps && flowInfo.completed_steps.includes(step.id)) {
                 stepClass = 'flow-step completed';
             } else if (step.id === currentStepId) {
                 stepClass = 'flow-step active';
             }
-            
+
             return `
                 <div class="${stepClass}">
                     <div class="step-indicator"></div>
@@ -712,7 +712,7 @@ class AvatarChatDashboard {
         this.currentAvatar = null;
         this.availableFlows = [];
         this.activeFlow = null;
-        
+
         // Update UI
         const avatarIcon = document.querySelector('.avatar-icon');
         const avatarName = document.getElementById('avatarName');
@@ -722,7 +722,7 @@ class AvatarChatDashboard {
         if (avatarIcon) avatarIcon.textContent = '🤖';
         if (avatarName) avatarName.textContent = 'Wybierz Avatar';
         if (avatarDescription) avatarDescription.textContent = 'Wybierz avatar aby rozpocząć rozmowę';
-        
+
         if (flowContent) {
             flowContent.innerHTML = `
                 <div class="no-avatar-selected">
@@ -779,24 +779,24 @@ class AvatarChatDashboard {
 
     async refreshFlows() {
         if (!this.currentAvatar) return;
-        
+
         this.showLoading('Odświeżanie flows...');
         await this.loadAvatarFlows(this.currentAvatar.id);
-        
+
         // After refreshing flows, restore the active flow state from session
         if (this.currentSession) {
             await this.refreshFlowState();
         } else {
             this.updateFlowPanel();
         }
-        
+
         this.hideLoading();
         this.showNotification('Flows odświeżone', 'success');
     }
 
     openFlowStudio() {
         if (!this.currentAvatar) return;
-        
+
         // Open Flow Studio with current avatar context
         const url = `/flow-studio.html?avatar=${this.currentAvatar.id}`;
         window.open(url, '_blank');
@@ -814,7 +814,7 @@ class AvatarChatDashboard {
             messages: this.chatHistory
         };
 
-        const blob = new Blob([JSON.stringify(chatData, null, 2)], { type: 'application/json' });
+        const blob = new Blob([JSON.stringify(chatData, null, 2)], {type: 'application/json'});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;

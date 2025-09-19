@@ -1,7 +1,7 @@
-import { Request, Response } from 'express';
+import {Request, Response} from 'express';
 import ExtendedDatabaseService from '../services/extended-database.service';
-import { ExecutionTimerService } from '../services/execution-timer.service';
-import { CompanyProfile } from '../models/auth-types';
+import {ExecutionTimerService} from '../services/execution-timer.service';
+import {CompanyProfile} from '../models/auth-types';
 
 export class ExtendedCompanyProfileController {
     private databaseService: ExtendedDatabaseService;
@@ -20,7 +20,7 @@ export class ExtendedCompanyProfileController {
 
         try {
             const profileData = req.body;
-            
+
             // Validation
             if (!profileData.name || !profileData.industry) {
                 res.status(400).json({
@@ -70,7 +70,7 @@ export class ExtendedCompanyProfileController {
         try {
             // For now, use default user - later get from auth
             const userId = req.query.user_id as string || 'default_user';
-            
+
             console.log('📥 Getting company profiles for user:', userId);
 
             const profiles = await this.databaseService.getCompanyProfilesByUserId(userId);
@@ -109,8 +109,8 @@ export class ExtendedCompanyProfileController {
         timer.start();
 
         try {
-            const { profileId } = req.params;
-            
+            const {profileId} = req.params;
+
             console.log('📥 Getting company profile:', profileId);
 
             const profile = await this.databaseService.getCompanyProfileById(profileId);
@@ -151,9 +151,9 @@ export class ExtendedCompanyProfileController {
         timer.start();
 
         try {
-            const { profileId } = req.params;
+            const {profileId} = req.params;
             const updateData = req.body;
-            
+
             console.log('✏️ Updating company profile:', profileId);
 
             const updatedProfile = await this.databaseService.updateCompanyProfile(profileId, updateData);
@@ -195,8 +195,8 @@ export class ExtendedCompanyProfileController {
         timer.start();
 
         try {
-            const { profileId } = req.params;
-            
+            const {profileId} = req.params;
+
             console.log('🗑️ Deleting company profile:', profileId);
 
             const deleted = await this.databaseService.deleteCompanyProfile(profileId);

@@ -10,130 +10,130 @@
     <script src="https://unpkg.com/dagre-d3@0.6.4/dist/dagre-d3.min.js"></script>
 </head>
 <body>
-    <div class="dashboard">
-        <!-- Header -->
-        <header class="header">
-            <h1>🤖 AI Avatar Business Dashboard</h1>
-            <div class="header-controls">
-                <div class="avatar-selector">
-                    <label for="avatar-type">👤 Avatar:</label>
-                    <select id="avatar-type" class="avatar-dropdown">
-                        <option value="networker">🤝 Networker (Anna Kowalczyk)</option>
-                        <option value="trainer">🎓 Trener (Prof. Anna Kowalska)</option>
-                    </select>
-                </div>
-                <button id="clear-session" class="btn btn-danger">🗑️ Wyczyść sesję</button>
-                <button id="export-data" class="btn btn-secondary">📥 Eksportuj dane</button>
+<div class="dashboard">
+    <!-- Header -->
+    <header class="header">
+        <h1>🤖 AI Avatar Business Dashboard</h1>
+        <div class="header-controls">
+            <div class="avatar-selector">
+                <label for="avatar-type">👤 Avatar:</label>
+                <select id="avatar-type" class="avatar-dropdown">
+                    <option value="networker">🤝 Networker (Anna Kowalczyk)</option>
+                    <option value="trainer">🎓 Trener (Prof. Anna Kowalska)</option>
+                </select>
             </div>
-        </header>
+            <button id="clear-session" class="btn btn-danger">🗑️ Wyczyść sesję</button>
+            <button id="export-data" class="btn btn-secondary">📥 Eksportuj dane</button>
+        </div>
+    </header>
 
-        <!-- Main content -->
-        <main class="main-content">
-            <!-- Left Panel - Chat -->
-            <div class="panel chat-panel">
-                <div class="panel-header">
-                    <h2>💬 Chat Testing</h2>
-                    <span class="session-id">Session: <span id="current-session">-</span></span>
-                </div>
-                
-                <div class="chat-container">
-                    <div class="chat-messages" id="chat-messages">
-                        <!-- Messages will be added here -->
-                    </div>
-                    
-                    <div class="chat-input">
-                        <input type="text" id="message-input" placeholder="Wpisz wiadomość..." />
-                        <button id="send-message" class="btn btn-primary">📤 Wyślij</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Center Panel - Flow Graph -->
-            <div class="panel flow-panel">
-                <div class="panel-header">
-                    <h2>📊 Flow Graph</h2>
-                    <div class="flow-controls">
-                        <select id="flow-selector">
-                            <option value="">Wybierz flow...</option>
-                        </select>
-                        <button id="reset-graph" class="btn btn-secondary">🔄 Reset</button>
-                    </div>
-                </div>
-                
-                <div class="graph-container">
-                    <svg id="flow-graph" width="100%" height="400"></svg>
-                </div>
-            </div>
-
-            <!-- Right Panel - MindState Monitor -->
-            <div class="panel mindstate-panel">
-                <div class="panel-header">
-                    <h2>🧠 MindState Monitor</h2>
-                    <div class="mindstate-controls">
-                        <button id="refresh-mindstate" class="btn btn-secondary">🔄 Odśwież</button>
-                    </div>
-                </div>
-                
-                <div class="mindstate-container">
-                    <div class="mindstate-section">
-                        <h3>📚 Stack History</h3>
-                        <div id="mindstate-stack" class="mindstate-stack">
-                            <!-- Stack items will be added here -->
-                        </div>
-                    </div>
-                    
-                    <div class="mindstate-section">
-                        <h3>🎯 Current Intent</h3>
-                        <div id="current-intent" class="current-intent">
-                            <span class="intent-name">-</span>
-                            <span class="intent-confidence">-</span>
-                        </div>
-                    </div>
-                    
-                    <div class="mindstate-section">
-                        <h3>🔄 Current Flow</h3>
-                        <div id="current-flow" class="current-flow">
-                            <div class="flow-name">-</div>
-                            <div class="flow-step">-</div>
-                            <div class="flow-progress">
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 0%"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mindstate-section">
-                        <h3>👤 Business Avatar</h3>
-                        <div id="business-avatar" class="business-avatar">
-                            <div class="avatar-name">-</div>
-                            <div class="avatar-company">-</div>
-                            <div class="avatar-expertise">-</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-
-        <!-- Bottom Panel - Debug Info -->
-        <div class="debug-panel">
+    <!-- Main content -->
+    <main class="main-content">
+        <!-- Left Panel - Chat -->
+        <div class="panel chat-panel">
             <div class="panel-header">
-                <h3>🔧 Debug Info</h3>
-                <button id="toggle-debug" class="btn btn-small">👁️ Toggle</button>
+                <h2>💬 Chat Testing</h2>
+                <span class="session-id">Session: <span id="current-session">-</span></span>
             </div>
-            <div class="debug-content" id="debug-content">
-                <div class="debug-section">
-                    <h4>📡 API Calls</h4>
-                    <div id="api-log" class="api-log"></div>
+
+            <div class="chat-container">
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Messages will be added here -->
                 </div>
-                <div class="debug-section">
-                    <h4>📊 Performance</h4>
-                    <div id="performance-log" class="performance-log"></div>
+
+                <div class="chat-input">
+                    <input type="text" id="message-input" placeholder="Wpisz wiadomość..."/>
+                    <button id="send-message" class="btn btn-primary">📤 Wyślij</button>
                 </div>
             </div>
         </div>
-    </div>
 
-    <script src="app.js"></script>
+        <!-- Center Panel - Flow Graph -->
+        <div class="panel flow-panel">
+            <div class="panel-header">
+                <h2>📊 Flow Graph</h2>
+                <div class="flow-controls">
+                    <select id="flow-selector">
+                        <option value="">Wybierz flow...</option>
+                    </select>
+                    <button id="reset-graph" class="btn btn-secondary">🔄 Reset</button>
+                </div>
+            </div>
+
+            <div class="graph-container">
+                <svg id="flow-graph" width="100%" height="400"></svg>
+            </div>
+        </div>
+
+        <!-- Right Panel - MindState Monitor -->
+        <div class="panel mindstate-panel">
+            <div class="panel-header">
+                <h2>🧠 MindState Monitor</h2>
+                <div class="mindstate-controls">
+                    <button id="refresh-mindstate" class="btn btn-secondary">🔄 Odśwież</button>
+                </div>
+            </div>
+
+            <div class="mindstate-container">
+                <div class="mindstate-section">
+                    <h3>📚 Stack History</h3>
+                    <div id="mindstate-stack" class="mindstate-stack">
+                        <!-- Stack items will be added here -->
+                    </div>
+                </div>
+
+                <div class="mindstate-section">
+                    <h3>🎯 Current Intent</h3>
+                    <div id="current-intent" class="current-intent">
+                        <span class="intent-name">-</span>
+                        <span class="intent-confidence">-</span>
+                    </div>
+                </div>
+
+                <div class="mindstate-section">
+                    <h3>🔄 Current Flow</h3>
+                    <div id="current-flow" class="current-flow">
+                        <div class="flow-name">-</div>
+                        <div class="flow-step">-</div>
+                        <div class="flow-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mindstate-section">
+                    <h3>👤 Business Avatar</h3>
+                    <div id="business-avatar" class="business-avatar">
+                        <div class="avatar-name">-</div>
+                        <div class="avatar-company">-</div>
+                        <div class="avatar-expertise">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Panel - Debug Info -->
+    <div class="debug-panel">
+        <div class="panel-header">
+            <h3>🔧 Debug Info</h3>
+            <button id="toggle-debug" class="btn btn-small">👁️ Toggle</button>
+        </div>
+        <div class="debug-content" id="debug-content">
+            <div class="debug-section">
+                <h4>📡 API Calls</h4>
+                <div id="api-log" class="api-log"></div>
+            </div>
+            <div class="debug-section">
+                <h4>📊 Performance</h4>
+                <div id="performance-log" class="performance-log"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="app.js"></script>
 </body>
 </html> 

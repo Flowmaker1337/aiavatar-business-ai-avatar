@@ -12,14 +12,14 @@ const FlowGraphEditor = (() => {
         addEdge,
         MarkerType,
     } = window.ReactFlow || {};
-    
+
     // Fallback for MarkerType if not available
     const ArrowClosed = MarkerType?.ArrowClosed || 'arrowclosed';
     console.log('🔍 FlowGraphEditor: ArrowClosed value:', ArrowClosed, 'MarkerType:', !!MarkerType);
 
     // Custom Node Types for AI Avatar Flows
     const nodeTypes = {
-        start: ({ data, selected }) => React.createElement('div', {
+        start: ({data, selected}) => React.createElement('div', {
             className: `flow-node flow-node-start ${selected ? 'selected' : ''}`,
             style: {
                 padding: '12px 20px',
@@ -33,14 +33,14 @@ const FlowGraphEditor = (() => {
                 textAlign: 'center'
             }
         }, [
-            React.createElement('div', { key: 'title', style: { fontSize: '14px' } }, data.title || 'Start'),
-            data.entry_intents && React.createElement('div', { 
-                key: 'intents', 
-                style: { fontSize: '10px', opacity: 0.8, marginTop: '4px' } 
+            React.createElement('div', {key: 'title', style: {fontSize: '14px'}}, data.title || 'Start'),
+            data.entry_intents && React.createElement('div', {
+                key: 'intents',
+                style: {fontSize: '10px', opacity: 0.8, marginTop: '4px'}
             }, `Intents: ${data.entry_intents.join(', ')}`)
         ]),
 
-        intent: ({ data, selected }) => React.createElement('div', {
+        intent: ({data, selected}) => React.createElement('div', {
             className: `flow-node flow-node-intent ${selected ? 'selected' : ''}`,
             style: {
                 padding: '12px 16px',
@@ -53,21 +53,21 @@ const FlowGraphEditor = (() => {
                 maxWidth: '250px'
             }
         }, [
-            React.createElement('div', { 
-                key: 'title', 
-                style: { fontWeight: 'bold', fontSize: '13px', marginBottom: '4px' } 
+            React.createElement('div', {
+                key: 'title',
+                style: {fontWeight: 'bold', fontSize: '13px', marginBottom: '4px'}
             }, data.title || 'Intent Step'),
-            React.createElement('div', { 
-                key: 'intent', 
-                style: { fontSize: '11px', opacity: 0.9 } 
+            React.createElement('div', {
+                key: 'intent',
+                style: {fontSize: '11px', opacity: 0.9}
             }, data.intent_name || 'No intent'),
-            data.confidence && React.createElement('div', { 
-                key: 'confidence', 
-                style: { fontSize: '10px', opacity: 0.7, marginTop: '2px' } 
+            data.confidence && React.createElement('div', {
+                key: 'confidence',
+                style: {fontSize: '10px', opacity: 0.7, marginTop: '2px'}
             }, `Confidence: ${data.confidence}`)
         ]),
 
-        response: ({ data, selected }) => React.createElement('div', {
+        response: ({data, selected}) => React.createElement('div', {
             className: `flow-node flow-node-response ${selected ? 'selected' : ''}`,
             style: {
                 padding: '12px 16px',
@@ -80,21 +80,21 @@ const FlowGraphEditor = (() => {
                 maxWidth: '220px'
             }
         }, [
-            React.createElement('div', { 
-                key: 'title', 
-                style: { fontWeight: 'bold', fontSize: '13px', marginBottom: '4px' } 
+            React.createElement('div', {
+                key: 'title',
+                style: {fontWeight: 'bold', fontSize: '13px', marginBottom: '4px'}
             }, data.title || 'AI Response'),
-            React.createElement('div', { 
-                key: 'content', 
-                style: { fontSize: '11px', opacity: 0.9, lineHeight: '1.3' } 
+            React.createElement('div', {
+                key: 'content',
+                style: {fontSize: '11px', opacity: 0.9, lineHeight: '1.3'}
             }, data.system_prompt ? data.system_prompt.substring(0, 60) + '...' : 'No prompt'),
-            data.required && React.createElement('div', { 
-                key: 'required', 
-                style: { fontSize: '10px', opacity: 0.7, marginTop: '2px' } 
+            data.required && React.createElement('div', {
+                key: 'required',
+                style: {fontSize: '10px', opacity: 0.7, marginTop: '2px'}
             }, 'Required: ✓')
         ]),
 
-        condition: ({ data, selected }) => React.createElement('div', {
+        condition: ({data, selected}) => React.createElement('div', {
             className: `flow-node flow-node-condition ${selected ? 'selected' : ''}`,
             style: {
                 padding: '12px 16px',
@@ -108,28 +108,28 @@ const FlowGraphEditor = (() => {
                 transformOrigin: 'center'
             }
         }, [
-            React.createElement('div', { 
-                key: 'title', 
-                style: { 
-                    fontWeight: 'bold', 
-                    fontSize: '12px', 
+            React.createElement('div', {
+                key: 'title',
+                style: {
+                    fontWeight: 'bold',
+                    fontSize: '12px',
                     transform: 'rotate(-45deg)',
                     textAlign: 'center'
-                } 
+                }
             }, data.title || 'Condition'),
-            data.conditions && React.createElement('div', { 
-                key: 'conditions', 
-                style: { 
-                    fontSize: '10px', 
-                    opacity: 0.8, 
+            data.conditions && React.createElement('div', {
+                key: 'conditions',
+                style: {
+                    fontSize: '10px',
+                    opacity: 0.8,
                     marginTop: '2px',
                     transform: 'rotate(-45deg)',
                     textAlign: 'center'
-                } 
+                }
             }, `${data.conditions.length} rules`)
         ]),
 
-        memory: ({ data, selected }) => React.createElement('div', {
+        memory: ({data, selected}) => React.createElement('div', {
             className: `flow-node flow-node-memory ${selected ? 'selected' : ''}`,
             style: {
                 padding: '12px 16px',
@@ -141,21 +141,21 @@ const FlowGraphEditor = (() => {
                 minWidth: '150px'
             }
         }, [
-            React.createElement('div', { 
-                key: 'title', 
-                style: { fontWeight: 'bold', fontSize: '13px', marginBottom: '4px' } 
+            React.createElement('div', {
+                key: 'title',
+                style: {fontWeight: 'bold', fontSize: '13px', marginBottom: '4px'}
             }, data.title || 'Memory Op'),
-            React.createElement('div', { 
-                key: 'operation', 
-                style: { fontSize: '11px', opacity: 0.9 } 
+            React.createElement('div', {
+                key: 'operation',
+                style: {fontSize: '11px', opacity: 0.9}
             }, data.memory_operation || 'Store context'),
-            data.memory_key && React.createElement('div', { 
-                key: 'key', 
-                style: { fontSize: '10px', opacity: 0.7, marginTop: '2px' } 
+            data.memory_key && React.createElement('div', {
+                key: 'key',
+                style: {fontSize: '10px', opacity: 0.7, marginTop: '2px'}
             }, `Key: ${data.memory_key}`)
         ]),
 
-        knowledge: ({ data, selected }) => React.createElement('div', {
+        knowledge: ({data, selected}) => React.createElement('div', {
             className: `flow-node flow-node-knowledge ${selected ? 'selected' : ''}`,
             style: {
                 padding: '12px 16px',
@@ -167,21 +167,21 @@ const FlowGraphEditor = (() => {
                 minWidth: '150px'
             }
         }, [
-            React.createElement('div', { 
-                key: 'title', 
-                style: { fontWeight: 'bold', fontSize: '13px', marginBottom: '4px' } 
+            React.createElement('div', {
+                key: 'title',
+                style: {fontWeight: 'bold', fontSize: '13px', marginBottom: '4px'}
             }, data.title || 'Knowledge'),
-            React.createElement('div', { 
-                key: 'source', 
-                style: { fontSize: '11px', opacity: 0.9 } 
+            React.createElement('div', {
+                key: 'source',
+                style: {fontSize: '11px', opacity: 0.9}
             }, data.knowledge_source || 'RAG Query'),
-            data.vector_search && React.createElement('div', { 
-                key: 'vector', 
-                style: { fontSize: '10px', opacity: 0.7, marginTop: '2px' } 
+            data.vector_search && React.createElement('div', {
+                key: 'vector',
+                style: {fontSize: '10px', opacity: 0.7, marginTop: '2px'}
             }, 'Vector Search: ✓')
         ]),
 
-        end: ({ data, selected }) => React.createElement('div', {
+        end: ({data, selected}) => React.createElement('div', {
             className: `flow-node flow-node-end ${selected ? 'selected' : ''}`,
             style: {
                 padding: '12px 20px',
@@ -195,16 +195,19 @@ const FlowGraphEditor = (() => {
                 textAlign: 'center'
             }
         }, [
-            React.createElement('div', { key: 'title', style: { fontSize: '14px' } }, data.title || 'End'),
-            data.success_criteria && React.createElement('div', { 
-                key: 'criteria', 
-                style: { fontSize: '10px', opacity: 0.8, marginTop: '4px' } 
+            React.createElement('div', {key: 'title', style: {fontSize: '14px'}}, data.title || 'End'),
+            data.success_criteria && React.createElement('div', {
+                key: 'criteria',
+                style: {fontSize: '10px', opacity: 0.8, marginTop: '4px'}
             }, 'Success criteria defined')
         ])
     };
 
     // Main FlowGraphEditor Component
-    const FlowGraphEditor = ({ flowDefinitions = [], activeFlow = null, onNodeClick = () => {}, editable = false }) => {
+    const FlowGraphEditor = ({
+                                 flowDefinitions = [], activeFlow = null, onNodeClick = () => {
+        }, editable = false
+                             }) => {
         const [nodes, setNodes, onNodesChange] = useNodesState([]);
         const [edges, setEdges, onEdgesChange] = useEdgesState([]);
         const [selectedNode, setSelectedNode] = React.useState(null);
@@ -218,7 +221,7 @@ const FlowGraphEditor = (() => {
             const loadTemplatesAndIntents = async () => {
                 try {
                     console.log('🔄 FlowGraphEditor: Loading prompt templates and intents...');
-                    
+
                     // Load prompt templates
                     const promptResponse = await fetch('/api/prompt-templates');
                     console.log('🔍 FlowGraphEditor: Prompt templates response status:', promptResponse.status);
@@ -231,7 +234,7 @@ const FlowGraphEditor = (() => {
                     } else {
                         console.error('❌ FlowGraphEditor: Failed to load prompt templates:', promptResponse.status);
                     }
-                    
+
                     // Load intent definitions
                     const intentResponse = await fetch('/api/intent-definitions');
                     console.log('🔍 FlowGraphEditor: Intent definitions response status:', intentResponse.status);
@@ -246,7 +249,7 @@ const FlowGraphEditor = (() => {
                     }
                 } catch (error) {
                     console.error('❌ FlowGraphEditor: Error loading templates/intents:', error);
-                    
+
                     // Fallback data for testing
                     console.log('🔧 FlowGraphEditor: Using fallback data for testing');
                     setPromptTemplates([
@@ -257,13 +260,13 @@ const FlowGraphEditor = (() => {
                             user_prompt_template: 'Test user prompt: {{user_message}}'
                         },
                         {
-                            id: 'company_overview_template', 
+                            id: 'company_overview_template',
                             intent: 'company_overview',
                             system_prompt: 'Test system prompt for company overview',
                             user_prompt_template: 'Test company prompt: {{user_message}}'
                         }
                     ]);
-                    
+
                     setIntentDefinitions([
                         {
                             name: 'greeting',
@@ -273,14 +276,14 @@ const FlowGraphEditor = (() => {
                         },
                         {
                             name: 'company_overview',
-                            description: 'Test company overview intent', 
+                            description: 'Test company overview intent',
                             keywords: ['company', 'overview'],
                             examples: ['Tell me about your company']
                         }
                     ]);
                 }
             };
-            
+
             loadTemplatesAndIntents();
         }, []);
 
@@ -302,7 +305,11 @@ const FlowGraphEditor = (() => {
             }
 
             console.log('🎯 FlowGraphEditor: Converting flows to ReactFlow format:', flowDefinitions.length, 'with', promptTemplates.length, 'templates');
-            console.log('🔍 FlowGraphEditor: Flow definitions:', flowDefinitions.map(f => ({ id: f.id, name: f.name, steps: f.steps?.length || 0 })));
+            console.log('🔍 FlowGraphEditor: Flow definitions:', flowDefinitions.map(f => ({
+                id: f.id,
+                name: f.name,
+                steps: f.steps?.length || 0
+            })));
 
             const flowNodes = [];
             const flowEdges = [];
@@ -312,12 +319,12 @@ const FlowGraphEditor = (() => {
                 const flowY = yOffset;
                 const flowHeight = 80;
                 const stepSpacing = 280;  // Increased from 180
-                
+
                 // Add flow title node
                 flowNodes.push({
                     id: `flow-${flow.id}`,
                     type: 'start',
-                    position: { x: -200, y: flowY + 10 },
+                    position: {x: -200, y: flowY + 10},
                     data: {
                         title: flow.name,
                         entry_intents: flow.entry_intents || [],
@@ -331,7 +338,7 @@ const FlowGraphEditor = (() => {
                     flow.steps.forEach((step, stepIndex) => {
                         const stepX = stepIndex * stepSpacing;
                         const stepY = flowY + 10;
-                        
+
                         // Determine node type based on step properties
                         let nodeType = 'response'; // default
                         if (step.id === 'start' || step.type === 'start') nodeType = 'start';
@@ -342,13 +349,13 @@ const FlowGraphEditor = (() => {
                         else if (step.type === 'end' || step.id.includes('end')) nodeType = 'end';
 
                         // Check if this step is currently active
-                        const isActive = activeFlow && 
-                                        activeFlow.flow_id === flow.id && 
-                                        activeFlow.current_step === step.id;
+                        const isActive = activeFlow &&
+                            activeFlow.flow_id === flow.id &&
+                            activeFlow.current_step === step.id;
 
                         // Find prompt template for this step/intent
                         let stepIntent = step.intent_name || step.id;
-                        
+
                         // Smart mapping: step ID -> intent name
                         const stepToIntentMap = {
                             'initial_greeting': 'greeting',
@@ -439,21 +446,21 @@ const FlowGraphEditor = (() => {
                             'leadership_guidance': 'user_expectations',
                             'business_networking': 'conversation_redirect'
                         };
-                        
+
                         // Use mapped intent if available
                         if (stepToIntentMap[step.id]) {
                             stepIntent = stepToIntentMap[step.id];
                             console.log(`🔄 Mapped step ${step.id} → intent ${stepIntent}`);
                         }
-                        
+
                         const promptTemplate = promptTemplates.find(t => t.intent === stepIntent);
                         const intentDefinition = intentDefinitions.find(i => i.name === stepIntent);
-                        
+
                         // Debug template matching for ALL steps
                         const hasTemplate = !!promptTemplate;
                         const hasIntent = !!intentDefinition;
                         console.log(`🔍 Step ${step.id} (${stepIntent}): Template=${hasTemplate ? '✅' : '❌'} Intent=${hasIntent ? '✅' : '❌'}`);
-                        
+
                         if (!hasTemplate) {
                             console.log(`  ❌ Missing template for "${stepIntent}". Available:`, promptTemplates.map(t => t.intent).slice(0, 5));
                         }
@@ -466,7 +473,7 @@ const FlowGraphEditor = (() => {
                         flowNodes.push({
                             id: `${flow.id}-${step.id}`,
                             type: nodeType,
-                            position: { x: stepX, y: stepY },
+                            position: {x: stepX, y: stepY},
                             data: {
                                 // Step properties
                                 title: step.title || step.name || step.id,
@@ -511,12 +518,12 @@ const FlowGraphEditor = (() => {
                                     console.log(`⏭️ Skipping 'completed' for step ${step.id}`);
                                     return;
                                 }
-                                
+
                                 const targetStepExists = flow.steps.find(s => s.id === nextStepId);
                                 if (targetStepExists) {
-                                    const isActiveEdge = isActive && 
-                                                        activeFlow?.current_step === step.id;
-                                    
+                                    const isActiveEdge = isActive &&
+                                        activeFlow?.current_step === step.id;
+
                                     const edge = {
                                         id: `edge-${flow.id}-${step.id}-${nextStepId}`,
                                         source: `${flow.id}-${step.id}`,
@@ -525,13 +532,13 @@ const FlowGraphEditor = (() => {
                                         markerEnd: {
                                             type: ArrowClosed,
                                         },
-                                        style: { 
+                                        style: {
                                             stroke: isActiveEdge ? '#22c55e' : '#ffffff',
                                             strokeWidth: isActiveEdge ? 4 : 3
                                         },
                                         animated: isActiveEdge
                                     };
-                                    
+
                                     console.log(`✅ Adding edge: ${step.id} -> ${nextStepId}`, {
                                         id: edge.id,
                                         source: edge.source,
@@ -547,9 +554,9 @@ const FlowGraphEditor = (() => {
                             });
                         } else if (stepIndex < flow.steps.length - 1) {
                             // Fallback: consecutive steps if no next_steps defined
-                            const isActiveEdge = isActive && 
-                                                activeFlow?.current_step === step.id;
-                            
+                            const isActiveEdge = isActive &&
+                                activeFlow?.current_step === step.id;
+
                             const edge = {
                                 id: `edge-${flow.id}-${step.id}-${flow.steps[stepIndex + 1].id}`,
                                 source: `${flow.id}-${step.id}`,
@@ -558,13 +565,13 @@ const FlowGraphEditor = (() => {
                                 markerEnd: {
                                     type: ArrowClosed,
                                 },
-                                style: { 
+                                style: {
                                     stroke: isActiveEdge ? '#22c55e' : '#ffffff',
                                     strokeWidth: isActiveEdge ? 4 : 3
                                 },
                                 animated: isActiveEdge
                             };
-                            
+
                             console.log(`🔄 Fallback edge: ${step.id} -> ${flow.steps[stepIndex + 1].id}`, {
                                 id: edge.id,
                                 source: edge.source,
@@ -587,9 +594,9 @@ const FlowGraphEditor = (() => {
             console.log('🎯 FlowGraphEditor: Sample nodes:', flowNodes.slice(0, 2));
             console.log('🎯 FlowGraphEditor: Sample edges:', flowEdges.slice(0, 2));
             console.log('🎯 FlowGraphEditor: Edge details:', flowEdges.map(e => ({
-                id: e.id, 
-                source: e.source, 
-                target: e.target, 
+                id: e.id,
+                source: e.source,
+                target: e.target,
                 type: e.type,
                 hasMarker: !!e.markerEnd
             })).slice(0, 5));
@@ -601,7 +608,7 @@ const FlowGraphEditor = (() => {
         const handleNodeClick = React.useCallback((event, node) => {
             console.log('🎯 FlowGraphEditor: Node clicked:', node);
             setSelectedNode(node);
-            
+
             // If editable, open edit dialog
             if (editable) {
                 setEditingNode({
@@ -632,7 +639,7 @@ const FlowGraphEditor = (() => {
                 });
                 setShowNodeDialog(true);
             }
-            
+
             onNodeClick(node);
         }, [onNodeClick, editable]);
 
@@ -645,14 +652,14 @@ const FlowGraphEditor = (() => {
 
         if (!ReactFlow) {
             return React.createElement('div', {
-                style: { 
-                    padding: '20px', 
-                    textAlign: 'center', 
-                    color: '#ef4444' 
+                style: {
+                    padding: '20px',
+                    textAlign: 'center',
+                    color: '#ef4444'
                 }
             }, 'ReactFlow library not loaded. Please check CDN import.');
         }
-        
+
         console.log('🎯 FlowGraphEditor: About to render ReactFlow with:', {
             nodes: nodes.length,
             edges: edges.length,
@@ -666,29 +673,29 @@ const FlowGraphEditor = (() => {
             const edgeElements = document.querySelectorAll('.react-flow__edge-path');
             const svgPaths = document.querySelectorAll('.react-flow__edges path');
             const allSvgPaths = document.querySelectorAll('svg path');
-            
+
             console.log('🔍 DOM Debug: Edge elements (.react-flow__edge-path):', edgeElements.length);
             console.log('🔍 DOM Debug: ReactFlow SVG paths (.react-flow__edges path):', svgPaths.length);
             console.log('🔍 DOM Debug: All SVG paths (svg path):', allSvgPaths.length);
-            
+
             if (svgPaths.length > 0) {
                 console.log('🔍 DOM Debug: First ReactFlow path:', svgPaths[0]);
                 console.log('🔍 DOM Debug: First path style:', window.getComputedStyle(svgPaths[0]));
             }
-            
+
             // Check ReactFlow edges container
             const edgesContainer = document.querySelector('.react-flow__edges');
             if (edgesContainer) {
                 console.log('🔍 DOM Debug: ReactFlow edges container found:', edgesContainer);
                 console.log('🔍 DOM Debug: Edges container children:', edgesContainer.children.length);
             }
-            
+
             // Debug black overlays
             const blackRects = document.querySelectorAll('rect[fill="#000000"], rect[fill="black"]');
             const selectionPanes = document.querySelectorAll('.react-flow__selectionpane, .react-flow__pane');
             console.log('🔍 DOM Debug: Black rectangles found:', blackRects.length);
             console.log('🔍 DOM Debug: Selection panes found:', selectionPanes.length);
-            
+
             if (blackRects.length > 0) {
                 console.log('🔍 DOM Debug: First black rect:', blackRects[0]);
                 blackRects[0].style.display = 'none'; // Force hide
@@ -696,9 +703,9 @@ const FlowGraphEditor = (() => {
         }, 1000);
 
         return React.createElement('div', {
-            style: { 
-                width: '100%', 
-                height: '600px', 
+            style: {
+                width: '100%',
+                height: '600px',
                 border: '1px solid #374151',
                 borderRadius: '8px',
                 backgroundColor: '#0d1117'
@@ -721,8 +728,8 @@ const FlowGraphEditor = (() => {
                 onNodeClick: handleNodeClick,
                 nodeTypes: nodeTypes,
                 fitView: true,
-                fitViewOptions: { padding: 0.1 },
-                defaultViewport: { x: 0, y: 0, zoom: 0.8 },
+                fitViewOptions: {padding: 0.1},
+                defaultViewport: {x: 0, y: 0, zoom: 0.8},
                 minZoom: 0.2,
                 maxZoom: 2,
                 nodesDraggable: editable,
@@ -732,7 +739,7 @@ const FlowGraphEditor = (() => {
                 edgesUpdatable: false,
                 deleteKeyCode: null  // Disable delete key
             }, [
-                React.createElement(Controls, { key: 'controls' }),
+                React.createElement(Controls, {key: 'controls'}),
                 // Background removed - may cause black overlay
                 // React.createElement(Background, { 
                 //     key: 'background',
@@ -758,7 +765,7 @@ const FlowGraphEditor = (() => {
                     }
                 })
             ]),
-            
+
             // Node Edit Dialog
             showNodeDialog && React.createElement('div', {
                 key: 'dialog-overlay',
@@ -791,28 +798,34 @@ const FlowGraphEditor = (() => {
                 }, [
                     React.createElement('h3', {
                         key: 'title',
-                        style: { marginBottom: '16px', color: '#f9fafb' }
+                        style: {marginBottom: '16px', color: '#f9fafb'}
                     }, `Edit ${editingNode?.type || 'Node'}: ${editingNode?.title || 'Untitled'}`),
-                    
+
                     React.createElement('div', {
                         key: 'content',
-                        style: { marginBottom: '16px', maxHeight: '400px', overflowY: 'auto' }
+                        style: {marginBottom: '16px', maxHeight: '400px', overflowY: 'auto'}
                     }, [
                         // === FLOW STEP PROPERTIES ===
                         React.createElement('h4', {
                             key: 'step-header',
-                            style: { color: '#3b82f6', marginBottom: '12px', fontSize: '16px', borderBottom: '1px solid #374151', paddingBottom: '4px' }
+                            style: {
+                                color: '#3b82f6',
+                                marginBottom: '12px',
+                                fontSize: '16px',
+                                borderBottom: '1px solid #374151',
+                                paddingBottom: '4px'
+                            }
                         }, '📋 Flow Step Properties'),
-                        
+
                         React.createElement('label', {
                             key: 'title-label',
-                            style: { display: 'block', marginBottom: '4px', fontSize: '14px', color: '#d1d5db' }
+                            style: {display: 'block', marginBottom: '4px', fontSize: '14px', color: '#d1d5db'}
                         }, 'Step Title:'),
                         React.createElement('input', {
                             key: 'title-input',
                             type: 'text',
                             value: editingNode?.title || '',
-                            onChange: (e) => setEditingNode(prev => ({ ...prev, title: e.target.value })),
+                            onChange: (e) => setEditingNode(prev => ({...prev, title: e.target.value})),
                             style: {
                                 width: '100%',
                                 padding: '8px',
@@ -823,15 +836,15 @@ const FlowGraphEditor = (() => {
                                 marginBottom: '12px'
                             }
                         }),
-                        
+
                         React.createElement('label', {
                             key: 'description-label',
-                            style: { display: 'block', marginBottom: '4px', fontSize: '14px', color: '#d1d5db' }
+                            style: {display: 'block', marginBottom: '4px', fontSize: '14px', color: '#d1d5db'}
                         }, 'Step Description:'),
                         React.createElement('textarea', {
                             key: 'description-input',
                             value: editingNode?.description || '',
-                            onChange: (e) => setEditingNode(prev => ({ ...prev, description: e.target.value })),
+                            onChange: (e) => setEditingNode(prev => ({...prev, description: e.target.value})),
                             rows: 2,
                             style: {
                                 width: '100%',
@@ -844,37 +857,37 @@ const FlowGraphEditor = (() => {
                                 resize: 'vertical'
                             }
                         }),
-                        
+
                         React.createElement('div', {
                             key: 'required-section',
-                            style: { marginBottom: '12px' }
+                            style: {marginBottom: '12px'}
                         }, [
                             React.createElement('label', {
                                 key: 'required-checkbox',
-                                style: { display: 'flex', alignItems: 'center', color: '#d1d5db', cursor: 'pointer' }
+                                style: {display: 'flex', alignItems: 'center', color: '#d1d5db', cursor: 'pointer'}
                             }, [
                                 React.createElement('input', {
                                     key: 'required-input',
                                     type: 'checkbox',
                                     checked: editingNode?.required || false,
-                                    onChange: (e) => setEditingNode(prev => ({ ...prev, required: e.target.checked })),
-                                    style: { marginRight: '8px' }
+                                    onChange: (e) => setEditingNode(prev => ({...prev, required: e.target.checked})),
+                                    style: {marginRight: '8px'}
                                 }),
                                 'Required Step'
                             ])
                         ]),
-                        
+
                         React.createElement('label', {
                             key: 'next-steps-label',
-                            style: { display: 'block', marginBottom: '4px', fontSize: '14px', color: '#d1d5db' }
+                            style: {display: 'block', marginBottom: '4px', fontSize: '14px', color: '#d1d5db'}
                         }, 'Next Steps (comma-separated):'),
                         React.createElement('input', {
                             key: 'next-steps-input',
                             type: 'text',
                             value: (editingNode?.next_steps || []).join(', '),
-                            onChange: (e) => setEditingNode(prev => ({ 
-                                ...prev, 
-                                next_steps: e.target.value.split(',').map(s => s.trim()).filter(s => s) 
+                            onChange: (e) => setEditingNode(prev => ({
+                                ...prev,
+                                next_steps: e.target.value.split(',').map(s => s.trim()).filter(s => s)
                             })),
                             placeholder: 'e.g. step2, step3, completed',
                             style: {
@@ -887,25 +900,31 @@ const FlowGraphEditor = (() => {
                                 marginBottom: '16px'
                             }
                         }),
-                        
+
                         // === INTENT PROPERTIES ===
                         editingNode?.intent_name && React.createElement('div', {
                             key: 'intent-section'
                         }, [
                             React.createElement('h4', {
                                 key: 'intent-header',
-                                style: { color: '#f59e0b', marginBottom: '12px', fontSize: '16px', borderBottom: '1px solid #374151', paddingBottom: '4px' }
+                                style: {
+                                    color: '#f59e0b',
+                                    marginBottom: '12px',
+                                    fontSize: '16px',
+                                    borderBottom: '1px solid #374151',
+                                    paddingBottom: '4px'
+                                }
                             }, `🎯 Intent Properties ${editingNode?.has_intent_definition ? '✅' : '⚠️'}`),
-                            
+
                             React.createElement('label', {
                                 key: 'intent-label',
-                                style: { display: 'block', marginBottom: '4px', fontSize: '14px', color: '#d1d5db' }
+                                style: {display: 'block', marginBottom: '4px', fontSize: '14px', color: '#d1d5db'}
                             }, 'Intent Name:'),
                             React.createElement('input', {
                                 key: 'intent-input',
                                 type: 'text',
                                 value: editingNode?.intent_name || '',
-                                onChange: (e) => setEditingNode(prev => ({ ...prev, intent_name: e.target.value })),
+                                onChange: (e) => setEditingNode(prev => ({...prev, intent_name: e.target.value})),
                                 style: {
                                     width: '100%',
                                     padding: '8px',
@@ -916,13 +935,13 @@ const FlowGraphEditor = (() => {
                                     marginBottom: '12px'
                                 }
                             }),
-                            
+
                             editingNode?.intent_description && React.createElement('div', {
                                 key: 'intent-description'
                             }, [
                                 React.createElement('label', {
                                     key: 'desc-label',
-                                    style: { display: 'block', marginBottom: '4px', fontSize: '14px', color: '#d1d5db' }
+                                    style: {display: 'block', marginBottom: '4px', fontSize: '14px', color: '#d1d5db'}
                                 }, 'Intent Description:'),
                                 React.createElement('div', {
                                     key: 'desc-value',
@@ -937,13 +956,13 @@ const FlowGraphEditor = (() => {
                                     }
                                 }, editingNode.intent_description)
                             ]),
-                            
+
                             editingNode?.intent_keywords?.length > 0 && React.createElement('div', {
                                 key: 'intent-keywords'
                             }, [
                                 React.createElement('label', {
                                     key: 'keywords-label',
-                                    style: { display: 'block', marginBottom: '4px', fontSize: '14px', color: '#d1d5db' }
+                                    style: {display: 'block', marginBottom: '4px', fontSize: '14px', color: '#d1d5db'}
                                 }, 'Keywords:'),
                                 React.createElement('div', {
                                     key: 'keywords-value',
@@ -958,13 +977,13 @@ const FlowGraphEditor = (() => {
                                     }
                                 }, editingNode.intent_keywords.join(', '))
                             ]),
-                            
+
                             editingNode?.intent_examples?.length > 0 && React.createElement('div', {
                                 key: 'intent-examples'
                             }, [
                                 React.createElement('label', {
                                     key: 'examples-label',
-                                    style: { display: 'block', marginBottom: '4px', fontSize: '14px', color: '#d1d5db' }
+                                    style: {display: 'block', marginBottom: '4px', fontSize: '14px', color: '#d1d5db'}
                                 }, 'Examples:'),
                                 React.createElement('div', {
                                     key: 'examples-value',
@@ -982,24 +1001,30 @@ const FlowGraphEditor = (() => {
                                 }, editingNode.intent_examples.map((example, i) => `${i + 1}. ${example}`).join('\n'))
                             ])
                         ]),
-                        
+
                         // === PROMPT PROPERTIES ===
                         React.createElement('div', {
                             key: 'prompt-section'
                         }, [
                             React.createElement('h4', {
                                 key: 'prompt-header',
-                                style: { color: '#8b5cf6', marginBottom: '12px', fontSize: '16px', borderBottom: '1px solid #374151', paddingBottom: '4px' }
+                                style: {
+                                    color: '#8b5cf6',
+                                    marginBottom: '12px',
+                                    fontSize: '16px',
+                                    borderBottom: '1px solid #374151',
+                                    paddingBottom: '4px'
+                                }
                             }, `💬 Prompt Templates ${editingNode?.has_prompt_template ? '✅' : '⚠️'}`),
-                            
+
                             React.createElement('label', {
                                 key: 'system-prompt-label',
-                                style: { display: 'block', marginBottom: '4px', fontSize: '14px', color: '#d1d5db' }
+                                style: {display: 'block', marginBottom: '4px', fontSize: '14px', color: '#d1d5db'}
                             }, 'System Prompt:'),
                             React.createElement('textarea', {
                                 key: 'system-prompt-input',
                                 value: editingNode?.system_prompt || '',
-                                onChange: (e) => setEditingNode(prev => ({ ...prev, system_prompt: e.target.value })),
+                                onChange: (e) => setEditingNode(prev => ({...prev, system_prompt: e.target.value})),
                                 rows: 3,
                                 placeholder: 'Enter system prompt for this step...',
                                 style: {
@@ -1013,15 +1038,18 @@ const FlowGraphEditor = (() => {
                                     resize: 'vertical'
                                 }
                             }),
-                            
+
                             React.createElement('label', {
                                 key: 'user-prompt-label',
-                                style: { display: 'block', marginBottom: '4px', fontSize: '14px', color: '#d1d5db' }
+                                style: {display: 'block', marginBottom: '4px', fontSize: '14px', color: '#d1d5db'}
                             }, 'User Prompt Template:'),
                             React.createElement('textarea', {
                                 key: 'user-prompt-input',
                                 value: editingNode?.user_prompt_template || '',
-                                onChange: (e) => setEditingNode(prev => ({ ...prev, user_prompt_template: e.target.value })),
+                                onChange: (e) => setEditingNode(prev => ({
+                                    ...prev,
+                                    user_prompt_template: e.target.value
+                                })),
                                 rows: 3,
                                 placeholder: 'Enter user prompt template...',
                                 style: {
@@ -1036,25 +1064,31 @@ const FlowGraphEditor = (() => {
                                 }
                             })
                         ]),
-                        
+
                         // === MEMORY PROPERTIES ===
                         editingNode?.type === 'memory' && React.createElement('div', {
                             key: 'memory-section'
                         }, [
                             React.createElement('h4', {
                                 key: 'memory-header',
-                                style: { color: '#ec4899', marginBottom: '12px', fontSize: '16px', borderBottom: '1px solid #374151', paddingBottom: '4px' }
+                                style: {
+                                    color: '#ec4899',
+                                    marginBottom: '12px',
+                                    fontSize: '16px',
+                                    borderBottom: '1px solid #374151',
+                                    paddingBottom: '4px'
+                                }
                             }, '🧠 Memory Operations'),
-                            
+
                             React.createElement('label', {
                                 key: 'memory-op-label',
-                                style: { display: 'block', marginBottom: '4px', fontSize: '14px', color: '#d1d5db' }
+                                style: {display: 'block', marginBottom: '4px', fontSize: '14px', color: '#d1d5db'}
                             }, 'Memory Operation:'),
                             React.createElement('input', {
                                 key: 'memory-op-input',
                                 type: 'text',
                                 value: editingNode?.memory_operation || '',
-                                onChange: (e) => setEditingNode(prev => ({ ...prev, memory_operation: e.target.value })),
+                                onChange: (e) => setEditingNode(prev => ({...prev, memory_operation: e.target.value})),
                                 placeholder: 'e.g. store, retrieve, update',
                                 style: {
                                     width: '100%',
@@ -1066,16 +1100,16 @@ const FlowGraphEditor = (() => {
                                     marginBottom: '12px'
                                 }
                             }),
-                            
+
                             React.createElement('label', {
                                 key: 'memory-key-label',
-                                style: { display: 'block', marginBottom: '4px', fontSize: '14px', color: '#d1d5db' }
+                                style: {display: 'block', marginBottom: '4px', fontSize: '14px', color: '#d1d5db'}
                             }, 'Memory Key:'),
                             React.createElement('input', {
                                 key: 'memory-key-input',
                                 type: 'text',
                                 value: editingNode?.memory_key || '',
-                                onChange: (e) => setEditingNode(prev => ({ ...prev, memory_key: e.target.value })),
+                                onChange: (e) => setEditingNode(prev => ({...prev, memory_key: e.target.value})),
                                 placeholder: 'e.g. user_context, conversation_state',
                                 style: {
                                     width: '100%',
@@ -1088,25 +1122,31 @@ const FlowGraphEditor = (() => {
                                 }
                             })
                         ]),
-                        
+
                         // === KNOWLEDGE PROPERTIES ===
                         editingNode?.type === 'knowledge' && React.createElement('div', {
                             key: 'knowledge-section'
                         }, [
                             React.createElement('h4', {
                                 key: 'knowledge-header',
-                                style: { color: '#eab308', marginBottom: '12px', fontSize: '16px', borderBottom: '1px solid #374151', paddingBottom: '4px' }
+                                style: {
+                                    color: '#eab308',
+                                    marginBottom: '12px',
+                                    fontSize: '16px',
+                                    borderBottom: '1px solid #374151',
+                                    paddingBottom: '4px'
+                                }
                             }, '📚 Knowledge & RAG'),
-                            
+
                             React.createElement('label', {
                                 key: 'knowledge-source-label',
-                                style: { display: 'block', marginBottom: '4px', fontSize: '14px', color: '#d1d5db' }
+                                style: {display: 'block', marginBottom: '4px', fontSize: '14px', color: '#d1d5db'}
                             }, 'Knowledge Source:'),
                             React.createElement('input', {
                                 key: 'knowledge-source-input',
                                 type: 'text',
                                 value: editingNode?.knowledge_source || '',
-                                onChange: (e) => setEditingNode(prev => ({ ...prev, knowledge_source: e.target.value })),
+                                onChange: (e) => setEditingNode(prev => ({...prev, knowledge_source: e.target.value})),
                                 placeholder: 'e.g. business_docs, product_catalog',
                                 style: {
                                     width: '100%',
@@ -1118,31 +1158,34 @@ const FlowGraphEditor = (() => {
                                     marginBottom: '12px'
                                 }
                             }),
-                            
+
                             React.createElement('div', {
                                 key: 'vector-search-section',
-                                style: { marginBottom: '16px' }
+                                style: {marginBottom: '16px'}
                             }, [
                                 React.createElement('label', {
                                     key: 'vector-search-checkbox',
-                                    style: { display: 'flex', alignItems: 'center', color: '#d1d5db', cursor: 'pointer' }
+                                    style: {display: 'flex', alignItems: 'center', color: '#d1d5db', cursor: 'pointer'}
                                 }, [
                                     React.createElement('input', {
                                         key: 'vector-search-input',
                                         type: 'checkbox',
                                         checked: editingNode?.vector_search || false,
-                                        onChange: (e) => setEditingNode(prev => ({ ...prev, vector_search: e.target.checked })),
-                                        style: { marginRight: '8px' }
+                                        onChange: (e) => setEditingNode(prev => ({
+                                            ...prev,
+                                            vector_search: e.target.checked
+                                        })),
+                                        style: {marginRight: '8px'}
                                     }),
                                     'Enable Vector Search'
                                 ])
                             ])
                         ])
                     ]),
-                    
+
                     React.createElement('div', {
                         key: 'buttons',
-                        style: { display: 'flex', gap: '8px', justifyContent: 'flex-end' }
+                        style: {display: 'flex', gap: '8px', justifyContent: 'flex-end'}
                     }, [
                         React.createElement('button', {
                             key: 'cancel',

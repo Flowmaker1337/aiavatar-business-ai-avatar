@@ -16,33 +16,33 @@ class SceneBuilder {
             required: [],
             optional: []
         };
-        
+
         this.init();
     }
 
     async init() {
         console.log('🎬 Scene Builder initialized');
-        
+
         // Setup event listeners
         this.setupEventListeners();
-        
+
         // Load company profiles for context selector
         await this.loadCompanyProfiles();
-        
+
         // Load existing scenes
         await this.loadExistingScenes();
-        
+
         // Load templates
         await this.loadTemplates();
-        
+
         // Add default participant
         this.addParticipant('required');
     }
 
     setupEventListeners() {
         // List inputs
-        const listInputs = ['objectivesInput', 'constraintsInput', 'successCriteriaInput', 
-                           'conversationStartersInput', 'keyTalkingPointsInput', 'potentialObjectionsInput'];
+        const listInputs = ['objectivesInput', 'constraintsInput', 'successCriteriaInput',
+            'conversationStartersInput', 'keyTalkingPointsInput', 'potentialObjectionsInput'];
         listInputs.forEach(inputId => {
             const input = document.getElementById(inputId);
             if (input) {
@@ -61,11 +61,11 @@ class SceneBuilder {
         // Update tab buttons
         document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
         document.querySelector(`[onclick="sceneBuilder.switchTab('${tabName}')"]`).classList.add('active');
-        
+
         // Update tab content
         document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
         document.getElementById(`${tabName}Tab`).classList.add('active');
-        
+
         // Load data for specific tabs
         if (tabName === 'manage') {
             this.loadExistingScenes();
@@ -78,7 +78,7 @@ class SceneBuilder {
         // Update visual selection
         document.querySelectorAll('.category-option').forEach(opt => opt.classList.remove('selected'));
         document.querySelector(`[data-category="${category}"]`).classList.add('selected');
-        
+
         this.selectedCategory = category;
         console.log('📂 Selected category:', category);
     }
@@ -87,7 +87,7 @@ class SceneBuilder {
         // Update visual selection
         document.querySelectorAll('.difficulty-option').forEach(opt => opt.classList.remove('selected'));
         document.querySelector(`[data-difficulty="${difficulty}"]`).classList.add('selected');
-        
+
         this.selectedDifficulty = difficulty;
         console.log('⭐ Selected difficulty:', difficulty);
     }
@@ -102,7 +102,7 @@ class SceneBuilder {
     addListItem(listType) {
         const input = document.getElementById(`${listType}Input`);
         const value = input.value.trim();
-        
+
         if (value && !this.lists[listType].includes(value)) {
             this.lists[listType].push(value);
             input.value = '';
@@ -121,10 +121,10 @@ class SceneBuilder {
 
         const items = this.lists[listType];
         const addButton = display.querySelector('.add-item-btn');
-        
+
         // Clear existing items but keep add button
         display.innerHTML = '';
-        
+
         // Add list items
         items.forEach((item, index) => {
             const itemElement = document.createElement('div');
@@ -137,7 +137,7 @@ class SceneBuilder {
             `;
             display.appendChild(itemElement);
         });
-        
+
         // Re-add the add button
         display.appendChild(addButton);
     }
@@ -150,10 +150,10 @@ class SceneBuilder {
             motivation: '',
             behavior_style: 'neutral'
         };
-        
+
         this.participants[type].push(participant);
         this.updateParticipantsDisplay(type);
-        
+
         // Focus on the new participant input
         setTimeout(() => {
             const newInput = document.querySelector(`#${participantId}_role`);
@@ -171,7 +171,7 @@ class SceneBuilder {
         if (!container) return;
 
         container.innerHTML = '';
-        
+
         this.participants[type].forEach((participant, index) => {
             const participantElement = document.createElement('div');
             participantElement.className = 'participant-item';
@@ -209,22 +209,22 @@ class SceneBuilder {
 
     async loadCompanyProfiles() {
         console.log('🏢 Loading company profiles...');
-        
+
         try {
             const response = await fetch('/api/company-profiles');
-            
+
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
-            
+
             const result = await response.json();
             const profiles = result.data || {};
-            
+
             const selector = document.getElementById('companyContext');
             if (selector) {
                 // Clear existing options except the first one
                 selector.innerHTML = '<option value="">Wybierz profil firmy (opcjonalne)</option>';
-                
+
                 Object.entries(profiles).forEach(([profileId, profile]) => {
                     const option = document.createElement('option');
                     option.value = profileId;
@@ -232,7 +232,7 @@ class SceneBuilder {
                     selector.appendChild(option);
                 });
             }
-            
+
         } catch (error) {
             console.error('❌ Error loading company profiles:', error);
         }
@@ -240,16 +240,16 @@ class SceneBuilder {
 
     async generateWithAI(field) {
         console.log(`🤖 Generating ${field} with AI...`);
-        
+
         const button = event.target;
         const originalText = button.innerHTML;
         button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generowanie...';
         button.disabled = true;
-        
+
         try {
             // Get context from current form data
             const context = this.getFormData();
-            
+
             const response = await fetch('/api/flow-wizard/generate-avatar-field', {
                 method: 'POST',
                 headers: {
@@ -271,7 +271,7 @@ class SceneBuilder {
             }
 
             const result = await response.json();
-            
+
             if (result.success && result.generated_content) {
                 // Fill the appropriate field
                 const fieldElement = document.getElementById(this.getFieldElementId(field));
@@ -284,7 +284,7 @@ class SceneBuilder {
             } else {
                 throw new Error(result.error || 'Nie udało się wygenerować treści');
             }
-            
+
         } catch (error) {
             console.error(`❌ Error generating ${field}:`, error);
             this.showNotification(`❌ Błąd generowania: ${error.message}`, 'error');
@@ -328,25 +328,25 @@ class SceneBuilder {
 
     async saveScene() {
         console.log('💾 Saving simulation scene...');
-        
+
         const formData = this.getFormData();
-        
+
         // Validation
         if (!formData.name.trim()) {
             this.showNotification('❌ Nazwa sceny jest wymagana', 'error');
             return;
         }
-        
+
         if (!formData.category) {
             this.showNotification('❌ Kategoria sceny jest wymagana', 'error');
             return;
         }
-        
+
         const saveButton = document.querySelector('.btn-primary');
         const originalText = saveButton.innerHTML;
         saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Zapisywanie...';
         saveButton.disabled = true;
-        
+
         try {
             const sceneData = {
                 ...formData,
@@ -354,9 +354,9 @@ class SceneBuilder {
                 is_template: false,
                 usage_count: 0
             };
-            
+
             console.log('📤 Sending scene data:', sceneData);
-            
+
             const response = await fetch('/api/simulation-scenes', {
                 method: 'POST',
                 headers: {
@@ -364,24 +364,24 @@ class SceneBuilder {
                 },
                 body: JSON.stringify(sceneData)
             });
-            
+
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
-            
+
             const result = await response.json();
             console.log('✅ Scene saved:', result);
-            
+
             this.showNotification('✅ Scena została zapisana!', 'success');
-            
+
             // Refresh the scenes list
             await this.loadExistingScenes();
-            
+
             // Clear form if it was a new scene
             if (!this.currentScene) {
                 this.clearForm();
             }
-            
+
         } catch (error) {
             console.error('❌ Error saving scene:', error);
             this.showNotification(`❌ Błąd zapisywania: ${error.message}`, 'error');
@@ -393,19 +393,19 @@ class SceneBuilder {
 
     async loadExistingScenes() {
         console.log('📂 Loading existing scenes...');
-        
+
         try {
             const response = await fetch('/api/simulation-scenes');
-            
+
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
-            
+
             const result = await response.json();
             console.log('📥 Loaded scenes:', result);
-            
+
             this.displayScenes(result.data || []);
-            
+
         } catch (error) {
             console.error('❌ Error loading scenes:', error);
             document.getElementById('existingScenes').innerHTML = `
@@ -418,7 +418,7 @@ class SceneBuilder {
 
     displayScenes(scenes) {
         const container = document.getElementById('existingScenes');
-        
+
         if (scenes.length === 0) {
             container.innerHTML = `
                 <p style="text-align: center; color: #a0aec0;">
@@ -427,9 +427,9 @@ class SceneBuilder {
             `;
             return;
         }
-        
+
         container.innerHTML = '';
-        
+
         scenes.forEach(scene => {
             const sceneCard = document.createElement('div');
             sceneCard.className = 'scene-card';
@@ -487,19 +487,19 @@ class SceneBuilder {
 
     async loadTemplates() {
         console.log('📋 Loading scene templates...');
-        
+
         try {
             const response = await fetch('/api/simulation-scenes/templates');
-            
+
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
-            
+
             const result = await response.json();
             console.log('📥 Loaded templates:', result);
-            
+
             this.displayTemplates(result.data || []);
-            
+
         } catch (error) {
             console.error('❌ Error loading templates:', error);
             document.getElementById('sceneTemplates').innerHTML = `
@@ -512,7 +512,7 @@ class SceneBuilder {
 
     displayTemplates(templates) {
         const container = document.getElementById('sceneTemplates');
-        
+
         if (templates.length === 0) {
             container.innerHTML = `
                 <p style="text-align: center; color: #a0aec0;">
@@ -521,9 +521,9 @@ class SceneBuilder {
             `;
             return;
         }
-        
+
         container.innerHTML = '';
-        
+
         templates.forEach(template => {
             const templateCard = document.createElement('div');
             templateCard.className = 'template-card';
@@ -559,21 +559,21 @@ class SceneBuilder {
 
     useTemplate(template) {
         console.log('📋 Using template:', template.name);
-        
+
         // Switch to create tab
         this.switchTab('create');
-        
+
         // Fill form with template data
         document.getElementById('sceneName').value = template.name + ' (kopia)';
         document.getElementById('sceneDescription').value = template.description || '';
         document.getElementById('scenarioSituation').value = template.scenario?.situation || '';
         document.getElementById('scenarioContext').value = template.scenario?.context || '';
         document.getElementById('estimatedDuration').value = template.estimated_duration_minutes || 30;
-        
+
         // Set category and difficulty
         this.selectCategory(template.category);
         this.selectDifficulty(template.difficulty_level);
-        
+
         // Set lists
         this.lists.objectives = [...(template.scenario?.objectives || [])];
         this.lists.constraints = [...(template.scenario?.constraints || [])];
@@ -581,19 +581,19 @@ class SceneBuilder {
         this.lists.conversationStarters = [...(template.conversation_starters || [])];
         this.lists.keyTalkingPoints = [...(template.key_talking_points || [])];
         this.lists.potentialObjections = [...(template.potential_objections || [])];
-        
+
         // Update displays
         Object.keys(this.lists).forEach(listType => {
             this.updateListDisplay(listType);
         });
-        
+
         // Set participants
         this.participants.required = [...(template.required_participants || [])];
         this.participants.optional = [...(template.optional_participants || [])];
-        
+
         this.updateParticipantsDisplay('required');
         this.updateParticipantsDisplay('optional');
-        
+
         this.showNotification('✅ Szablon został załadowany!', 'success');
     }
 
@@ -605,7 +605,7 @@ class SceneBuilder {
 
     async duplicateScene(sceneId) {
         console.log('📋 Duplicating scene:', sceneId);
-        
+
         try {
             const response = await fetch(`/api/simulation-scenes/${sceneId}/duplicate`, {
                 method: 'POST',
@@ -614,17 +614,17 @@ class SceneBuilder {
                 },
                 body: JSON.stringify({})
             });
-            
+
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
-            
+
             const result = await response.json();
             console.log('✅ Scene duplicated:', result);
-            
+
             this.showNotification('✅ Scena została zduplikowana!', 'success');
             await this.loadExistingScenes();
-            
+
         } catch (error) {
             console.error('❌ Error duplicating scene:', error);
             this.showNotification(`❌ Błąd duplikowania: ${error.message}`, 'error');
@@ -634,19 +634,19 @@ class SceneBuilder {
     async deleteScene(sceneId) {
         if (confirm('Czy na pewno chcesz usunąć tę scenę?')) {
             console.log('🗑️ Deleting scene:', sceneId);
-            
+
             try {
                 const response = await fetch(`/api/simulation-scenes/${sceneId}`, {
                     method: 'DELETE'
                 });
-                
+
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
-                
+
                 this.showNotification('✅ Scena została usunięta!', 'success');
                 await this.loadExistingScenes();
-                
+
             } catch (error) {
                 console.error('❌ Error deleting scene:', error);
                 this.showNotification(`❌ Błąd usuwania: ${error.message}`, 'error');
@@ -657,7 +657,7 @@ class SceneBuilder {
     previewScene() {
         const formData = this.getFormData();
         console.log('👁️ Scene preview:', formData);
-        
+
         // Create preview modal/popup
         const preview = JSON.stringify(formData, null, 2);
         alert(`Scene Preview:\n\n${preview}`);
@@ -666,31 +666,31 @@ class SceneBuilder {
     clearForm() {
         // Clear all form fields
         document.getElementById('sceneForm').reset();
-        
+
         // Clear selections
         this.selectedCategory = null;
         this.selectedDifficulty = 'intermediate';
-        
+
         // Clear visual selections
         document.querySelectorAll('.category-option').forEach(opt => opt.classList.remove('selected'));
         document.querySelectorAll('.difficulty-option').forEach(opt => opt.classList.remove('selected'));
         document.querySelector('[data-difficulty="intermediate"]').classList.add('selected');
-        
+
         // Clear lists
         Object.keys(this.lists).forEach(listType => {
             this.lists[listType] = [];
             this.updateListDisplay(listType);
         });
-        
+
         // Clear participants
         this.participants.required = [];
         this.participants.optional = [];
         this.updateParticipantsDisplay('required');
         this.updateParticipantsDisplay('optional');
-        
+
         // Add default participant
         this.addParticipant('required');
-        
+
         this.currentScene = null;
     }
 
@@ -698,9 +698,9 @@ class SceneBuilder {
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
         notification.textContent = message;
-        
+
         document.body.appendChild(notification);
-        
+
         setTimeout(() => {
             notification.remove();
         }, 4000);

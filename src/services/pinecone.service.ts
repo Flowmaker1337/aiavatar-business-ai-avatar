@@ -6,8 +6,8 @@ import {
     PINECONE_INDEX_NAME,
     getVectorDatabaseName
 } from '../config/env';
-import { VectorData } from '../models/types';
-import { BaseVectorDatabaseService } from './base-vector-database.service';
+import {VectorData} from '../models/types';
+import {BaseVectorDatabaseService} from './base-vector-database.service';
 import vectorConfigService from './vector-config.service';
 
 /**
@@ -26,7 +26,7 @@ class PineconeService extends BaseVectorDatabaseService {
             projectId: PINECONE_PROJECT_ID
         });
 
-        this.index = this.client.Index(PINECONE_INDEX_NAME);        
+        this.index = this.client.Index(PINECONE_INDEX_NAME);
     }
 
     /**
@@ -78,7 +78,7 @@ class PineconeService extends BaseVectorDatabaseService {
                 text: vector.metadata.text,
                 text_length: vector.metadata.text_length,
                 token_count: vector.metadata.token_count,
-                ...(vector.metadata.avatar_id && { avatar_id: vector.metadata.avatar_id })
+                ...(vector.metadata.avatar_id && {avatar_id: vector.metadata.avatar_id})
             }
         }));
 

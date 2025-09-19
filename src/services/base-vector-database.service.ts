@@ -1,8 +1,8 @@
-import { VectorDatabaseService, VectorData, VectorDatabaseHealth } from '../models/types';
-import { ExecutionTimerService } from "./execution-timer.service";
+import {VectorDatabaseService, VectorData, VectorDatabaseHealth} from '../models/types';
+import {ExecutionTimerService} from "./execution-timer.service";
 import openaiService from './openai.service';
 import vectorConfigService from './vector-config.service';
-import { getVectorDatabaseName } from '../config/env';
+import {getVectorDatabaseName} from '../config/env';
 
 /**
  * Base class for vector database services
@@ -59,7 +59,7 @@ export abstract class BaseVectorDatabaseService implements VectorDatabaseService
             topic: vector.metadata.topic,
             text_length: vector.metadata.text_length,
             token_count: vector.metadata.token_count,
-            ...(vector.metadata.avatar_id && { avatar_id: vector.metadata.avatar_id })
+            ...(vector.metadata.avatar_id && {avatar_id: vector.metadata.avatar_id})
         };
     }
 
@@ -68,7 +68,7 @@ export abstract class BaseVectorDatabaseService implements VectorDatabaseService
      */
     public async queryKnowledgeBase(query: string): Promise<string[]> {
         const executionTimerService = new ExecutionTimerService(`queryKnowledgeBase in ${getVectorDatabaseName()}`);
-        
+
         try {
             // Generate embeddings for user query
             const queryEmbedding = await openaiService.generateEmbeddings(query);
@@ -87,12 +87,12 @@ export abstract class BaseVectorDatabaseService implements VectorDatabaseService
                     const text = this.extractTextFromResult(match);
 
                     console.log(`[${getVectorDatabaseName()}] Found match with score: ${score}`);
-                    
+
                     if (metadata) {
                         console.log(`[${getVectorDatabaseName()}] Topic: ${metadata.topic}`);
                         console.log(`[${getVectorDatabaseName()}] Category: ${metadata.category}`);
                     }
-                    
+
                     if (typeof text === 'string' && text.trim() !== '') {
                         console.log(`[${getVectorDatabaseName()}] Text: ${text}`);
                         if (vectorConfigService.validateSearchResult(score)) {

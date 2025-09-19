@@ -3,7 +3,14 @@
     {
       "name": "greeting",
       "description": "Użytkownika wita się",
-      "keywords": ["cześć", "dzień dobry", "witaj", "hello", "hej", "miło poznać"],
+      "keywords": [
+        "cześć",
+        "dzień dobry",
+        "witaj",
+        "hello",
+        "hej",
+        "miło poznać"
+      ],
       "examples": [
         "Dzień dobry, miło mi poznać",
         "Cześć, jak się masz?",
@@ -17,7 +24,14 @@
     {
       "name": "theory_request",
       "description": "Prośba o wyjaśnienie teorii, definicji lub koncepcji",
-      "keywords": ["wyjaśnij", "teoria", "definicja", "koncepcja", "podstawy", "czym jest"],
+      "keywords": [
+        "wyjaśnij",
+        "teoria",
+        "definicja",
+        "koncepcja",
+        "podstawy",
+        "czym jest"
+      ],
       "examples": [
         "Wyjaśnij mi teorię...",
         "Co to jest archetyp?",
@@ -33,7 +47,13 @@
     {
       "name": "explain_concept",
       "description": "Prośba o dogłębne wytłumaczenie konkretnego zagadnienia",
-      "keywords": ["wytłumacz", "objaśnij", "jak działa", "mechanizm", "zasada"],
+      "keywords": [
+        "wytłumacz",
+        "objaśnij",
+        "jak działa",
+        "mechanizm",
+        "zasada"
+      ],
       "examples": [
         "Wytłumacz mi jak to działa",
         "Jak funkcjonuje ten mechanizm?",
@@ -49,7 +69,13 @@
     {
       "name": "what_is",
       "description": "Podstawowe pytania o istotę zagadnienia",
-      "keywords": ["co to", "czym jest", "kim jest", "jakie to", "definicja"],
+      "keywords": [
+        "co to",
+        "czym jest",
+        "kim jest",
+        "jakie to",
+        "definicja"
+      ],
       "examples": [
         "Co to znaczy?",
         "Czym jest archetyp wojownika?",
@@ -65,7 +91,13 @@
     {
       "name": "show_me_how",
       "description": "Prośba o pokazanie jak coś robić krok po kroku",
-      "keywords": ["pokaż", "jak", "krok po kroku", "przewodnik", "przeprowadź"],
+      "keywords": [
+        "pokaż",
+        "jak",
+        "krok po kroku",
+        "przewodnik",
+        "przeprowadź"
+      ],
       "examples": [
         "Pokaż mi jak to zrobić",
         "Przeprowadź mnie przez to",
@@ -81,7 +113,13 @@
     {
       "name": "practice_together",
       "description": "Chęć wspólnego ćwiczenia z trenerem",
-      "keywords": ["razem", "wspólnie", "ćwiczmy", "razem zrobimy", "pomóż mi"],
+      "keywords": [
+        "razem",
+        "wspólnie",
+        "ćwiczmy",
+        "razem zrobimy",
+        "pomóż mi"
+      ],
       "examples": [
         "Zrobimy to razem?",
         "Ćwiczmy wspólnie",
@@ -97,7 +135,13 @@
     {
       "name": "guide_me",
       "description": "Prośba o przewodnictwo i wsparcie podczas nauki",
-      "keywords": ["prowadź", "kieruj", "wspomagaj", "asystuj", "nadzoruj"],
+      "keywords": [
+        "prowadź",
+        "kieruj",
+        "wspomagaj",
+        "asystuj",
+        "nadzoruj"
+      ],
       "examples": [
         "Prowadź mnie przez to",
         "Kieruj moją nauką",
@@ -113,7 +157,13 @@
     {
       "name": "ask_question",
       "description": "Zadawanie pytań i prośby o wyjaśnienia",
-      "keywords": ["pytanie", "zapytać", "wyjaśnienie", "wątpliwość", "nie rozumiem"],
+      "keywords": [
+        "pytanie",
+        "zapytać",
+        "wyjaśnienie",
+        "wątpliwość",
+        "nie rozumiem"
+      ],
       "examples": [
         "Mam pytanie...",
         "Chcę zapytać o...",
@@ -129,7 +179,13 @@
     {
       "name": "check_understanding",
       "description": "Sprawdzenie poziomu zrozumienia materiału",
-      "keywords": ["sprawdź", "zrozumiałem", "dobrze myślę", "czy to znaczy", "poprawnie"],
+      "keywords": [
+        "sprawdź",
+        "zrozumiałem",
+        "dobrze myślę",
+        "czy to znaczy",
+        "poprawnie"
+      ],
       "examples": [
         "Sprawdź czy dobrze rozumiem",
         "Czy dobrze myślę że...?",
@@ -145,7 +201,13 @@
     {
       "name": "clarify",
       "description": "Prośba o doprecyzowanie lub wyjaśnienie niejasności",
-      "keywords": ["wyjaśnij", "doprecyzuj", "nie jest jasne", "niejasne", "sprecyzuj"],
+      "keywords": [
+        "wyjaśnij",
+        "doprecyzuj",
+        "nie jest jasne",
+        "niejasne",
+        "sprecyzuj"
+      ],
       "examples": [
         "Wyjaśnij to jeszcze raz",
         "Doprecyzuj tę kwestię",
@@ -161,7 +223,13 @@
     {
       "name": "practice_alone",
       "description": "Chęć samodzielnego ćwiczenia i praktykowania",
-      "keywords": ["sam", "samodzielnie", "ćwiczenie", "praktyka", "zadanie"],
+      "keywords": [
+        "sam",
+        "samodzielnie",
+        "ćwiczenie",
+        "praktyka",
+        "zadanie"
+      ],
       "examples": [
         "Chcę spróbować sam",
         "Daj mi zadanie do ćwiczenia",
@@ -177,7 +245,13 @@
     {
       "name": "try_myself",
       "description": "Pragnienie samodzielnej próby zastosowania wiedzy",
-      "keywords": ["spróbuję", "sam zrobię", "własne siły", "bez pomocy", "niezależnie"],
+      "keywords": [
+        "spróbuję",
+        "sam zrobię",
+        "własne siły",
+        "bez pomocy",
+        "niezależnie"
+      ],
       "examples": [
         "Spróbuję sam",
         "Sam to zrobię",
@@ -193,7 +267,13 @@
     {
       "name": "exercise",
       "description": "Prośba o zadania i ćwiczenia praktyczne",
-      "keywords": ["ćwiczenie", "zadanie", "przykład", "case", "scenariusz"],
+      "keywords": [
+        "ćwiczenie",
+        "zadanie",
+        "przykład",
+        "case",
+        "scenariusz"
+      ],
       "examples": [
         "Daj mi ćwiczenie",
         "Chcę zadanie praktyczne",
@@ -209,7 +289,13 @@
     {
       "name": "test_me",
       "description": "Prośba o test wiedzy lub sprawdzenie umiejętności",
-      "keywords": ["test", "sprawdź", "egzamin", "quiz", "oceń"],
+      "keywords": [
+        "test",
+        "sprawdź",
+        "egzamin",
+        "quiz",
+        "oceń"
+      ],
       "examples": [
         "Przetestuj moją wiedzę",
         "Sprawdź co umiem",
@@ -225,7 +311,13 @@
     {
       "name": "check_knowledge",
       "description": "Sprawdzenie aktualnego poziomu wiedzy",
-      "keywords": ["wiedza", "poziom", "umiejętności", "kompetencje", "stan"],
+      "keywords": [
+        "wiedza",
+        "poziom",
+        "umiejętności",
+        "kompetencje",
+        "stan"
+      ],
       "examples": [
         "Sprawdź moją wiedzę",
         "Jaki jest mój poziom?",
@@ -241,7 +333,13 @@
     {
       "name": "assessment",
       "description": "Formalna ocena postępów w nauce",
-      "keywords": ["ocena", "ewaluacja", "sprawdzian", "kontrola", "weryfikacja"],
+      "keywords": [
+        "ocena",
+        "ewaluacja",
+        "sprawdzian",
+        "kontrola",
+        "weryfikacja"
+      ],
       "examples": [
         "Chcę ocenę swoich postępów",
         "Czas na ewaluację",
@@ -257,7 +355,13 @@
     {
       "name": "summarize",
       "description": "Prośba o podsumowanie materiału lub sesji",
-      "keywords": ["podsumuj", "skrót", "najważniejsze", "główne punkty", "esencja"],
+      "keywords": [
+        "podsumuj",
+        "skrót",
+        "najważniejsze",
+        "główne punkty",
+        "esencja"
+      ],
       "examples": [
         "Podsumuj to co przerobiliśmy",
         "Daj mi skrót najważniejszych punktów",
@@ -273,7 +377,13 @@
     {
       "name": "reflect",
       "description": "Czas na refleksję i przemyślenia nad materiałem",
-      "keywords": ["refleksja", "przemyślenia", "zastanowić", "pogłówkować", "rozważyć"],
+      "keywords": [
+        "refleksja",
+        "przemyślenia",
+        "zastanowić",
+        "pogłówkować",
+        "rozważyć"
+      ],
       "examples": [
         "Czas na refleksję",
         "Chcę się nad tym zastanowić",
@@ -289,7 +399,13 @@
     {
       "name": "what_learned",
       "description": "Analiza tego czego się nauczyliśmy",
-      "keywords": ["nauczyłem", "wyniosłem", "zrozumiałem", "odkryłem", "poznałem"],
+      "keywords": [
+        "nauczyłem",
+        "wyniosłem",
+        "zrozumiałem",
+        "odkryłem",
+        "poznałem"
+      ],
       "examples": [
         "Co się nauczyłem?",
         "Co wyniosłem z tej sesji?",
@@ -305,7 +421,13 @@
     {
       "name": "what_next",
       "description": "Pytanie o dalsze kroki i kontynuację nauki",
-      "keywords": ["co dalej", "następny krok", "kontynuacja", "dalej", "później"],
+      "keywords": [
+        "co dalej",
+        "następny krok",
+        "kontynuacja",
+        "dalej",
+        "później"
+      ],
       "examples": [
         "Co robimy dalej?",
         "Jaki następny krok?",
@@ -321,7 +443,13 @@
     {
       "name": "continue_learning",
       "description": "Chęć kontynuowania nauki i rozwoju",
-      "keywords": ["kontynuuj", "dalsze uczenie", "rozwój", "pogłębianie", "więcej"],
+      "keywords": [
+        "kontynuuj",
+        "dalsze uczenie",
+        "rozwój",
+        "pogłębianie",
+        "więcej"
+      ],
       "examples": [
         "Chcę kontynuować naukę",
         "Dalsze uczenie się",
@@ -337,7 +465,13 @@
     {
       "name": "next_topic",
       "description": "Przejście do kolejnego tematu lub zagadnienia",
-      "keywords": ["następny temat", "kolejne zagadnienie", "nowy materiał", "inne", "zmiana"],
+      "keywords": [
+        "następny temat",
+        "kolejne zagadnienie",
+        "nowy materiał",
+        "inne",
+        "zmiana"
+      ],
       "examples": [
         "Przejdźmy do następnego tematu",
         "Kolejne zagadnienie",
@@ -353,7 +487,14 @@
     {
       "name": "user_comments",
       "description": "Komentarze i luźne wypowiedzi użytkownika",
-      "keywords": ["eh", "ale", "hmm", "ciekawe", "fajnie", "super"],
+      "keywords": [
+        "eh",
+        "ale",
+        "hmm",
+        "ciekawe",
+        "fajnie",
+        "super"
+      ],
       "examples": [
         "Ale dziś mam ciężki dzień...",
         "Hmm, ciekawe podejście",
@@ -366,26 +507,82 @@
     }
   ],
   "intent_categories": {
-    "theory_learning": ["theory_request", "explain_concept", "what_is"],
-    "guided_practice": ["show_me_how", "practice_together", "guide_me"],
-    "interactive_learning": ["ask_question", "check_understanding", "clarify"],
-    "independent_work": ["practice_alone", "try_myself", "exercise"],
-    "knowledge_assessment": ["test_me", "check_knowledge", "assessment"],
-    "reflection_synthesis": ["summarize", "reflect", "what_learned"],
-    "learning_navigation": ["what_next", "continue_learning", "next_topic"]
+    "theory_learning": [
+      "theory_request",
+      "explain_concept",
+      "what_is"
+    ],
+    "guided_practice": [
+      "show_me_how",
+      "practice_together",
+      "guide_me"
+    ],
+    "interactive_learning": [
+      "ask_question",
+      "check_understanding",
+      "clarify"
+    ],
+    "independent_work": [
+      "practice_alone",
+      "try_myself",
+      "exercise"
+    ],
+    "knowledge_assessment": [
+      "test_me",
+      "check_knowledge",
+      "assessment"
+    ],
+    "reflection_synthesis": [
+      "summarize",
+      "reflect",
+      "what_learned"
+    ],
+    "learning_navigation": [
+      "what_next",
+      "continue_learning",
+      "next_topic"
+    ]
   },
   "flow_mappings": {
-    "theory_introduction_flow": ["theory_request", "explain_concept", "what_is"],
-    "guided_practice_flow": ["show_me_how", "practice_together", "guide_me"],
-    "question_answer_flow": ["ask_question", "check_understanding", "clarify"],
-    "independent_practice_flow": ["practice_alone", "try_myself", "exercise"],
-    "assessment_flow": ["test_me", "check_knowledge", "assessment"],
-    "summary_reflection_flow": ["summarize", "reflect", "what_learned"],
-    "next_steps_flow": ["what_next", "continue_learning", "next_topic"]
+    "theory_introduction_flow": [
+      "theory_request",
+      "explain_concept",
+      "what_is"
+    ],
+    "guided_practice_flow": [
+      "show_me_how",
+      "practice_together",
+      "guide_me"
+    ],
+    "question_answer_flow": [
+      "ask_question",
+      "check_understanding",
+      "clarify"
+    ],
+    "independent_practice_flow": [
+      "practice_alone",
+      "try_myself",
+      "exercise"
+    ],
+    "assessment_flow": [
+      "test_me",
+      "check_knowledge",
+      "assessment"
+    ],
+    "summary_reflection_flow": [
+      "summarize",
+      "reflect",
+      "what_learned"
+    ],
+    "next_steps_flow": [
+      "what_next",
+      "continue_learning",
+      "next_topic"
+    ]
   },
   "metadata": {
     "version": "1.0.0",
-    "created": "2024-01-15", 
+    "created": "2024-01-15",
     "description": "Definicje intentów dla avatara-szkoleniowca obsługującego metodyczne przepływy szkoleniowe",
     "total_intents": 21,
     "language": "polish",

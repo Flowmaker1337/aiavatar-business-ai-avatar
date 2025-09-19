@@ -1,8 +1,8 @@
-import { 
-    MindStateStack, 
-    MindStateStackItem, 
-    FulfilledIntent, 
-    IntentClassificationResult 
+import {
+    MindStateStack,
+    MindStateStackItem,
+    FulfilledIntent,
+    IntentClassificationResult
 } from '../models/types';
 import DatabaseService from './database.service';
 
@@ -37,10 +37,10 @@ class MemoryManager {
 
         // Pobierz z bazy danych
         const mindState = await this.loadMindStateFromDatabase(sessionId);
-        
+
         // Dodaj do cache
         this.mindStateCache.set(sessionId, mindState);
-        
+
         return mindState;
     }
 
@@ -49,10 +49,10 @@ class MemoryManager {
      */
     public async saveMindStateStack(mindState: MindStateStack): Promise<void> {
         mindState.updated_at = Date.now();
-        
+
         // Aktualizuj cache
         this.mindStateCache.set(mindState.session_id, mindState);
-        
+
         // Zapisz do bazy
         await this.saveMindStateToDatabase(mindState);
     }
@@ -61,13 +61,13 @@ class MemoryManager {
      * Dodaje nową intencję do stosu
      */
     public async pushIntent(
-        sessionId: string, 
-        intent: string, 
+        sessionId: string,
+        intent: string,
         confidence: number,
         metadata?: Record<string, any>
     ): Promise<MindStateStack> {
         const mindState = await this.getMindStateStack(sessionId);
-        
+
         const newItem: MindStateStackItem = {
             tag: intent,
             timestamp: Date.now(),
@@ -78,7 +78,7 @@ class MemoryManager {
 
         // Dodaj do stosu
         mindState.stack.push(newItem);
-        
+
         // Aktualizuj fulfilled_intents
         if (!mindState.fulfilled_intents[intent]) {
             mindState.fulfilled_intents[intent] = {
@@ -87,7 +87,7 @@ class MemoryManager {
                 completion_count: 0
             };
         }
-        
+
         mindState.fulfilled_intents[intent].last_used = Date.now();
 
         await this.saveMindStateStack(mindState);
@@ -99,14 +99,14 @@ class MemoryManager {
      */
     public async popIntent(sessionId: string): Promise<MindStateStackItem | null> {
         const mindState = await this.getMindStateStack(sessionId);
-        
+
         if (mindState.stack.length === 0) {
             return null;
         }
 
         const poppedItem = mindState.stack.pop()!;
         await this.saveMindStateStack(mindState);
-        
+
         return poppedItem;
     }
 
@@ -116,7 +116,7 @@ class MemoryManager {
     public async canExecuteIntent(sessionId: string, intent: string): Promise<boolean> {
         const mindState = await this.getMindStateStack(sessionId);
         const fulfilledIntent = mindState.fulfilled_intents[intent];
-        
+
         if (!fulfilledIntent) {
             return true; // Nowa intencja - można wykonać
         }
@@ -142,7 +142,7 @@ class MemoryManager {
      */
     public async markIntentFulfilled(sessionId: string, intent: string): Promise<void> {
         const mindState = await this.getMindStateStack(sessionId);
-        
+
         if (!mindState.fulfilled_intents[intent]) {
             mindState.fulfilled_intents[intent] = {
                 fulfilled: false,
@@ -163,17 +163,17 @@ class MemoryManager {
      */
     public async isIntentContinuation(sessionId: string, intent: string): Promise<boolean> {
         const mindState = await this.getMindStateStack(sessionId);
-        
+
         if (mindState.stack.length === 0) {
             return false;
         }
 
         const lastItem = mindState.stack[mindState.stack.length - 1];
-        
+
         // Sprawdź czy to ta sama intencja w krótkim czasie
         const timeDiff = Date.now() - lastItem.timestamp;
         const isRecent = timeDiff < 30000; // 30 sekund
-        
+
         return isRecent && lastItem.intent === intent;
     }
 
@@ -182,10 +182,10 @@ class MemoryManager {
      */
     public async updateCurrentFlow(sessionId: string, flowName: string, flowStep?: string): Promise<void> {
         const mindState = await this.getMindStateStack(sessionId);
-        
+
         mindState.current_flow = flowName;
         mindState.current_flow_step = flowStep;
-        
+
         await this.saveMindStateStack(mindState);
     }
 
@@ -195,7 +195,7 @@ class MemoryManager {
     public async cleanupExpiredIntents(sessionId: string): Promise<void> {
         const mindState = await this.getMindStateStack(sessionId);
         const now = Date.now();
-        
+
         // Wyczyść stary stos (starsze niż 1 godzina)
         mindState.stack = mindState.stack.filter(item => {
             const age = (now - item.timestamp) / 1000;
@@ -221,7 +221,7 @@ class MemoryManager {
      */
     public async getIntentHistory(sessionId: string, limit: number = 10): Promise<MindStateStackItem[]> {
         const mindState = await this.getMindStateStack(sessionId);
-        
+
         return mindState.stack
             .slice(-limit)
             .sort((a, b) => b.timestamp - a.timestamp);
@@ -255,9 +255,9 @@ class MemoryManager {
         try {
             const db = this.databaseService.getDatabase();
             const collection = db.collection('mindStates');
-            
-            const mindState = await collection.findOne({ session_id: sessionId });
-            
+
+            const mindState = await collection.findOne({session_id: sessionId});
+
             if (!mindState) {
                 return this.createEmptyMindState(sessionId);
             }
@@ -282,19 +282,19 @@ class MemoryManager {
      */
     public async updateFlowStatus(sessionId: string, flowId: string, status: string): Promise<void> {
         const mindState = await this.getMindStateStack(sessionId);
-        
+
         // Aktualizuj flow status w kontekście
         if (!mindState.flow_history) {
             mindState.flow_history = [];
         }
-        
+
         // Dodaj wpis do historii flow
         mindState.flow_history.push({
             flow_id: flowId,
             status: status,
             timestamp: Date.now()
         });
-        
+
         // Jeśli flow jest zakończony, wyczyść current_flow
         if (status === 'completed' || status === 'timeout' || status === 'cancelled') {
             if (mindState.current_flow === flowId) {
@@ -302,7 +302,7 @@ class MemoryManager {
                 mindState.current_flow_step = undefined;
             }
         }
-        
+
         await this.saveMindStateStack(mindState);
     }
 
@@ -313,11 +313,11 @@ class MemoryManager {
         try {
             const db = this.databaseService.getDatabase();
             const collection = db.collection('mindStates');
-            
+
             await collection.replaceOne(
-                { session_id: mindState.session_id },
+                {session_id: mindState.session_id},
                 mindState,
-                { upsert: true }
+                {upsert: true}
             );
         } catch (error) {
             console.error('Error saving MindStateStack to database:', error);

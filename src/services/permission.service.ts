@@ -1,7 +1,7 @@
 // ============ PERMISSION MANAGEMENT SERVICE ============
 
 import ExtendedDatabaseService from './extended-database.service';
-import { UserRole, PermissionAction, ResourceType, Permission, RolePermission } from '../models/auth-types';
+import {UserRole, PermissionAction, ResourceType, Permission, RolePermission} from '../models/auth-types';
 
 interface PermissionCheck {
     hasPermission: boolean;
@@ -33,7 +33,7 @@ class PermissionService {
                 // Avatar management - full access
                 'create_avatars',
                 'read_all_avatars',
-                'read_own_avatars', 
+                'read_own_avatars',
                 'read_demo_avatars',
                 'update_all_avatars',
                 'update_own_avatars',
@@ -135,8 +135,8 @@ class PermissionService {
     // ============ PERMISSION CHECKING ============
 
     public async checkPermission(
-        userId: string, 
-        action: PermissionAction, 
+        userId: string,
+        action: PermissionAction,
         resource: ResourceType,
         resourceId?: string
     ): Promise<PermissionCheck> {
@@ -144,11 +144,11 @@ class PermissionService {
             // Get user
             const user = await this.db.getUserById(userId);
             if (!user) {
-                return { hasPermission: false, reason: 'User not found' };
+                return {hasPermission: false, reason: 'User not found'};
             }
 
             if (user.status !== 'active') {
-                return { hasPermission: false, reason: 'User account is not active' };
+                return {hasPermission: false, reason: 'User account is not active'};
             }
 
             // Get user permissions
@@ -156,7 +156,7 @@ class PermissionService {
 
             // Check if user has admin role (admins can do everything)
             if (user.role === 'admin') {
-                return { hasPermission: true };
+                return {hasPermission: true};
             }
 
             // Build permission key
@@ -166,14 +166,14 @@ class PermissionService {
 
             // Check for "all" permission first
             if (userPermissions.includes(allPermissionKey)) {
-                return { hasPermission: true };
+                return {hasPermission: true};
             }
 
             // Check for demo permission (for demo avatars)
             if (action === 'read' && resource === 'avatars' && resourceId) {
                 const isDemo = await this.isDemoResource(resource, resourceId);
                 if (isDemo && userPermissions.includes(demoPermissionKey)) {
-                    return { hasPermission: true };
+                    return {hasPermission: true};
                 }
             }
 
@@ -181,32 +181,32 @@ class PermissionService {
             if (userPermissions.includes(ownPermissionKey)) {
                 // If no resourceId provided, assume it's for creation or general access
                 if (!resourceId) {
-                    return { hasPermission: true };
+                    return {hasPermission: true};
                 }
 
                 // Check ownership
                 const isOwner = await this.checkResourceOwnership(userId, resourceId, resource);
                 if (isOwner) {
-                    return { hasPermission: true };
+                    return {hasPermission: true};
                 }
 
-                return { 
-                    hasPermission: false, 
+                return {
+                    hasPermission: false,
                     reason: 'You can only access your own resources',
                     requiredPermissions: [allPermissionKey, ownPermissionKey]
                 };
             }
 
             // No matching permission found
-            return { 
-                hasPermission: false, 
+            return {
+                hasPermission: false,
                 reason: `Permission '${action}' on '${resource}' not granted`,
                 requiredPermissions: [allPermissionKey, ownPermissionKey]
             };
 
         } catch (error) {
             console.error('Permission check error:', error);
-            return { hasPermission: false, reason: 'Permission check failed' };
+            return {hasPermission: false, reason: 'Permission check failed'};
         }
     }
 
@@ -241,12 +241,12 @@ class PermissionService {
 
             // Update user role
             const result = await this.db.getDatabase().collection('user_accounts').updateOne(
-                { id: userId },
-                { 
-                    $set: { 
-                        role: newRole, 
-                        updated_at: new Date() 
-                    } 
+                {id: userId},
+                {
+                    $set: {
+                        role: newRole,
+                        updated_at: new Date()
+                    }
                 }
             );
 
@@ -260,7 +260,7 @@ class PermissionService {
                 'update_user_role',
                 'users',
                 userId,
-                { new_role: newRole },
+                {new_role: newRole},
                 'system',
                 'system',
                 true
@@ -348,7 +348,7 @@ class PermissionService {
 
         for (const permission of permissions) {
             const parts = permission.split('_');
-            
+
             if (parts.length < 2) {
                 errors.push(`Invalid permission format: ${permission}`);
                 continue;
@@ -396,7 +396,7 @@ class PermissionService {
             } else {
                 // System-wide analytics
                 const users = await this.db.getDatabase().collection('user_accounts')
-                    .find({}, { projection: { role: 1, status: 1 } })
+                    .find({}, {projection: {role: 1, status: 1}})
                     .toArray();
 
                 analytics.user_distribution = {
@@ -416,7 +416,7 @@ class PermissionService {
 
         } catch (error) {
             console.error('Error getting permission analytics:', error);
-            return { error: 'Failed to get permission analytics' };
+            return {error: 'Failed to get permission analytics'};
         }
     }
 }

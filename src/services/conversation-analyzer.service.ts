@@ -7,7 +7,7 @@ import {
     SimulationParticipant
 } from '../models/types';
 import openAIService from './openai.service';
-import { ExecutionTimerService } from './execution-timer.service';
+import {ExecutionTimerService} from './execution-timer.service';
 
 /**
  * ConversationAnalyzerService - analizuje jakość i efektywność symulowanych konwersacji
@@ -41,7 +41,7 @@ export class ConversationAnalyzerService {
 
             timer.stop();
             console.log(`📊 Complete conversation analysis finished for simulation ${simulation.id}`);
-            
+
             return analysis;
         } catch (error) {
             timer.stop();
@@ -133,9 +133,9 @@ Odpowiedz TYLKO liczbą od 0 do 1 (np. 0.8):`;
                 role: 'user' as const,
                 content: prompt
             };
-            
+
             const response = await this.openAIService.generateResponse(userPrompt);
-            
+
             const score = parseFloat(response.trim());
             return isNaN(score) ? 0.5 : Math.max(0, Math.min(1, score));
         } catch (error) {
@@ -194,9 +194,9 @@ Oceń czy rozmowa zmierza ku realizacji celu. Odpowiedz TYLKO liczbą 0-1:`;
                 role: 'user' as const,
                 content: prompt
             };
-            
+
             const response = await this.openAIService.generateResponse(userPrompt);
-            
+
             const score = parseFloat(response.trim());
             return isNaN(score) ? 0.5 : Math.max(0, Math.min(1, score));
         } catch (error) {
@@ -212,13 +212,13 @@ Oceń czy rozmowa zmierza ku realizacji celu. Odpowiedz TYLKO liczbą 0-1:`;
         // Placeholder - można rozwinąć o integrację z FlowManager
         const messages = simulation.messages;
         const flowMessages = messages.filter(m => m.flow_step);
-        
+
         if (flowMessages.length === 0) return 0.3; // Brak flows = średni wynik
-        
+
         // Prosta heurystyka - czy flow messages mają różne kroki
         const uniqueSteps = new Set(flowMessages.map(m => m.flow_step));
         const progressScore = Math.min(1, uniqueSteps.size / 5); // Zakładamy 5 kroków max
-        
+
         return progressScore;
     }
 
@@ -231,13 +231,13 @@ Oceń czy rozmowa zmierza ku realizacji celu. Odpowiedz TYLKO liczbą 0-1:`;
         // Bierz próbkę odpowiedzi do analizy
         const sampleSize = Math.min(4, Math.floor(messages.length / 2));
         const sampleMessages = messages.slice(-sampleSize);
-        
+
         let totalScore = 0;
         let analyzedCount = 0;
 
         for (const message of sampleMessages) {
             if (message.content.length < 10) continue; // Skip bardzo krótkie
-            
+
             const score = await this.analyzeMessageQuality(message.content);
             totalScore += score;
             analyzedCount++;
@@ -252,24 +252,24 @@ Oceń czy rozmowa zmierza ku realizacji celu. Odpowiedz TYLKO liczbą 0-1:`;
     private async analyzeMessageQuality(content: string): Promise<number> {
         // Prosta analiza bez API call dla performance
         let score = 0.5; // Base score
-        
+
         // Długość wiadomości
         if (content.length > 50 && content.length < 500) score += 0.1;
-        
+
         // Obecność pytań (engagement)
         if (content.includes('?')) score += 0.1;
-        
+
         // Konkretność (liczby, nazwy)
         if (/\d/.test(content) || /[A-Z][a-z]+/.test(content)) score += 0.1;
-        
+
         // Brak powtórzeń
         const words = content.toLowerCase().split(/\s+/);
         const uniqueWords = new Set(words);
         if (uniqueWords.size / words.length > 0.7) score += 0.1;
-        
+
         // Struktura (przecinki, kropki)
         if (content.includes(',') || content.split('.').length > 2) score += 0.1;
-        
+
         return Math.min(1, score);
     }
 
@@ -291,11 +291,11 @@ Oceń czy rozmowa zmierza ku realizacji celu. Odpowiedz TYLKO liczbą 0-1:`;
      * Oblicza wydajność pojedynczego uczestnika
      */
     private async calculateParticipantPerformance(
-        simulation: SimulationExecution, 
+        simulation: SimulationExecution,
         participant: SimulationParticipant
     ): Promise<ParticipantPerformance> {
         const participantMessages = simulation.messages.filter(m => m.participant_id === participant.id);
-        
+
         if (participantMessages.length === 0) {
             return {
                 participant_id: participant.id,
@@ -321,7 +321,7 @@ Oceń czy rozmowa zmierza ku realizacji celu. Odpowiedz TYLKO liczbą 0-1:`;
         const messageQuality = await this.analyzeParticipantMessageQuality(participantMessages);
 
         // Identyfikuj mocne i słabe strony
-        const { strengths, weaknesses, improvements } = await this.identifyParticipantStrengthsWeaknesses(
+        const {strengths, weaknesses, improvements} = await this.identifyParticipantStrengthsWeaknesses(
             participant, participantMessages
         );
 
@@ -417,7 +417,7 @@ Oceń czy rozmowa zmierza ku realizacji celu. Odpowiedz TYLKO liczbą 0-1:`;
             }
         }
 
-        return { strengths, weaknesses, improvements };
+        return {strengths, weaknesses, improvements};
     }
 
     /**
@@ -431,7 +431,7 @@ Oceń czy rozmowa zmierza ku realizacji celu. Odpowiedz TYLKO liczbą 0-1:`;
 
         // Analizuj flow steps w wiadomościach
         const flowMessages = messages.filter(m => m.flow_step);
-        
+
         for (const message of flowMessages) {
             if (message.flow_step) {
                 const flowName = this.extractFlowNameFromStep(message.flow_step);
@@ -464,7 +464,7 @@ Oceń czy rozmowa zmierza ku realizacji celu. Odpowiedz TYLKO liczbą 0-1:`;
      */
     private analyzeIntentDistribution(simulation: SimulationExecution): Map<string, number> {
         const distribution = new Map<string, number>();
-        
+
         for (const message of simulation.messages) {
             const count = distribution.get(message.intent) || 0;
             distribution.set(message.intent, count + 1);
@@ -486,7 +486,7 @@ Oceń czy rozmowa zmierza ku realizacji celu. Odpowiedz TYLKO liczbą 0-1:`;
             .map(m => m.response_time_ms);
 
         if (responseTimes.length === 0) {
-            return { average: 0, min: 0, max: 0 };
+            return {average: 0, min: 0, max: 0};
         }
 
         const sum = responseTimes.reduce((a, b) => a + b, 0);
@@ -507,10 +507,10 @@ Oceń czy rozmowa zmierza ku realizacji celu. Odpowiedz TYLKO liczbą 0-1:`;
         goal_achievement_rate: number;
     }> {
         const messages = simulation.messages;
-        
+
         const total_turns = messages.length;
-        const avg_message_length = total_turns > 0 
-            ? messages.reduce((sum, m) => sum + m.content.length, 0) / total_turns 
+        const avg_message_length = total_turns > 0
+            ? messages.reduce((sum, m) => sum + m.content.length, 0) / total_turns
             : 0;
 
         const topic_consistency = await this.calculateTopicConsistency(messages);
@@ -531,7 +531,7 @@ Oceń czy rozmowa zmierza ku realizacji celu. Odpowiedz TYLKO liczbą 0-1:`;
         if (messages.length < 3) return 1;
 
         // Prosta analiza - sprawdź czy wiadomości zawierają podobne słowa kluczowe
-        const allWords = messages.flatMap(m => 
+        const allWords = messages.flatMap(m =>
             m.content.toLowerCase()
                 .replace(/[^\w\s]/g, '')
                 .split(/\s+/)
@@ -549,7 +549,7 @@ Oceń czy rozmowa zmierza ku realizacji celu. Odpowiedz TYLKO liczbą 0-1:`;
             .length;
 
         const uniqueWords = wordCounts.size;
-        
+
         // Im więcej powtarzających się słów w stosunku do unikalnych, tym większa spójność
         return Math.min(1, repeatedWords / (uniqueWords * 0.3));
     }
@@ -577,7 +577,7 @@ Oceń czy rozmowa zmierza ku realizacji celu. Odpowiedz TYLKO liczbą 0-1:`;
         const counts = Array.from(participantCounts.values());
         const maxCount = Math.max(...counts);
         const minCount = Math.min(...counts);
-        
+
         if (maxCount / minCount > 2) {
             insights.push('Nierównowaga w konwersacji - jeden uczestnik dominuje');
         } else {
@@ -588,7 +588,7 @@ Oceń czy rozmowa zmierza ku realizacji celu. Odpowiedz TYLKO liczbą 0-1:`;
         const intentCounts = Array.from(simulation.analysis.intent_distribution.values());
         const totalIntents = intentCounts.reduce((sum, count) => sum + count, 0);
         const mostCommonIntentCount = Math.max(...intentCounts);
-        
+
         if (mostCommonIntentCount / totalIntents > 0.5) {
             insights.push('Konwersacja skupiała się głównie na jednym temacie');
         } else {

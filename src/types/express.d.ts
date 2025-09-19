@@ -1,6 +1,6 @@
 // ============ EXPRESS TYPE DEFINITIONS ============
 
-import { JWTPayload } from '../models/auth-types';
+import {JWTPayload} from '../models/auth-types';
 
 declare global {
     namespace Express {

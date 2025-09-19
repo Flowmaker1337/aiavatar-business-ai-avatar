@@ -1,7 +1,7 @@
-import { Request, Response } from 'express';
+import {Request, Response} from 'express';
 import PersonaGeneratorService from '../services/persona-generator.service';
 import PersonaLibraryService from '../services/persona-library.service';
-import { ExecutionTimerService } from '../services/execution-timer.service';
+import {ExecutionTimerService} from '../services/execution-timer.service';
 
 /**
  * PersonaController - API endpoints dla zarządzania personami
@@ -25,13 +25,13 @@ export class PersonaController {
         timer.start();
 
         try {
-            const { 
-                description, 
-                role, 
-                industry, 
-                companySize, 
+            const {
+                description,
+                role,
+                industry,
+                companySize,
                 saveToLibrary = true,
-                tags = [] 
+                tags = []
             } = req.body;
 
             // Walidacja danych wejściowych
@@ -69,7 +69,7 @@ export class PersonaController {
             if (saveToLibrary) {
                 const personaTags = [role, ...tags];
                 if (industry) personaTags.push(industry);
-                
+
                 personaId = await this.personaLibrary.addPersona(persona, personaTags);
             }
 
@@ -100,7 +100,7 @@ export class PersonaController {
      */
     public async getPersonaLibrary(req: Request, res: Response): Promise<void> {
         try {
-            const { search, tags, role, industry, favorites_only } = req.query;
+            const {search, tags, role, industry, favorites_only} = req.query;
 
             let personas;
 
@@ -170,7 +170,7 @@ export class PersonaController {
      */
     public async getPopularPersonas(req: Request, res: Response): Promise<void> {
         try {
-            const { limit = 10 } = req.query;
+            const {limit = 10} = req.query;
             const personas = this.personaLibrary.getPopularPersonas(parseInt(limit as string));
 
             res.json({
@@ -323,7 +323,7 @@ export class PersonaController {
     public async ratePersona(req: Request, res: Response): Promise<void> {
         try {
             const personaId = req.params.id;
-            const { rating } = req.body;
+            const {rating} = req.body;
 
             if (!rating || rating < 1 || rating > 5) {
                 res.status(400).json({
@@ -364,7 +364,7 @@ export class PersonaController {
     public async addTags(req: Request, res: Response): Promise<void> {
         try {
             const personaId = req.params.id;
-            const { tags } = req.body;
+            const {tags} = req.body;
 
             if (!Array.isArray(tags)) {
                 res.status(400).json({
@@ -405,7 +405,7 @@ export class PersonaController {
     public async createParticipant(req: Request, res: Response): Promise<void> {
         try {
             const personaId = req.params.id;
-            const { role, avatarType = 'networker' } = req.body;
+            const {role, avatarType = 'networker'} = req.body;
 
             if (!role) {
                 res.status(400).json({
@@ -471,7 +471,7 @@ export class PersonaController {
      */
     public async importLibrary(req: Request, res: Response): Promise<void> {
         try {
-            const { jsonData } = req.body;
+            const {jsonData} = req.body;
 
             if (!jsonData) {
                 res.status(400).json({
@@ -510,12 +510,12 @@ export class PersonaController {
 
         try {
             const personas = await this.personaGenerator.generateExamplePersonas();
-            
+
             // Zapisz do biblioteki
             const savedIds: string[] = [];
             for (const persona of personas) {
                 const personaId = await this.personaLibrary.addPersona(
-                    persona, 
+                    persona,
                     ['example', 'demo']
                 );
                 savedIds.push(personaId);

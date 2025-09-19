@@ -21,7 +21,7 @@ class ConversationLoggerService {
     private constructor() {
         this.logDirectory = path.resolve(process.cwd(), 'logs');
         if (!fs.existsSync(this.logDirectory)) {
-            fs.mkdirSync(this.logDirectory, { recursive: true });
+            fs.mkdirSync(this.logDirectory, {recursive: true});
             console.log(`✅ Created conversation log directory at: ${this.logDirectory}`);
         }
     }
@@ -38,12 +38,12 @@ class ConversationLoggerService {
         const date = timestamp.split('T')[0];
         const fileName = `conversation_log_${date}.jsonl`;
         const filePath = path.join(this.logDirectory, fileName);
-        
+
         const logEntry = JSON.stringify({
             ...data,
             log_timestamp: timestamp
         });
-        
+
         try {
             fs.appendFileSync(filePath, logEntry + '\n');
         } catch (error) {

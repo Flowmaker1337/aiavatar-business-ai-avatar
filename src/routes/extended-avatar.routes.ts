@@ -1,8 +1,8 @@
 // ============ EXTENDED AVATAR ROUTES ============
 
-import { Router } from 'express';
-import { ExtendedAvatarController } from '../controllers/extended-avatar.controller';
-import { authenticateToken } from '../middleware/auth.middleware';
+import {Router} from 'express';
+import {ExtendedAvatarController} from '../controllers/extended-avatar.controller';
+import {authenticateToken} from '../middleware/auth.middleware';
 
 export class ExtendedAvatarRoutes {
     private router: Router;

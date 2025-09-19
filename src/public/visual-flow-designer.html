@@ -317,657 +317,657 @@
     </style>
 </head>
 <body>
-    <div id="root"></div>
+<div id="root"></div>
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef, useCallback } = React;
+<script type="text/babel">
+    const {useState, useEffect, useRef, useCallback} = React;
 
-        // Node types available in toolbar
-        const NODE_TYPES = {
-            'start': { 
-                label: '🚀 Start', 
-                color: '#28a745',
-                description: 'Punkt startowy flow'
-            },
-            'intent': { 
-                label: '🎯 Intent', 
-                color: '#58a6ff',
-                description: 'Rozpoznanie intencji użytkownika'
-            },
-            'condition': { 
-                label: '🤔 Condition', 
-                color: '#ffc107',
-                description: 'Warunek logiczny'
-            },
-            'action': { 
-                label: '⚡ Action', 
-                color: '#17a2b8',
-                description: 'Akcja/operacja'
-            },
-            'response': { 
-                label: '💬 Response', 
-                color: '#6f42c1',
-                description: 'Odpowiedź do użytkownika'
-            },
-            'mindstate': { 
-                label: '🧠 MindState', 
-                color: '#fd7e14',
-                description: 'Operacja na MindState stack'
-            },
-            'end': { 
-                label: '🏁 End', 
-                color: '#dc3545',
-                description: 'Zakończenie flow'
-            }
-        };
+    // Node types available in toolbar
+    const NODE_TYPES = {
+        'start': {
+            label: '🚀 Start',
+            color: '#28a745',
+            description: 'Punkt startowy flow'
+        },
+        'intent': {
+            label: '🎯 Intent',
+            color: '#58a6ff',
+            description: 'Rozpoznanie intencji użytkownika'
+        },
+        'condition': {
+            label: '🤔 Condition',
+            color: '#ffc107',
+            description: 'Warunek logiczny'
+        },
+        'action': {
+            label: '⚡ Action',
+            color: '#17a2b8',
+            description: 'Akcja/operacja'
+        },
+        'response': {
+            label: '💬 Response',
+            color: '#6f42c1',
+            description: 'Odpowiedź do użytkownika'
+        },
+        'mindstate': {
+            label: '🧠 MindState',
+            color: '#fd7e14',
+            description: 'Operacja na MindState stack'
+        },
+        'end': {
+            label: '🏁 End',
+            color: '#dc3545',
+            description: 'Zakończenie flow'
+        }
+    };
 
-        // Default node structure
-        const createDefaultNode = (type, x = 100, y = 100) => ({
-            id: `node_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            type,
-            x,
-            y,
-            label: NODE_TYPES[type]?.label || type,
-            
-            // Flow properties
+    // Default node structure
+    const createDefaultNode = (type, x = 100, y = 100) => ({
+        id: `node_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        type,
+        x,
+        y,
+        label: NODE_TYPES[type]?.label || type,
+
+        // Flow properties
+        name: '',
+        description: '',
+        required: true,
+
+        // Intent properties (if type === 'intent')
+        intent: {
             name: '',
+            keywords: [],
+            examples: [],
+            confidence_threshold: 0.7,
+            requires_flow: true
+        },
+
+        // Condition properties (if type === 'condition')
+        condition: {
+            type: 'simple', // simple, complex, mindstate
+            field: '',
+            operator: 'equals',
+            value: '',
+            expression: ''
+        },
+
+        // Response properties (if type === 'response')
+        response: {
+            system_prompt: '',
+            user_prompt_template: '',
+            variables: [],
+            use_rag: false,
+            knowledge_areas: []
+        },
+
+        // MindState properties (if type === 'mindstate')
+        mindstate: {
+            operation: 'push', // push, pop, clear, check
+            tag: '',
+            metadata: {}
+        },
+
+        // Next steps
+        next_steps: []
+    });
+
+    // Main Visual Flow Designer Component
+    function VisualFlowDesigner() {
+        const [activeTab, setActiveTab] = useState('canvas');
+        const [flowData, setFlowData] = useState({
+            id: `flow_${Date.now()}`,
+            name: 'New Flow',
             description: '',
-            required: true,
-            
-            // Intent properties (if type === 'intent')
-            intent: {
-                name: '',
-                keywords: [],
-                examples: [],
-                confidence_threshold: 0.7,
-                requires_flow: true
-            },
-            
-            // Condition properties (if type === 'condition')
-            condition: {
-                type: 'simple', // simple, complex, mindstate
-                field: '',
-                operator: 'equals',
-                value: '',
-                expression: ''
-            },
-            
-            // Response properties (if type === 'response')
-            response: {
-                system_prompt: '',
-                user_prompt_template: '',
-                variables: [],
-                use_rag: false,
-                knowledge_areas: []
-            },
-            
-            // MindState properties (if type === 'mindstate')
-            mindstate: {
-                operation: 'push', // push, pop, clear, check
-                tag: '',
-                metadata: {}
-            },
-            
-            // Next steps
-            next_steps: []
+            avatar_type: 'networker',
+            nodes: [],
+            edges: [],
+            entry_intents: [],
+            priority: 5,
+            max_duration: 600,
+            repeatable: true
         });
 
-        // Main Visual Flow Designer Component
-        function VisualFlowDesigner() {
-            const [activeTab, setActiveTab] = useState('canvas');
-            const [flowData, setFlowData] = useState({
-                id: `flow_${Date.now()}`,
-                name: 'New Flow',
-                description: '',
-                avatar_type: 'networker',
-                nodes: [],
-                edges: [],
-                entry_intents: [],
-                priority: 5,
-                max_duration: 600,
-                repeatable: true
-            });
-            
-            const [selectedNode, setSelectedNode] = useState(null);
-            const [nodeModalOpen, setNodeModalOpen] = useState(false);
-            const [editingNode, setEditingNode] = useState(null);
-            const [draggedNodeType, setDraggedNodeType] = useState(null);
-            
-            const canvasRef = useRef(null);
-            const svgRef = useRef(null);
+        const [selectedNode, setSelectedNode] = useState(null);
+        const [nodeModalOpen, setNodeModalOpen] = useState(false);
+        const [editingNode, setEditingNode] = useState(null);
+        const [draggedNodeType, setDraggedNodeType] = useState(null);
 
-            // Initialize D3 and create SVG
-            useEffect(() => {
-                if (!svgRef.current) return;
-                
-                const svg = d3.select(svgRef.current);
-                svg.selectAll("*").remove();
-                
-                // Add definitions for arrow markers
-                const defs = svg.append("defs");
-                defs.append("marker")
-                    .attr("id", "arrowhead")
-                    .attr("viewBox", "0 0 10 10")
-                    .attr("refX", 8)
-                    .attr("refY", 3)
-                    .attr("markerWidth", 6)
-                    .attr("markerHeight", 6)
-                    .attr("orient", "auto")
-                    .append("path")
-                    .attr("d", "M0,0 L0,6 L9,3 z")
-                    .attr("fill", "#58a6ff");
-                
-                // Main container group
-                const g = svg.append("g").attr("class", "graph-container");
-                
-                redrawGraph();
-            }, [flowData.nodes, flowData.edges]);
+        const canvasRef = useRef(null);
+        const svgRef = useRef(null);
 
-            // Redraw the graph
-            const redrawGraph = useCallback(() => {
-                if (!svgRef.current) return;
-                
-                const svg = d3.select(svgRef.current);
-                const g = svg.select(".graph-container");
-                
-                g.selectAll(".node-group").remove();
-                g.selectAll(".edge").remove();
-                
-                // Draw edges first (so they appear behind nodes)
-                flowData.edges.forEach(edge => {
-                    const sourceNode = flowData.nodes.find(n => n.id === edge.source);
-                    const targetNode = flowData.nodes.find(n => n.id === edge.target);
-                    
-                    if (sourceNode && targetNode) {
-                        g.append("line")
-                            .attr("class", "edge")
-                            .attr("x1", sourceNode.x + 60)
-                            .attr("y1", sourceNode.y + 30)
-                            .attr("x2", targetNode.x + 60)
-                            .attr("y2", targetNode.y + 30)
-                            .attr("stroke", "#58a6ff")
-                            .attr("stroke-width", 2)
-                            .attr("marker-end", "url(#arrowhead)");
-                    }
-                });
-                
-                // Draw nodes
-                const nodeGroups = g.selectAll(".node-group")
-                    .data(flowData.nodes)
-                    .enter()
-                    .append("g")
-                    .attr("class", "node-group")
-                    .attr("transform", d => `translate(${d.x}, ${d.y})`);
-                
-                // Node rectangles
-                nodeGroups.append("rect")
-                    .attr("class", d => `node ${selectedNode?.id === d.id ? 'selected' : ''}`)
-                    .attr("width", 120)
-                    .attr("height", 60)
-                    .attr("rx", 8)
-                    .attr("fill", d => NODE_TYPES[d.type]?.color || '#3a3a3a')
-                    .attr("stroke", "#58a6ff")
-                    .attr("stroke-width", d => selectedNode?.id === d.id ? 3 : 2)
-                    .style("cursor", "pointer")
-                    .on("click", (event, d) => {
-                        setSelectedNode(d);
-                    })
-                    .on("dblclick", (event, d) => {
-                        setEditingNode(d);
-                        setNodeModalOpen(true);
-                    });
-                
-                // Node labels
-                nodeGroups.append("text")
-                    .attr("class", "node-label")
-                    .attr("x", 60)
-                    .attr("y", 25)
-                    .attr("text-anchor", "middle")
-                    .attr("dominant-baseline", "middle")
-                    .attr("fill", "white")
-                    .attr("font-size", "11px")
-                    .attr("font-weight", "bold")
-                    .style("pointer-events", "none")
-                    .text(d => d.label);
-                
-                // Node names (if set)
-                nodeGroups.append("text")
-                    .attr("class", "node-name")
-                    .attr("x", 60)
-                    .attr("y", 40)
-                    .attr("text-anchor", "middle")
-                    .attr("dominant-baseline", "middle")
-                    .attr("fill", "rgba(255,255,255,0.8)")
-                    .attr("font-size", "9px")
-                    .style("pointer-events", "none")
-                    .text(d => d.name || '');
-                    
-            }, [flowData.nodes, flowData.edges, selectedNode]);
+        // Initialize D3 and create SVG
+        useEffect(() => {
+            if (!svgRef.current) return;
 
-            // Handle canvas drop
-            const handleCanvasDrop = useCallback((event) => {
-                event.preventDefault();
-                if (!draggedNodeType) return;
-                
-                const rect = canvasRef.current.getBoundingClientRect();
-                const x = event.clientX - rect.left - 60;
-                const y = event.clientY - rect.top - 30;
-                
-                const newNode = createDefaultNode(draggedNodeType, x, y);
-                setFlowData(prev => ({
-                    ...prev,
-                    nodes: [...prev.nodes, newNode]
-                }));
-                
-                setDraggedNodeType(null);
-            }, [draggedNodeType]);
+            const svg = d3.select(svgRef.current);
+            svg.selectAll("*").remove();
 
-            const handleCanvasDragOver = useCallback((event) => {
-                event.preventDefault();
-            }, []);
+            // Add definitions for arrow markers
+            const defs = svg.append("defs");
+            defs.append("marker")
+                .attr("id", "arrowhead")
+                .attr("viewBox", "0 0 10 10")
+                .attr("refX", 8)
+                .attr("refY", 3)
+                .attr("markerWidth", 6)
+                .attr("markerHeight", 6)
+                .attr("orient", "auto")
+                .append("path")
+                .attr("d", "M0,0 L0,6 L9,3 z")
+                .attr("fill", "#58a6ff");
 
-            // Add edge between nodes
-            const addEdge = useCallback((sourceId, targetId) => {
-                const edgeExists = flowData.edges.some(e => 
-                    e.source === sourceId && e.target === targetId
-                );
-                
-                if (!edgeExists && sourceId !== targetId) {
-                    setFlowData(prev => ({
-                        ...prev,
-                        edges: [...prev.edges, {
-                            id: `edge_${Date.now()}`,
-                            source: sourceId,
-                            target: targetId
-                        }]
-                    }));
+            // Main container group
+            const g = svg.append("g").attr("class", "graph-container");
+
+            redrawGraph();
+        }, [flowData.nodes, flowData.edges]);
+
+        // Redraw the graph
+        const redrawGraph = useCallback(() => {
+            if (!svgRef.current) return;
+
+            const svg = d3.select(svgRef.current);
+            const g = svg.select(".graph-container");
+
+            g.selectAll(".node-group").remove();
+            g.selectAll(".edge").remove();
+
+            // Draw edges first (so they appear behind nodes)
+            flowData.edges.forEach(edge => {
+                const sourceNode = flowData.nodes.find(n => n.id === edge.source);
+                const targetNode = flowData.nodes.find(n => n.id === edge.target);
+
+                if (sourceNode && targetNode) {
+                    g.append("line")
+                        .attr("class", "edge")
+                        .attr("x1", sourceNode.x + 60)
+                        .attr("y1", sourceNode.y + 30)
+                        .attr("x2", targetNode.x + 60)
+                        .attr("y2", targetNode.y + 30)
+                        .attr("stroke", "#58a6ff")
+                        .attr("stroke-width", 2)
+                        .attr("marker-end", "url(#arrowhead)");
                 }
-            }, [flowData.edges]);
+            });
 
-            // Delete selected node
-            const deleteSelectedNode = useCallback(() => {
-                if (!selectedNode) return;
-                
+            // Draw nodes
+            const nodeGroups = g.selectAll(".node-group")
+                .data(flowData.nodes)
+                .enter()
+                .append("g")
+                .attr("class", "node-group")
+                .attr("transform", d => `translate(${d.x}, ${d.y})`);
+
+            // Node rectangles
+            nodeGroups.append("rect")
+                .attr("class", d => `node ${selectedNode?.id === d.id ? 'selected' : ''}`)
+                .attr("width", 120)
+                .attr("height", 60)
+                .attr("rx", 8)
+                .attr("fill", d => NODE_TYPES[d.type]?.color || '#3a3a3a')
+                .attr("stroke", "#58a6ff")
+                .attr("stroke-width", d => selectedNode?.id === d.id ? 3 : 2)
+                .style("cursor", "pointer")
+                .on("click", (event, d) => {
+                    setSelectedNode(d);
+                })
+                .on("dblclick", (event, d) => {
+                    setEditingNode(d);
+                    setNodeModalOpen(true);
+                });
+
+            // Node labels
+            nodeGroups.append("text")
+                .attr("class", "node-label")
+                .attr("x", 60)
+                .attr("y", 25)
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "middle")
+                .attr("fill", "white")
+                .attr("font-size", "11px")
+                .attr("font-weight", "bold")
+                .style("pointer-events", "none")
+                .text(d => d.label);
+
+            // Node names (if set)
+            nodeGroups.append("text")
+                .attr("class", "node-name")
+                .attr("x", 60)
+                .attr("y", 40)
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "middle")
+                .attr("fill", "rgba(255,255,255,0.8)")
+                .attr("font-size", "9px")
+                .style("pointer-events", "none")
+                .text(d => d.name || '');
+
+        }, [flowData.nodes, flowData.edges, selectedNode]);
+
+        // Handle canvas drop
+        const handleCanvasDrop = useCallback((event) => {
+            event.preventDefault();
+            if (!draggedNodeType) return;
+
+            const rect = canvasRef.current.getBoundingClientRect();
+            const x = event.clientX - rect.left - 60;
+            const y = event.clientY - rect.top - 30;
+
+            const newNode = createDefaultNode(draggedNodeType, x, y);
+            setFlowData(prev => ({
+                ...prev,
+                nodes: [...prev.nodes, newNode]
+            }));
+
+            setDraggedNodeType(null);
+        }, [draggedNodeType]);
+
+        const handleCanvasDragOver = useCallback((event) => {
+            event.preventDefault();
+        }, []);
+
+        // Add edge between nodes
+        const addEdge = useCallback((sourceId, targetId) => {
+            const edgeExists = flowData.edges.some(e =>
+                e.source === sourceId && e.target === targetId
+            );
+
+            if (!edgeExists && sourceId !== targetId) {
                 setFlowData(prev => ({
                     ...prev,
-                    nodes: prev.nodes.filter(n => n.id !== selectedNode.id),
-                    edges: prev.edges.filter(e => 
-                        e.source !== selectedNode.id && e.target !== selectedNode.id
-                    )
+                    edges: [...prev.edges, {
+                        id: `edge_${Date.now()}`,
+                        source: sourceId,
+                        target: targetId
+                    }]
                 }));
-                
-                setSelectedNode(null);
-            }, [selectedNode]);
+            }
+        }, [flowData.edges]);
 
-            // Generate flow JSON
-            const generateFlowJSON = useCallback(() => {
-                const flowDefinition = {
-                    id: flowData.id,
-                    name: flowData.name,
-                    description: flowData.description,
-                    avatar_type: flowData.avatar_type,
-                    entry_intents: flowData.entry_intents,
-                    priority: flowData.priority,
-                    steps: flowData.nodes.map(node => ({
-                        id: node.id,
-                        name: node.name || node.label,
-                        description: node.description,
-                        type: node.type,
-                        required: node.required,
-                        next_steps: flowData.edges
-                            .filter(e => e.source === node.id)
-                            .map(e => e.target),
-                        
-                        // Type-specific properties
-                        ...(node.type === 'intent' && { intent: node.intent }),
-                        ...(node.type === 'condition' && { condition: node.condition }),
-                        ...(node.type === 'response' && { response: node.response }),
-                        ...(node.type === 'mindstate' && { mindstate: node.mindstate })
-                    })),
-                    max_duration: flowData.max_duration,
-                    repeatable: flowData.repeatable,
-                    success_criteria: flowData.nodes.filter(n => n.required).map(n => n.id)
-                };
-                
-                return JSON.stringify(flowDefinition, null, 2);
-            }, [flowData]);
+        // Delete selected node
+        const deleteSelectedNode = useCallback(() => {
+            if (!selectedNode) return;
 
-            return React.createElement('div', { className: 'designer-container' },
-                // Header
-                React.createElement('div', { className: 'designer-header' },
-                    React.createElement('div', { className: 'designer-title' }, '🧙‍♂️ Visual Flow Designer'),
-                    React.createElement('div', { className: 'designer-tabs' },
-                        React.createElement('button', {
-                            className: `tab-btn ${activeTab === 'canvas' ? 'active' : ''}`,
-                            onClick: () => setActiveTab('canvas')
-                        }, '🎨 Canvas'),
-                        React.createElement('button', {
-                            className: `tab-btn ${activeTab === 'json' ? 'active' : ''}`,
-                            onClick: () => setActiveTab('json')
-                        }, '📄 JSON'),
-                        React.createElement('button', {
-                            className: `tab-btn ${activeTab === 'deploy' ? 'active' : ''}`,
-                            onClick: () => setActiveTab('deploy')
-                        }, '🚀 Deploy')
-                    )
-                ),
-                
-                // Body
-                React.createElement('div', { className: 'designer-body' },
-                    // Toolbar (Node types)
-                    activeTab === 'canvas' && React.createElement('div', { className: 'toolbar' },
-                        React.createElement('div', { className: 'toolbar-section' },
-                            React.createElement('div', { className: 'toolbar-title' }, 'Node Types'),
-                            Object.entries(NODE_TYPES).map(([type, config]) =>
-                                React.createElement('div', {
-                                    key: type,
-                                    className: 'node-type',
-                                    draggable: true,
-                                    onDragStart: () => setDraggedNodeType(type),
-                                    style: { borderColor: config.color }
-                                }, config.label)
-                            )
-                        ),
-                        React.createElement('div', { className: 'toolbar-section' },
-                            React.createElement('div', { className: 'toolbar-title' }, 'Actions'),
-                            React.createElement('button', {
-                                className: 'btn btn-sm',
-                                style: { width: '100%', marginBottom: '10px' },
-                                onClick: deleteSelectedNode,
-                                disabled: !selectedNode
-                            }, '🗑️ Delete Node'),
-                            React.createElement('button', {
-                                className: 'btn btn-secondary btn-sm',
-                                style: { width: '100%' }
-                            }, '💾 Save Flow')
+            setFlowData(prev => ({
+                ...prev,
+                nodes: prev.nodes.filter(n => n.id !== selectedNode.id),
+                edges: prev.edges.filter(e =>
+                    e.source !== selectedNode.id && e.target !== selectedNode.id
+                )
+            }));
+
+            setSelectedNode(null);
+        }, [selectedNode]);
+
+        // Generate flow JSON
+        const generateFlowJSON = useCallback(() => {
+            const flowDefinition = {
+                id: flowData.id,
+                name: flowData.name,
+                description: flowData.description,
+                avatar_type: flowData.avatar_type,
+                entry_intents: flowData.entry_intents,
+                priority: flowData.priority,
+                steps: flowData.nodes.map(node => ({
+                    id: node.id,
+                    name: node.name || node.label,
+                    description: node.description,
+                    type: node.type,
+                    required: node.required,
+                    next_steps: flowData.edges
+                        .filter(e => e.source === node.id)
+                        .map(e => e.target),
+
+                    // Type-specific properties
+                    ...(node.type === 'intent' && {intent: node.intent}),
+                    ...(node.type === 'condition' && {condition: node.condition}),
+                    ...(node.type === 'response' && {response: node.response}),
+                    ...(node.type === 'mindstate' && {mindstate: node.mindstate})
+                })),
+                max_duration: flowData.max_duration,
+                repeatable: flowData.repeatable,
+                success_criteria: flowData.nodes.filter(n => n.required).map(n => n.id)
+            };
+
+            return JSON.stringify(flowDefinition, null, 2);
+        }, [flowData]);
+
+        return React.createElement('div', {className: 'designer-container'},
+            // Header
+            React.createElement('div', {className: 'designer-header'},
+                React.createElement('div', {className: 'designer-title'}, '🧙‍♂️ Visual Flow Designer'),
+                React.createElement('div', {className: 'designer-tabs'},
+                    React.createElement('button', {
+                        className: `tab-btn ${activeTab === 'canvas' ? 'active' : ''}`,
+                        onClick: () => setActiveTab('canvas')
+                    }, '🎨 Canvas'),
+                    React.createElement('button', {
+                        className: `tab-btn ${activeTab === 'json' ? 'active' : ''}`,
+                        onClick: () => setActiveTab('json')
+                    }, '📄 JSON'),
+                    React.createElement('button', {
+                        className: `tab-btn ${activeTab === 'deploy' ? 'active' : ''}`,
+                        onClick: () => setActiveTab('deploy')
+                    }, '🚀 Deploy')
+                )
+            ),
+
+            // Body
+            React.createElement('div', {className: 'designer-body'},
+                // Toolbar (Node types)
+                activeTab === 'canvas' && React.createElement('div', {className: 'toolbar'},
+                    React.createElement('div', {className: 'toolbar-section'},
+                        React.createElement('div', {className: 'toolbar-title'}, 'Node Types'),
+                        Object.entries(NODE_TYPES).map(([type, config]) =>
+                            React.createElement('div', {
+                                key: type,
+                                className: 'node-type',
+                                draggable: true,
+                                onDragStart: () => setDraggedNodeType(type),
+                                style: {borderColor: config.color}
+                            }, config.label)
                         )
                     ),
-                    
-                    // Canvas
-                    activeTab === 'canvas' && React.createElement('div', { 
+                    React.createElement('div', {className: 'toolbar-section'},
+                        React.createElement('div', {className: 'toolbar-title'}, 'Actions'),
+                        React.createElement('button', {
+                            className: 'btn btn-sm',
+                            style: {width: '100%', marginBottom: '10px'},
+                            onClick: deleteSelectedNode,
+                            disabled: !selectedNode
+                        }, '🗑️ Delete Node'),
+                        React.createElement('button', {
+                            className: 'btn btn-secondary btn-sm',
+                            style: {width: '100%'}
+                        }, '💾 Save Flow')
+                    )
+                ),
+
+                // Canvas
+                activeTab === 'canvas' && React.createElement('div', {
                         className: 'canvas-container',
                         ref: canvasRef,
                         onDrop: handleCanvasDrop,
                         onDragOver: handleCanvasDragOver
                     },
-                        React.createElement('svg', {
-                            ref: svgRef,
-                            className: 'canvas-svg',
-                            width: '100%',
-                            height: '100%'
-                        })
-                    ),
-                    
-                    // JSON View
-                    activeTab === 'json' && React.createElement('div', {
+                    React.createElement('svg', {
+                        ref: svgRef,
+                        className: 'canvas-svg',
+                        width: '100%',
+                        height: '100%'
+                    })
+                ),
+
+                // JSON View
+                activeTab === 'json' && React.createElement('div', {
                         style: {
                             flex: 1,
                             padding: '20px',
                             backgroundColor: '#2a2a2a'
                         }
                     },
-                        React.createElement('pre', {
-                            style: {
-                                color: '#e1e5e9',
-                                fontSize: '12px',
-                                lineHeight: '1.5',
-                                overflow: 'auto',
-                                background: '#1e1e1e',
-                                padding: '20px',
-                                borderRadius: '8px',
-                                border: '1px solid #3a3a3a'
-                            }
-                        }, generateFlowJSON())
-                    ),
-                    
-                    // Properties Panel (when node selected)
-                    activeTab === 'canvas' && selectedNode && React.createElement('div', { className: 'properties-panel' },
-                        React.createElement('div', { className: 'toolbar-title' }, 
-                            `Properties: ${selectedNode.label}`
-                        ),
-                        
-                        React.createElement('div', { className: 'form-group' },
-                            React.createElement('label', { className: 'form-label' }, 'Node Name'),
-                            React.createElement('input', {
-                                type: 'text',
-                                className: 'form-input',
-                                value: selectedNode.name || '',
-                                onChange: (e) => {
-                                    const updatedNodes = flowData.nodes.map(n => 
-                                        n.id === selectedNode.id 
-                                            ? { ...n, name: e.target.value }
-                                            : n
-                                    );
-                                    setFlowData({ ...flowData, nodes: updatedNodes });
-                                    setSelectedNode({ ...selectedNode, name: e.target.value });
-                                }
-                            })
-                        ),
-                        
-                        React.createElement('div', { className: 'form-group' },
-                            React.createElement('label', { className: 'form-label' }, 'Description'),
-                            React.createElement('textarea', {
-                                className: 'form-input form-textarea',
-                                value: selectedNode.description || '',
-                                onChange: (e) => {
-                                    const updatedNodes = flowData.nodes.map(n => 
-                                        n.id === selectedNode.id 
-                                            ? { ...n, description: e.target.value }
-                                            : n
-                                    );
-                                    setFlowData({ ...flowData, nodes: updatedNodes });
-                                    setSelectedNode({ ...selectedNode, description: e.target.value });
-                                }
-                            })
-                        ),
-                        
-                        React.createElement('button', {
-                            className: 'btn',
-                            style: { width: '100%' },
-                            onClick: () => {
-                                setEditingNode(selectedNode);
-                                setNodeModalOpen(true);
-                            }
-                        }, '⚙️ Advanced Configuration')
-                    )
+                    React.createElement('pre', {
+                        style: {
+                            color: '#e1e5e9',
+                            fontSize: '12px',
+                            lineHeight: '1.5',
+                            overflow: 'auto',
+                            background: '#1e1e1e',
+                            padding: '20px',
+                            borderRadius: '8px',
+                            border: '1px solid #3a3a3a'
+                        }
+                    }, generateFlowJSON())
                 ),
-                
-                // Node Configuration Modal
-                nodeModalOpen && editingNode && React.createElement(NodeConfigModal, {
-                    node: editingNode,
-                    onClose: () => {
-                        setNodeModalOpen(false);
-                        setEditingNode(null);
-                    },
-                    onSave: (updatedNode) => {
-                        const updatedNodes = flowData.nodes.map(n => 
-                            n.id === updatedNode.id ? updatedNode : n
-                        );
-                        setFlowData({ ...flowData, nodes: updatedNodes });
-                        if (selectedNode?.id === updatedNode.id) {
-                            setSelectedNode(updatedNode);
+
+                // Properties Panel (when node selected)
+                activeTab === 'canvas' && selectedNode && React.createElement('div', {className: 'properties-panel'},
+                    React.createElement('div', {className: 'toolbar-title'},
+                        `Properties: ${selectedNode.label}`
+                    ),
+
+                    React.createElement('div', {className: 'form-group'},
+                        React.createElement('label', {className: 'form-label'}, 'Node Name'),
+                        React.createElement('input', {
+                            type: 'text',
+                            className: 'form-input',
+                            value: selectedNode.name || '',
+                            onChange: (e) => {
+                                const updatedNodes = flowData.nodes.map(n =>
+                                    n.id === selectedNode.id
+                                        ? {...n, name: e.target.value}
+                                        : n
+                                );
+                                setFlowData({...flowData, nodes: updatedNodes});
+                                setSelectedNode({...selectedNode, name: e.target.value});
+                            }
+                        })
+                    ),
+
+                    React.createElement('div', {className: 'form-group'},
+                        React.createElement('label', {className: 'form-label'}, 'Description'),
+                        React.createElement('textarea', {
+                            className: 'form-input form-textarea',
+                            value: selectedNode.description || '',
+                            onChange: (e) => {
+                                const updatedNodes = flowData.nodes.map(n =>
+                                    n.id === selectedNode.id
+                                        ? {...n, description: e.target.value}
+                                        : n
+                                );
+                                setFlowData({...flowData, nodes: updatedNodes});
+                                setSelectedNode({...selectedNode, description: e.target.value});
+                            }
+                        })
+                    ),
+
+                    React.createElement('button', {
+                        className: 'btn',
+                        style: {width: '100%'},
+                        onClick: () => {
+                            setEditingNode(selectedNode);
+                            setNodeModalOpen(true);
                         }
-                        setNodeModalOpen(false);
-                        setEditingNode(null);
+                    }, '⚙️ Advanced Configuration')
+                )
+            ),
+
+            // Node Configuration Modal
+            nodeModalOpen && editingNode && React.createElement(NodeConfigModal, {
+                node: editingNode,
+                onClose: () => {
+                    setNodeModalOpen(false);
+                    setEditingNode(null);
+                },
+                onSave: (updatedNode) => {
+                    const updatedNodes = flowData.nodes.map(n =>
+                        n.id === updatedNode.id ? updatedNode : n
+                    );
+                    setFlowData({...flowData, nodes: updatedNodes});
+                    if (selectedNode?.id === updatedNode.id) {
+                        setSelectedNode(updatedNode);
                     }
-                })
-            );
-        }
-
-        // Node Configuration Modal Component
-        function NodeConfigModal({ node, onClose, onSave }) {
-            const [editedNode, setEditedNode] = useState({ ...node });
-            const [newKeyword, setNewKeyword] = useState('');
-
-            const addKeyword = () => {
-                if (newKeyword.trim() && !editedNode.intent.keywords.includes(newKeyword.trim())) {
-                    setEditedNode({
-                        ...editedNode,
-                        intent: {
-                            ...editedNode.intent,
-                            keywords: [...editedNode.intent.keywords, newKeyword.trim()]
-                        }
-                    });
-                    setNewKeyword('');
+                    setNodeModalOpen(false);
+                    setEditingNode(null);
                 }
-            };
+            })
+        );
+    }
 
-            const removeKeyword = (keyword) => {
+    // Node Configuration Modal Component
+    function NodeConfigModal({node, onClose, onSave}) {
+        const [editedNode, setEditedNode] = useState({...node});
+        const [newKeyword, setNewKeyword] = useState('');
+
+        const addKeyword = () => {
+            if (newKeyword.trim() && !editedNode.intent.keywords.includes(newKeyword.trim())) {
                 setEditedNode({
                     ...editedNode,
                     intent: {
                         ...editedNode.intent,
-                        keywords: editedNode.intent.keywords.filter(k => k !== keyword)
+                        keywords: [...editedNode.intent.keywords, newKeyword.trim()]
                     }
                 });
-            };
+                setNewKeyword('');
+            }
+        };
 
-            return React.createElement('div', { className: 'modal' },
-                React.createElement('div', { className: 'modal-content' },
-                    React.createElement('div', { className: 'modal-header' },
-                        React.createElement('h3', { className: 'modal-title' }, 
-                            `Configure: ${editedNode.label}`
-                        ),
-                        React.createElement('button', {
-                            className: 'close-btn',
-                            onClick: onClose
-                        }, '×')
+        const removeKeyword = (keyword) => {
+            setEditedNode({
+                ...editedNode,
+                intent: {
+                    ...editedNode.intent,
+                    keywords: editedNode.intent.keywords.filter(k => k !== keyword)
+                }
+            });
+        };
+
+        return React.createElement('div', {className: 'modal'},
+            React.createElement('div', {className: 'modal-content'},
+                React.createElement('div', {className: 'modal-header'},
+                    React.createElement('h3', {className: 'modal-title'},
+                        `Configure: ${editedNode.label}`
                     ),
-                    
-                    // Basic Properties
-                    React.createElement('div', { className: 'form-group' },
-                        React.createElement('label', { className: 'form-label' }, 'Node Name'),
+                    React.createElement('button', {
+                        className: 'close-btn',
+                        onClick: onClose
+                    }, '×')
+                ),
+
+                // Basic Properties
+                React.createElement('div', {className: 'form-group'},
+                    React.createElement('label', {className: 'form-label'}, 'Node Name'),
+                    React.createElement('input', {
+                        type: 'text',
+                        className: 'form-input',
+                        value: editedNode.name || '',
+                        onChange: (e) => setEditedNode({...editedNode, name: e.target.value})
+                    })
+                ),
+
+                React.createElement('div', {className: 'form-group'},
+                    React.createElement('label', {className: 'form-label'}, 'Description'),
+                    React.createElement('textarea', {
+                        className: 'form-input form-textarea',
+                        value: editedNode.description || '',
+                        onChange: (e) => setEditedNode({...editedNode, description: e.target.value})
+                    })
+                ),
+
+                // Intent-specific configuration
+                editedNode.type === 'intent' && React.createElement('div', null,
+                    React.createElement('div', {className: 'form-group'},
+                        React.createElement('label', {className: 'form-label'}, 'Intent Name'),
                         React.createElement('input', {
                             type: 'text',
                             className: 'form-input',
-                            value: editedNode.name || '',
-                            onChange: (e) => setEditedNode({ ...editedNode, name: e.target.value })
+                            value: editedNode.intent.name || '',
+                            onChange: (e) => setEditedNode({
+                                ...editedNode,
+                                intent: {...editedNode.intent, name: e.target.value}
+                            })
                         })
                     ),
-                    
-                    React.createElement('div', { className: 'form-group' },
-                        React.createElement('label', { className: 'form-label' }, 'Description'),
-                        React.createElement('textarea', {
-                            className: 'form-input form-textarea',
-                            value: editedNode.description || '',
-                            onChange: (e) => setEditedNode({ ...editedNode, description: e.target.value })
-                        })
-                    ),
-                    
-                    // Intent-specific configuration
-                    editedNode.type === 'intent' && React.createElement('div', null,
-                        React.createElement('div', { className: 'form-group' },
-                            React.createElement('label', { className: 'form-label' }, 'Intent Name'),
+
+                    React.createElement('div', {className: 'form-group'},
+                        React.createElement('label', {className: 'form-label'}, 'Keywords'),
+                        React.createElement('div', {style: {display: 'flex', marginBottom: '10px'}},
                             React.createElement('input', {
                                 type: 'text',
-                                className: 'form-input',
-                                value: editedNode.intent.name || '',
-                                onChange: (e) => setEditedNode({
-                                    ...editedNode,
-                                    intent: { ...editedNode.intent, name: e.target.value }
-                                })
-                            })
+                                className: 'form-input add-keyword-input',
+                                value: newKeyword,
+                                onChange: (e) => setNewKeyword(e.target.value),
+                                onKeyPress: (e) => e.key === 'Enter' && addKeyword(),
+                                placeholder: 'Add keyword...'
+                            }),
+                            React.createElement('button', {
+                                className: 'btn btn-sm',
+                                onClick: addKeyword
+                            }, 'Add')
                         ),
-                        
-                        React.createElement('div', { className: 'form-group' },
-                            React.createElement('label', { className: 'form-label' }, 'Keywords'),
-                            React.createElement('div', { style: { display: 'flex', marginBottom: '10px' } },
-                                React.createElement('input', {
-                                    type: 'text',
-                                    className: 'form-input add-keyword-input',
-                                    value: newKeyword,
-                                    onChange: (e) => setNewKeyword(e.target.value),
-                                    onKeyPress: (e) => e.key === 'Enter' && addKeyword(),
-                                    placeholder: 'Add keyword...'
-                                }),
-                                React.createElement('button', {
-                                    className: 'btn btn-sm',
-                                    onClick: addKeyword
-                                }, 'Add')
-                            ),
-                            React.createElement('div', { className: 'keywords-container' },
-                                editedNode.intent.keywords.map((keyword, index) =>
-                                    React.createElement('span', {
-                                        key: index,
-                                        className: 'keyword-tag',
-                                        onClick: () => removeKeyword(keyword)
-                                    }, keyword + ' ×')
-                                )
+                        React.createElement('div', {className: 'keywords-container'},
+                            editedNode.intent.keywords.map((keyword, index) =>
+                                React.createElement('span', {
+                                    key: index,
+                                    className: 'keyword-tag',
+                                    onClick: () => removeKeyword(keyword)
+                                }, keyword + ' ×')
                             )
-                        ),
-                        
-                        React.createElement('div', { className: 'form-group' },
-                            React.createElement('label', { className: 'form-label' }, 'Confidence Threshold'),
-                            React.createElement('input', {
-                                type: 'number',
-                                min: '0',
-                                max: '1',
-                                step: '0.1',
-                                className: 'form-input',
-                                value: editedNode.intent.confidence_threshold || 0.7,
-                                onChange: (e) => setEditedNode({
-                                    ...editedNode,
-                                    intent: { ...editedNode.intent, confidence_threshold: parseFloat(e.target.value) }
-                                })
-                            })
                         )
                     ),
-                    
-                    // Response-specific configuration
-                    editedNode.type === 'response' && React.createElement('div', null,
-                        React.createElement('div', { className: 'form-group' },
-                            React.createElement('label', { className: 'form-label' }, 'System Prompt'),
-                            React.createElement('textarea', {
-                                className: 'form-input form-textarea',
-                                value: editedNode.response.system_prompt || '',
-                                onChange: (e) => setEditedNode({
-                                    ...editedNode,
-                                    response: { ...editedNode.response, system_prompt: e.target.value }
-                                }),
-                                placeholder: 'Jesteś profesjonalnym asystentem...'
+
+                    React.createElement('div', {className: 'form-group'},
+                        React.createElement('label', {className: 'form-label'}, 'Confidence Threshold'),
+                        React.createElement('input', {
+                            type: 'number',
+                            min: '0',
+                            max: '1',
+                            step: '0.1',
+                            className: 'form-input',
+                            value: editedNode.intent.confidence_threshold || 0.7,
+                            onChange: (e) => setEditedNode({
+                                ...editedNode,
+                                intent: {...editedNode.intent, confidence_threshold: parseFloat(e.target.value)}
                             })
-                        ),
-                        
-                        React.createElement('div', { className: 'form-group' },
-                            React.createElement('label', { className: 'form-label' }, 'User Prompt Template'),
-                            React.createElement('textarea', {
-                                className: 'form-input form-textarea',
-                                value: editedNode.response.user_prompt_template || '',
-                                onChange: (e) => setEditedNode({
-                                    ...editedNode,
-                                    response: { ...editedNode.response, user_prompt_template: e.target.value }
-                                }),
-                                placeholder: 'Użytkownik napisał: "{{user_message}}"...'
-                            })
-                        )
+                        })
+                    )
+                ),
+
+                // Response-specific configuration
+                editedNode.type === 'response' && React.createElement('div', null,
+                    React.createElement('div', {className: 'form-group'},
+                        React.createElement('label', {className: 'form-label'}, 'System Prompt'),
+                        React.createElement('textarea', {
+                            className: 'form-input form-textarea',
+                            value: editedNode.response.system_prompt || '',
+                            onChange: (e) => setEditedNode({
+                                ...editedNode,
+                                response: {...editedNode.response, system_prompt: e.target.value}
+                            }),
+                            placeholder: 'Jesteś profesjonalnym asystentem...'
+                        })
                     ),
-                    
-                    // Save/Cancel buttons
-                    React.createElement('div', { 
-                        style: { 
-                            display: 'flex', 
-                            gap: '10px', 
+
+                    React.createElement('div', {className: 'form-group'},
+                        React.createElement('label', {className: 'form-label'}, 'User Prompt Template'),
+                        React.createElement('textarea', {
+                            className: 'form-input form-textarea',
+                            value: editedNode.response.user_prompt_template || '',
+                            onChange: (e) => setEditedNode({
+                                ...editedNode,
+                                response: {...editedNode.response, user_prompt_template: e.target.value}
+                            }),
+                            placeholder: 'Użytkownik napisał: "{{user_message}}"...'
+                        })
+                    )
+                ),
+
+                // Save/Cancel buttons
+                React.createElement('div', {
+                        style: {
+                            display: 'flex',
+                            gap: '10px',
                             justifyContent: 'flex-end',
                             marginTop: '30px',
                             paddingTop: '20px',
                             borderTop: '1px solid #3a3a3a'
-                        } 
+                        }
                     },
-                        React.createElement('button', {
-                            className: 'btn btn-secondary',
-                            onClick: onClose
-                        }, 'Cancel'),
-                        React.createElement('button', {
-                            className: 'btn',
-                            onClick: () => onSave(editedNode)
-                        }, 'Save')
-                    )
+                    React.createElement('button', {
+                        className: 'btn btn-secondary',
+                        onClick: onClose
+                    }, 'Cancel'),
+                    React.createElement('button', {
+                        className: 'btn',
+                        onClick: () => onSave(editedNode)
+                    }, 'Save')
                 )
-            );
-        }
+            )
+        );
+    }
 
-        // Render the app
-        ReactDOM.render(React.createElement(VisualFlowDesigner), document.getElementById('root'));
-    </script>
+    // Render the app
+    ReactDOM.render(React.createElement(VisualFlowDesigner), document.getElementById('root'));
+</script>
 </body>
 </html>

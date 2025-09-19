@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
-import { v4 as uuidv4 } from 'uuid';
-import { SimulationPersona, SimulationParticipant } from '../models/types';
-import { ExecutionTimerService } from './execution-timer.service';
+import {v4 as uuidv4} from 'uuid';
+import {SimulationPersona, SimulationParticipant} from '../models/types';
+import {ExecutionTimerService} from './execution-timer.service';
 
 /**
  * PersonaLibraryService - zarządza biblioteką postaci
@@ -50,7 +50,7 @@ export class PersonaLibraryService {
 
             timer.stop();
             console.log(`✅ Added persona to library: ${persona.name} (ID: ${personaId})`);
-            
+
             return personaId;
         } catch (error) {
             timer.stop();
@@ -88,19 +88,19 @@ export class PersonaLibraryService {
 
         return allPersonas.filter(stored => {
             const persona = stored.persona;
-            
+
             // Szukaj w nazwie
             const nameMatch = persona.name.toLowerCase().includes(lowerQuery);
-            
+
             // Szukaj w opisie
             const backgroundMatch = persona.background.toLowerCase().includes(lowerQuery);
-            
+
             // Szukaj w branży
             const industryMatch = persona.industry.toLowerCase().includes(lowerQuery);
-            
+
             // Sprawdź tagi
-            const tagMatch = tags.length === 0 || tags.some(tag => 
-                stored.tags.some(storedTag => 
+            const tagMatch = tags.length === 0 || tags.some(tag =>
+                stored.tags.some(storedTag =>
                     storedTag.toLowerCase().includes(tag.toLowerCase())
                 )
             );
@@ -113,8 +113,8 @@ export class PersonaLibraryService {
      * Pobiera persony według kategorii/roli
      */
     public getPersonasByRole(role: string): StoredPersona[] {
-        return this.getAllPersonas().filter(stored => 
-            stored.tags.includes(role) || 
+        return this.getAllPersonas().filter(stored =>
+            stored.tags.includes(role) ||
             stored.persona.background.toLowerCase().includes(role.toLowerCase())
         );
     }
@@ -123,7 +123,7 @@ export class PersonaLibraryService {
      * Pobiera persony według branży
      */
     public getPersonasByIndustry(industry: string): StoredPersona[] {
-        return this.getAllPersonas().filter(stored => 
+        return this.getAllPersonas().filter(stored =>
             stored.persona.industry.toLowerCase().includes(industry.toLowerCase())
         );
     }
@@ -151,12 +151,12 @@ export class PersonaLibraryService {
         const stored = this.personaLibrary.get(personaId);
         if (!stored) return false;
 
-        stored.persona = { ...stored.persona, ...updates };
+        stored.persona = {...stored.persona, ...updates};
         stored.updated_at = new Date().toISOString();
 
         await this.savePersonaLibrary();
         console.log(`✅ Updated persona: ${stored.persona.name}`);
-        
+
         return true;
     }
 
@@ -192,7 +192,7 @@ export class PersonaLibraryService {
      */
     public async ratePersona(personaId: string, rating: number): Promise<boolean> {
         if (rating < 1 || rating > 5) return false;
-        
+
         const stored = this.personaLibrary.get(personaId);
         if (!stored) return false;
 
@@ -258,7 +258,7 @@ export class PersonaLibraryService {
      */
     public getLibraryStats(): LibraryStats {
         const allPersonas = this.getAllPersonas();
-        
+
         const industriesCount = new Map<string, number>();
         const rolesCount = new Map<string, number>();
         let totalUsage = 0;
@@ -300,7 +300,7 @@ export class PersonaLibraryService {
             version: "1.0",
             personas: Array.from(this.personaLibrary.values())
         };
-        
+
         return JSON.stringify(exportData, null, 2);
     }
 
@@ -318,7 +318,7 @@ export class PersonaLibraryService {
                         // Generuj nowe ID żeby uniknąć konfliktów
                         stored.id = uuidv4();
                         stored.updated_at = new Date().toISOString();
-                        
+
                         this.personaLibrary.set(stored.id, stored);
                         importedCount++;
                     }
@@ -345,7 +345,7 @@ export class PersonaLibraryService {
             if (fs.existsSync(this.personaLibraryPath)) {
                 const rawData = fs.readFileSync(this.personaLibraryPath, 'utf8');
                 const data = JSON.parse(rawData);
-                
+
                 if (data.personas) {
                     for (const stored of data.personas) {
                         if (this.validateStoredPersona(stored)) {
@@ -353,7 +353,7 @@ export class PersonaLibraryService {
                         }
                     }
                 }
-                
+
                 console.log(`📚 Loaded ${this.personaLibrary.size} personas from library`);
             } else {
                 // Utwórz pusty plik biblioteki
@@ -379,7 +379,7 @@ export class PersonaLibraryService {
 
             const dir = path.dirname(this.personaLibraryPath);
             if (!fs.existsSync(dir)) {
-                fs.mkdirSync(dir, { recursive: true });
+                fs.mkdirSync(dir, {recursive: true});
             }
 
             fs.writeFileSync(this.personaLibraryPath, JSON.stringify(saveData, null, 2));
@@ -393,12 +393,12 @@ export class PersonaLibraryService {
      * Waliduje stored persona object
      */
     private validateStoredPersona(stored: any): boolean {
-        return stored && 
-               stored.id && 
-               stored.persona && 
-               stored.persona.name && 
-               stored.persona.background &&
-               Array.isArray(stored.tags);
+        return stored &&
+            stored.id &&
+            stored.persona &&
+            stored.persona.name &&
+            stored.persona.background &&
+            Array.isArray(stored.tags);
     }
 
     /**
@@ -452,11 +452,16 @@ export class PersonaLibraryService {
      */
     private estimateExperienceYears(level: string): number {
         switch (level) {
-            case 'beginner': return 2;
-            case 'intermediate': return 5;
-            case 'advanced': return 10;
-            case 'expert': return 15;
-            default: return 5;
+            case 'beginner':
+                return 2;
+            case 'intermediate':
+                return 5;
+            case 'advanced':
+                return 10;
+            case 'expert':
+                return 15;
+            default:
+                return 5;
         }
     }
 }
@@ -489,4 +494,4 @@ interface LibraryStats {
 }
 
 export default PersonaLibraryService;
-export { StoredPersona, LibraryStats };
+export {StoredPersona, LibraryStats};

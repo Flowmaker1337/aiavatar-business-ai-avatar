@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
+import {Request, Response} from 'express';
 import DatabaseService from '../services/database.service';
-import { ExecutionTimerService } from '../services/execution-timer.service';
+import {ExecutionTimerService} from '../services/execution-timer.service';
 
 interface CompanyProfile {
     company_id: 'aureus' | 'techflow' | 'consultpro' | 'custom';
@@ -29,13 +29,13 @@ export class CompanyProfileController {
         timer.start();
 
         try {
-            const { companyId } = req.params;
-            const { 
-                company_context, 
-                your_role_description, 
-                current_situation, 
-                goals_objectives, 
-                key_challenges 
+            const {companyId} = req.params;
+            const {
+                company_context,
+                your_role_description,
+                current_situation,
+                goals_objectives,
+                key_challenges
             } = req.body;
 
             if (!companyId || !company_context) {
@@ -70,11 +70,11 @@ export class CompanyProfileController {
 
             // Upsert to database  
             const collectionName = 'company_profiles';
-            
+
             // Try to find existing
             const existing = await this.databaseService.findAll(collectionName);
             const existingProfile = existing.find((p: any) => p.company_id === companyId);
-            
+
             if (existingProfile) {
                 // Update existing
                 await this.databaseService.update(collectionName, existingProfile.id || existingProfile._id, profileData);
@@ -111,8 +111,8 @@ export class CompanyProfileController {
         timer.start();
 
         try {
-            const { companyId } = req.params;
-            
+            const {companyId} = req.params;
+
             if (!companyId) {
                 res.status(400).json({
                     success: false,

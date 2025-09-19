@@ -1,14 +1,14 @@
 import fs from 'fs';
 import path from 'path';
-import { 
-    PromptContext, 
-    PromptTemplate, 
-    BusinessAvatar, 
-    MindStateStack, 
-    SystemPrompt, 
-    UserPrompt 
+import {
+    PromptContext,
+    PromptTemplate,
+    BusinessAvatar,
+    MindStateStack,
+    SystemPrompt,
+    UserPrompt
 } from '../models/types';
-import { ExecutionTimerService } from './execution-timer.service';
+import {ExecutionTimerService} from './execution-timer.service';
 import IntentClassifier from './intent-classifier.service';
 
 /**
@@ -49,7 +49,7 @@ class PromptBuilder {
             this.templates = data.templates;
             this.defaultSystemPrompt = this.templates.find(t => t.id === 'system_prompt_default') || null;
             this.initialized = true;
-            
+
             console.log(`✅ PromptBuilder initialized with ${this.templates.length} prompt templates`);
             if (this.defaultSystemPrompt) {
                 console.log('✅ Default system prompt loaded.');
@@ -67,7 +67,7 @@ class PromptBuilder {
         if (!this.initialized) {
             await this.initialize();
         }
-        
+
         const timer = new ExecutionTimerService('buildPrompt in PromptBuilder');
         timer.start();
 
@@ -76,7 +76,7 @@ class PromptBuilder {
         if (context.current_flow_step) {
             template = this.findTemplateForFlowStep(context.current_flow_step);
         }
-        
+
         // Jeśli nie znaleziono template'a dla kroku, sprawdź custom intent lub użyj standard template
         if (!template) {
             // Sprawdź czy to custom intent z własnym prompt
@@ -89,7 +89,7 @@ class PromptBuilder {
                 template = this.findTemplate(context.current_intent);
             }
         }
-        
+
         if (!template) {
             timer.stop();
             throw new Error(`No template found for intent: ${context.current_intent} or flow step: ${context.current_flow_step}`);
@@ -108,7 +108,7 @@ class PromptBuilder {
         }
 
         timer.stop();
-        return { systemPrompt, userPrompt };
+        return {systemPrompt, userPrompt};
     }
 
     /**
@@ -120,7 +120,7 @@ class PromptBuilder {
             // Pobierz custom intents dla tego avatara
             const customIntents = this.intentClassifier.getIntentDefinitionsForAvatar(avatarId);
             const customIntent = customIntents.find(intent => intent.name === intentName);
-            
+
             if (customIntent && customIntent.system_prompt_template && customIntent.user_prompt_template) {
                 // Konwertuj custom intent na PromptTemplate
                 return {
@@ -134,7 +134,7 @@ class PromptBuilder {
                 };
             }
         }
-        
+
         return null;
     }
 
@@ -159,12 +159,12 @@ class PromptBuilder {
             'discuss_terms': 'discuss_terms',
             'purchase_decision': 'purchase_decision'
         };
-        
+
         const templateIntent = flowStepTemplateMap[flowStep];
         if (templateIntent) {
             return this.templates.find(template => template.intent === templateIntent) || null;
         }
-        
+
         return null;
     }
 
@@ -181,7 +181,7 @@ class PromptBuilder {
             console.log('🎯 PromptBuilder: Custom avatar detected:', customAvatar.name);
             console.log('🎯 PromptBuilder: Personality type:', typeof customAvatar.personality);
             console.log('🎯 PromptBuilder: Personality value:', customAvatar.personality);
-            
+
             if (customAvatar.specialization) {
                 // Bezpieczne pobieranie personality - może być string lub object
                 let personalityText = '';
@@ -203,7 +203,7 @@ Twoje odpowiedzi są oparte na Twojej specjalizacji i doświadczeniu.
 Prowadź rozmowę naturalnie, słuchaj uważnie i oferuj konkretne rozwiązania.
 Zakaz używania: formatowania tekstu, znaków końca linii, znaków wcięć, znaków tabulacji, list wypunktowanych i numerycznych, wyliczeń, akapitów.
 WAŻNE! Odpowiadaj krótkimi zdaniami w maksymalnej ilości 3 zdań i cała odpowiedź ma mieć maksymalnie 350 znaków.`;
-                
+
                 console.log('✅ PromptBuilder: Generated custom system prompt');
                 console.log('🔧 PromptBuilder: Custom system prompt content:', systemPrompt.substring(0, 100) + '...');
             } else {
@@ -230,7 +230,7 @@ WAŻNE! Odpowiadaj krótkimi zdaniami w maksymalnej ilości 3 zdań i cała odpo
         console.log(`🔧 PromptBuilder: Building user prompt for template '${template.id}' (${template.intent})`);
         // console.log(`🔧 PromptBuilder: Template content preview: ${template.user_prompt_template.substring(0, 100)}...`);
         // console.log(`🔧 PromptBuilder: Template content preview: ${template.user_prompt_template}`);
-        
+
         let userPrompt = template.user_prompt_template;
 
         // Zamień placeholdery
@@ -281,7 +281,7 @@ WAŻNE! Odpowiadaj krótkimi zdaniami w maksymalnej ilości 3 zdań i cała odpo
         // Memory placeholdery
         const memoryShort = this.getMemoryShort(context.mind_state);
         const memoryLong = this.getMemoryLong(context.mind_state);
-        
+
         result = result.replace(/\{\{memory_short\}\}/g, memoryShort);
         result = result.replace(/\{\{memory_long\}\}/g, memoryLong);
 
@@ -330,7 +330,7 @@ WAŻNE! Odpowiadaj krótkimi zdaniami w maksymalnej ilości 3 zdań i cała odpo
                 .slice(-3)
                 .map(item => `${item.intent} (${new Date(item.timestamp).toLocaleTimeString()})`)
                 .join(', ');
-            
+
             contextualPrompt += '\n\n### OSTATNIE INTENCJE ###\n';
             contextualPrompt += `Ostatnie intencje: ${recentIntents}`;
         }
@@ -348,7 +348,7 @@ WAŻNE! Odpowiadaj krótkimi zdaniami w maksymalnej ilości 3 zdań i cała odpo
 
         const lastItem = mindState.stack[mindState.stack.length - 1];
         const timeAgo = Math.floor((Date.now() - lastItem.timestamp) / 1000);
-        
+
         return `Ostatnia intencja: ${lastItem.intent} (${timeAgo}s temu)`;
     }
 
@@ -446,7 +446,7 @@ WAŻNE! Odpowiadaj krótkimi zdaniami w maksymalnej ilości 3 zdań i cała odpo
         missingVariables: string[];
     } {
         const missingVariables: string[] = [];
-        
+
         // Sprawdź czy wszystkie zmienne z template.variables są dostępne w kontekście
         for (const variable of template.variables) {
             if (!this.hasVariable(variable, context)) {

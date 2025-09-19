@@ -3,7 +3,14 @@
     {
       "name": "greeting",
       "description": "Użytkownika wita się",
-      "keywords": ["cześć", "dzień dobry", "witaj", "hello", "hej", "miło poznać"],
+      "keywords": [
+        "cześć",
+        "dzień dobry",
+        "witaj",
+        "hello",
+        "hej",
+        "miło poznać"
+      ],
       "examples": [
         "Dzień dobry, miło mi poznać",
         "Cześć, jak się masz?",
@@ -17,7 +24,14 @@
     {
       "name": "ask_about_npc_firm",
       "description": "Pytania o firmę NPC, jej działalność, misję, usługi",
-      "keywords": ["firma", "działalność", "zajmujecie", "usługi", "produkty", "specjalizacja"],
+      "keywords": [
+        "firma",
+        "działalność",
+        "zajmujecie",
+        "usługi",
+        "produkty",
+        "specjalizacja"
+      ],
       "examples": [
         "Czym się zajmujecie?",
         "Opowiedz o swojej firmie",
@@ -32,7 +46,12 @@
     {
       "name": "user_firm_info",
       "description": "Zbieranie danych o firmie użytkownika",
-      "keywords": ["moja firma", "pracujemy", "zajmujemy się", "nasza działalność"],
+      "keywords": [
+        "moja firma",
+        "pracujemy",
+        "zajmujemy się",
+        "nasza działalność"
+      ],
       "examples": [
         "Nasza firma zajmuje się...",
         "Mamy problem z...",
@@ -47,7 +66,13 @@
     {
       "name": "user_needs",
       "description": "Identyfikacja potrzeb i wyzwań użytkownika",
-      "keywords": ["potrzebujemy", "szukamy", "problem", "wyzwanie", "chcemy"],
+      "keywords": [
+        "potrzebujemy",
+        "szukamy",
+        "problem",
+        "wyzwanie",
+        "chcemy"
+      ],
       "examples": [
         "Potrzebujemy rozwiązania...",
         "Mamy problem z...",
@@ -62,7 +87,13 @@
     {
       "name": "user_expectations",
       "description": "Zbieranie oczekiwań użytkownika względem współpracy",
-      "keywords": ["oczekujemy", "zależy nam", "warunki", "współpraca", "partnerstwo"],
+      "keywords": [
+        "oczekujemy",
+        "zależy nam",
+        "warunki",
+        "współpraca",
+        "partnerstwo"
+      ],
       "examples": [
         "Zależy nam na...",
         "Oczekujemy...",
@@ -77,7 +108,14 @@
     {
       "name": "user_questions",
       "description": "Pytania pogłębiające od użytkownika",
-      "keywords": ["dlaczego", "jak", "kiedy", "gdzie", "czy można", "jakie"],
+      "keywords": [
+        "dlaczego",
+        "jak",
+        "kiedy",
+        "gdzie",
+        "czy można",
+        "jakie"
+      ],
       "examples": [
         "Jak to działa?",
         "Dlaczego tak?",
@@ -92,7 +130,12 @@
     {
       "name": "solution_presentation",
       "description": "Prezentacja rozwiązań i propozycji współpracy",
-      "keywords": ["rozwiązanie", "propozycja", "oferujemy", "możemy pomóc"],
+      "keywords": [
+        "rozwiązanie",
+        "propozycja",
+        "oferujemy",
+        "możemy pomóc"
+      ],
       "examples": [
         "Jakie macie rozwiązania?",
         "Co możecie zaproponować?",
@@ -107,7 +150,14 @@
     {
       "name": "user_comments",
       "description": "Komentarze i luźne wypowiedzi użytkownika",
-      "keywords": ["eh", "ale", "hmm", "ciekawe", "fajnie", "super"],
+      "keywords": [
+        "eh",
+        "ale",
+        "hmm",
+        "ciekawe",
+        "fajnie",
+        "super"
+      ],
       "examples": [
         "Ale dziś mam ciężki dzień...",
         "Hmm, ciekawe podejście",
@@ -121,7 +171,14 @@
     {
       "name": "general_questions",
       "description": "Pytania ogólne o branżę, trendy, rynek",
-      "keywords": ["rynek", "branża", "trendy", "AI", "przyszłość", "rozwój"],
+      "keywords": [
+        "rynek",
+        "branża",
+        "trendy",
+        "AI",
+        "przyszłość",
+        "rozwój"
+      ],
       "examples": [
         "Jak AI wpływa na rynek?",
         "Jakie są trendy w branży?",
@@ -135,7 +192,16 @@
     {
       "name": "conversation_redirect",
       "description": "Przekierowanie rozmowy lub sygnał zakończenia tematu",
-      "keywords": ["zespół", "zespołem", "porozmawiaj", "skontaktuj", "przekaż", "szczegóły", "dalej", "następny krok"],
+      "keywords": [
+        "zespół",
+        "zespołem",
+        "porozmawiaj",
+        "skontaktuj",
+        "przekaż",
+        "szczegóły",
+        "dalej",
+        "następny krok"
+      ],
       "examples": [
         "O szczegółach najlepiej gdybyś porozmawiał z moim zespołem",
         "Skontaktuj się z naszym zespołem",
@@ -151,7 +217,15 @@
     {
       "name": "email_promise",
       "description": "Użytkownik obiecuje podać adres email ale jeszcze go nie podał",
-      "keywords": ["podam", "dam", "wyślę", "prześlę", "podać", "wysłać", "przesłać"],
+      "keywords": [
+        "podam",
+        "dam",
+        "wyślę",
+        "prześlę",
+        "podać",
+        "wysłać",
+        "przesłać"
+      ],
       "examples": [
         "Podam Ci mail do kierownika",
         "Dam Ci jego email",
@@ -166,7 +240,15 @@
     {
       "name": "email_provided",
       "description": "Użytkownik faktycznie podaje konkretny adres email osoby do kontaktu",
-      "keywords": ["@", "gmail", "outlook", "yahoo", ".com", ".pl", ".org"],
+      "keywords": [
+        "@",
+        "gmail",
+        "outlook",
+        "yahoo",
+        ".com",
+        ".pl",
+        ".org"
+      ],
       "examples": [
         "jan.kowalski@firma.pl",
         "Mój email to kowalski@example.com",
@@ -181,7 +263,16 @@
     {
       "name": "npc_interest_in_user_offer",
       "description": "NPC wyrażające zainteresowanie ofertą lub rozwiązaniami użytkownika",
-      "keywords": ["zainteresowany", "kupić", "potrzebujemy", "mogłoby nam się przydać", "chcielibyśmy", "szukamy", "kupno", "współpraca"],
+      "keywords": [
+        "zainteresowany",
+        "kupić",
+        "potrzebujemy",
+        "mogłoby nam się przydać",
+        "chcielibyśmy",
+        "szukamy",
+        "kupno",
+        "współpraca"
+      ],
       "examples": [
         "To brzmi interesująco, mogłoby nam się przydać",
         "Jesteśmy zainteresowani Twoim rozwiązaniem",
@@ -198,7 +289,15 @@
     {
       "name": "user_presenting_offer",
       "description": "Użytkownik przedstawia swoją ofertę, produkty lub usługi",
-      "keywords": ["oferujemy", "mamy do zaoferowania", "nasze produkty", "nasze usługi", "specjalizujemy się", "możemy Wam pomóc", "nasze rozwiązania"],
+      "keywords": [
+        "oferujemy",
+        "mamy do zaoferowania",
+        "nasze produkty",
+        "nasze usługi",
+        "specjalizujemy się",
+        "możemy Wam pomóc",
+        "nasze rozwiązania"
+      ],
       "examples": [
         "Oferujemy rozwiązania z zakresu...",
         "Mamy do zaoferowania system...",
@@ -215,7 +314,13 @@
     {
       "name": "evaluate_fit",
       "description": "Ocena dopasowania oferty użytkownika do potrzeb NPC",
-      "keywords": ["ocena", "dopasowanie", "pasuje", "odpowiada", "analiza"],
+      "keywords": [
+        "ocena",
+        "dopasowanie",
+        "pasuje",
+        "odpowiada",
+        "analiza"
+      ],
       "examples": [
         "Jak to pasuje do naszych potrzeb?",
         "Czy to odpowiada naszym wymaganiom?",
@@ -228,7 +333,13 @@
     {
       "name": "discuss_terms",
       "description": "Omówienie warunków współpracy i kontraktu",
-      "keywords": ["warunki", "cennik", "kontrakt", "płatność", "terminy"],
+      "keywords": [
+        "warunki",
+        "cennik",
+        "kontrakt",
+        "płatność",
+        "terminy"
+      ],
       "examples": [
         "Jakie są warunki współpracy?",
         "Omówmy szczegóły kontraktu",
@@ -241,7 +352,13 @@
     {
       "name": "purchase_decision",
       "description": "Podjęcie decyzji o zakupie lub współpracy",
-      "keywords": ["decyzja", "kupujemy", "zamówienie", "współpraca", "zgoda"],
+      "keywords": [
+        "decyzja",
+        "kupujemy",
+        "zamówienie",
+        "współpraca",
+        "zgoda"
+      ],
       "examples": [
         "Podejmujemy decyzję o zakupie",
         "Chcemy to kupić",
@@ -254,7 +371,13 @@
     {
       "name": "meeting_arrangement",
       "description": "Prośba o kontakt z zespołem lub umówienie spotkania",
-      "keywords": ["spotkanie", "umówmy", "zespół", "kontakt", "spotkajmy"],
+      "keywords": [
+        "spotkanie",
+        "umówmy",
+        "zespół",
+        "kontakt",
+        "spotkajmy"
+      ],
       "examples": [
         "Umówmy spotkanie z zespołem",
         "Chciałbym się skontaktować",
@@ -268,7 +391,12 @@
     {
       "name": "meeting_confirmation",
       "description": "Potwierdzenie otrzymania kontaktu i następnych kroków",
-      "keywords": ["potwierdzam", "otrzymałem", "skontaktujemy", "zespół"],
+      "keywords": [
+        "potwierdzam",
+        "otrzymałem",
+        "skontaktujemy",
+        "zespół"
+      ],
       "examples": [
         "Potwierdzam otrzymanie emaila",
         "Zespół się skontaktuje",
@@ -281,7 +409,12 @@
     {
       "name": "express_interest",
       "description": "Wyrażenie zainteresowania ofertą użytkownika",
-      "keywords": ["zainteresowani", "ciekawe", "mogłoby pomóc", "przydatne"],
+      "keywords": [
+        "zainteresowani",
+        "ciekawe",
+        "mogłoby pomóc",
+        "przydatne"
+      ],
       "examples": [
         "To brzmi interesująco",
         "Jesteśmy zainteresowani",
@@ -294,7 +427,12 @@
     {
       "name": "ask_about_offer",
       "description": "Pytania o szczegóły oferty użytkownika",
-      "keywords": ["jak działa", "szczegóły", "więcej informacji", "opowiedz"],
+      "keywords": [
+        "jak działa",
+        "szczegóły",
+        "więcej informacji",
+        "opowiedz"
+      ],
       "examples": [
         "Jak to działa?",
         "Opowiedz więcej o ofercie",

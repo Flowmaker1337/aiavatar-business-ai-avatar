@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { KnowledgeFile } from '../models/types';
+import {KnowledgeFile} from '../models/types';
 import vectorDatabaseService from './vector-database.service';
 import openAIService from './openai.service';
 
@@ -14,10 +14,10 @@ class KnowledgeFileProcessor {
 
     private constructor() {
         this.uploadDir = path.resolve(__dirname, '../../uploads');
-        
+
         // Ensure upload directory exists
         if (!fs.existsSync(this.uploadDir)) {
-            fs.mkdirSync(this.uploadDir, { recursive: true });
+            fs.mkdirSync(this.uploadDir, {recursive: true});
         }
     }
 
@@ -32,7 +32,7 @@ class KnowledgeFileProcessor {
      * Przetwarza pojedynczy plik knowledge na vectors
      */
     public async processKnowledgeFile(
-        file: KnowledgeFile, 
+        file: KnowledgeFile,
         avatarId: string,
         fileBuffer?: Buffer
     ): Promise<{ success: boolean; vectorCount: number; error?: string }> {
@@ -67,11 +67,11 @@ class KnowledgeFileProcessor {
             const vectorCount = await this.storeChunksAsVectors(chunks, file, avatarId);
 
             console.log(`✅ Processed ${file.name}: ${vectorCount} vectors stored`);
-            return { success: true, vectorCount };
+            return {success: true, vectorCount};
 
         } catch (error: any) {
             console.error(`❌ Error processing knowledge file ${file.name}:`, error);
-            return { success: false, vectorCount: 0, error: error.message };
+            return {success: false, vectorCount: 0, error: error.message};
         }
     }
 
@@ -79,7 +79,7 @@ class KnowledgeFileProcessor {
      * Przetwarza wszystkie pliki knowledge dla avatara
      */
     public async processAllKnowledgeFiles(
-        files: KnowledgeFile[], 
+        files: KnowledgeFile[],
         avatarId: string
     ): Promise<{ totalVectors: number; processedFiles: number; errors: string[] }> {
         let totalVectors = 0;
@@ -99,7 +99,7 @@ class KnowledgeFileProcessor {
         console.log(`📊 Processed ${processedFiles}/${files.length} knowledge files for avatar ${avatarId}`);
         console.log(`📊 Total vectors: ${totalVectors}, Errors: ${errors.length}`);
 
-        return { totalVectors, processedFiles, errors };
+        return {totalVectors, processedFiles, errors};
     }
 
     /**
@@ -201,7 +201,7 @@ class KnowledgeFileProcessor {
         while (start < text.length) {
             const end = Math.min(start + chunkSize, text.length);
             const chunk = text.substring(start, end);
-            
+
             if (chunk.trim().length > 0) {
                 chunks.push(chunk.trim());
             }
@@ -218,21 +218,21 @@ class KnowledgeFileProcessor {
      * Przechowuje chunks jako vectors w bazie
      */
     private async storeChunksAsVectors(
-        chunks: string[], 
-        file: KnowledgeFile, 
+        chunks: string[],
+        file: KnowledgeFile,
         avatarId: string
     ): Promise<number> {
         let vectorCount = 0;
 
         for (let i = 0; i < chunks.length; i++) {
             const chunk = chunks[i];
-            
+
             // Generate embedding
             const embedding = await openAIService.generateEmbeddings(chunk);
-            
+
             // Create vector ID
             const vectorId = `${avatarId}_${file.id}_chunk_${i}`;
-            
+
             // Metadata (matching VectorData interface requirements)
             const metadata = {
                 category: 'knowledge_file',

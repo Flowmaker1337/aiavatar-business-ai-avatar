@@ -14,21 +14,21 @@ import {
     BusinessAvatar
 } from '../models/types';
 import SimulationManager from '../services/simulation-manager.service';
-import { ConversationAnalyzerService } from '../services/conversation-analyzer.service';
+import {ConversationAnalyzerService} from '../services/conversation-analyzer.service';
 
 // Load environment variables
-require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
+require('dotenv').config({path: path.resolve(__dirname, '../../.env')});
 
 async function loadTestData() {
     console.log('📁 Loading test data...');
-    
+
     // Load scenarios
     const scenariosPath = path.resolve(__dirname, '../config/simulation-scenarios.json');
     const avatarsPath = path.resolve(__dirname, '../config/simulation-avatars.json');
-    
+
     const scenariosData = JSON.parse(fs.readFileSync(scenariosPath, 'utf8'));
     const avatarsData = JSON.parse(fs.readFileSync(avatarsPath, 'utf8'));
-    
+
     return {
         scenarios: scenariosData.scenarios,
         avatars: avatarsData.simulation_avatars
@@ -86,7 +86,7 @@ async function runSimulationTest() {
 
     try {
         // Load test data
-        const { scenarios, avatars } = await loadTestData();
+        const {scenarios, avatars} = await loadTestData();
         console.log(`✅ Loaded ${scenarios.length} scenarios and ${Object.keys(avatars).length} avatar types\n`);
 
         // Get simulation manager
@@ -138,7 +138,7 @@ async function runSimulationTest() {
 
         // Start simulation
         const simulation = await simulationManager.startSimulation(testScenario, config);
-        
+
         console.log(`✅ Simulation created with ID: ${simulation.id}`);
         console.log(`   Status: ${simulation.status}`);
         console.log(`   Max turns: ${simulation.max_turns}\n`);
@@ -184,7 +184,7 @@ async function runSimulationTest() {
 
 async function handleSimulationComplete(simulation: any) {
     console.log('📊 Simulation completed, generating analysis...\n');
-    
+
     // Display results
     console.log('=== SIMULATION RESULTS ===');
     console.log(`Status: ${simulation.status}`);
@@ -205,7 +205,7 @@ async function handleSimulationComplete(simulation: any) {
     // Display analysis
     if (simulation.analysis) {
         console.log('=== ANALYSIS ===');
-        
+
         // Conversation metrics
         console.log('Conversation Metrics:');
         console.log(`  Total turns: ${simulation.analysis.conversation_metrics.total_turns}`);
@@ -258,4 +258,4 @@ if (require.main === module) {
     runSimulationTest().catch(console.error);
 }
 
-export { runSimulationTest };
+export {runSimulationTest};

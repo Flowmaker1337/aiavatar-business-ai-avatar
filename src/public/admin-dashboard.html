@@ -18,7 +18,7 @@
             margin: 0 auto;
             background: white;
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
 
@@ -90,8 +90,14 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .stats-grid {
@@ -123,7 +129,7 @@
         .data-table {
             background: white;
             border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
 
@@ -187,7 +193,7 @@
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
         .table {
@@ -246,7 +252,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0, 0, 0, 0.8);
             z-index: 1000;
             align-items: center;
             justify-content: center;
@@ -340,8 +346,12 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .alert {
@@ -379,11 +389,11 @@
             .admin-nav-tabs {
                 flex-direction: column;
             }
-            
+
             .stats-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .data-table {
                 overflow-x: auto;
             }
@@ -391,207 +401,207 @@
     </style>
 </head>
 <body>
-    <div class="admin-dashboard">
-        <div class="admin-container">
-            <!-- Header -->
-            <div class="admin-header">
-                <h1><i class="fas fa-shield-alt"></i> Panel Administratora</h1>
-                <p>Zarządzanie użytkownikami, rolami i uprawnieniami systemu</p>
+<div class="admin-dashboard">
+    <div class="admin-container">
+        <!-- Header -->
+        <div class="admin-header">
+            <h1><i class="fas fa-shield-alt"></i> Panel Administratora</h1>
+            <p>Zarządzanie użytkownikami, rolami i uprawnieniami systemu</p>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="admin-nav">
+            <ul class="admin-nav-tabs">
+                <li class="admin-nav-tab">
+                    <a href="#" class="admin-nav-link active" data-tab="overview">
+                        <i class="fas fa-chart-line"></i> Przegląd
+                    </a>
+                </li>
+                <li class="admin-nav-tab">
+                    <a href="#" class="admin-nav-link" data-tab="users">
+                        <i class="fas fa-users"></i> Użytkownicy
+                    </a>
+                </li>
+                <li class="admin-nav-tab">
+                    <a href="#" class="admin-nav-link" data-tab="roles">
+                        <i class="fas fa-user-shield"></i> Role i Uprawnienia
+                    </a>
+                </li>
+                <li class="admin-nav-tab">
+                    <a href="#" class="admin-nav-link" data-tab="audit">
+                        <i class="fas fa-history"></i> Logi Audytu
+                    </a>
+                </li>
+                <li class="admin-nav-tab">
+                    <a href="#" class="admin-nav-link" data-tab="settings">
+                        <i class="fas fa-cog"></i> Ustawienia
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Content -->
+        <div class="admin-content">
+            <!-- Overview Tab -->
+            <div id="overview" class="tab-content active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalUsers">-</div>
+                        <div class="stat-label">Użytkownicy</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="activeUsers">-</div>
+                        <div class="stat-label">Aktywni</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalAvatars">-</div>
+                        <div class="stat-label">Avatary</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalSimulations">-</div>
+                        <div class="stat-label">Symulacje</div>
+                    </div>
+                </div>
+
+                <div class="data-table">
+                    <div class="data-table-header">
+                        <h3 class="data-table-title">Ostatnia Aktywność</h3>
+                    </div>
+                    <div id="recentActivity" class="loading">
+                        <div class="loading-spinner"></div>
+                        <p>Ładowanie aktywności...</p>
+                    </div>
+                </div>
             </div>
 
-            <!-- Navigation -->
-            <nav class="admin-nav">
-                <ul class="admin-nav-tabs">
-                    <li class="admin-nav-tab">
-                        <a href="#" class="admin-nav-link active" data-tab="overview">
-                            <i class="fas fa-chart-line"></i> Przegląd
-                        </a>
-                    </li>
-                    <li class="admin-nav-tab">
-                        <a href="#" class="admin-nav-link" data-tab="users">
-                            <i class="fas fa-users"></i> Użytkownicy
-                        </a>
-                    </li>
-                    <li class="admin-nav-tab">
-                        <a href="#" class="admin-nav-link" data-tab="roles">
-                            <i class="fas fa-user-shield"></i> Role i Uprawnienia
-                        </a>
-                    </li>
-                    <li class="admin-nav-tab">
-                        <a href="#" class="admin-nav-link" data-tab="audit">
-                            <i class="fas fa-history"></i> Logi Audytu
-                        </a>
-                    </li>
-                    <li class="admin-nav-tab">
-                        <a href="#" class="admin-nav-link" data-tab="settings">
-                            <i class="fas fa-cog"></i> Ustawienia
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-
-            <!-- Content -->
-            <div class="admin-content">
-                <!-- Overview Tab -->
-                <div id="overview" class="tab-content active">
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-value" id="totalUsers">-</div>
-                            <div class="stat-label">Użytkownicy</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="activeUsers">-</div>
-                            <div class="stat-label">Aktywni</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="totalAvatars">-</div>
-                            <div class="stat-label">Avatary</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="totalSimulations">-</div>
-                            <div class="stat-label">Symulacje</div>
+            <!-- Users Tab -->
+            <div id="users" class="tab-content">
+                <div class="data-table">
+                    <div class="data-table-header">
+                        <h3 class="data-table-title">Zarządzanie Użytkownikami</h3>
+                        <div class="data-table-actions">
+                            <button class="btn btn-primary" onclick="adminApp.showCreateUserModal()">
+                                <i class="fas fa-plus"></i> Dodaj Użytkownika
+                            </button>
+                            <button class="btn btn-secondary" onclick="adminApp.refreshUsers()">
+                                <i class="fas fa-refresh"></i> Odśwież
+                            </button>
                         </div>
                     </div>
-
-                    <div class="data-table">
-                        <div class="data-table-header">
-                            <h3 class="data-table-title">Ostatnia Aktywność</h3>
-                        </div>
-                        <div id="recentActivity" class="loading">
-                            <div class="loading-spinner"></div>
-                            <p>Ładowanie aktywności...</p>
-                        </div>
+                    <div id="usersTable" class="loading">
+                        <div class="loading-spinner"></div>
+                        <p>Ładowanie użytkowników...</p>
                     </div>
                 </div>
+            </div>
 
-                <!-- Users Tab -->
-                <div id="users" class="tab-content">
-                    <div class="data-table">
-                        <div class="data-table-header">
-                            <h3 class="data-table-title">Zarządzanie Użytkownikami</h3>
-                            <div class="data-table-actions">
-                                <button class="btn btn-primary" onclick="adminApp.showCreateUserModal()">
-                                    <i class="fas fa-plus"></i> Dodaj Użytkownika
-                                </button>
-                                <button class="btn btn-secondary" onclick="adminApp.refreshUsers()">
-                                    <i class="fas fa-refresh"></i> Odśwież
-                                </button>
-                            </div>
-                        </div>
-                        <div id="usersTable" class="loading">
-                            <div class="loading-spinner"></div>
-                            <p>Ładowanie użytkowników...</p>
+            <!-- Roles Tab -->
+            <div id="roles" class="tab-content">
+                <div class="data-table">
+                    <div class="data-table-header">
+                        <h3 class="data-table-title">Role i Uprawnienia</h3>
+                        <div class="data-table-actions">
+                            <button class="btn btn-primary" onclick="adminApp.showPermissionsAnalytics()">
+                                <i class="fas fa-chart-bar"></i> Analiza Uprawnień
+                            </button>
                         </div>
                     </div>
-                </div>
-
-                <!-- Roles Tab -->
-                <div id="roles" class="tab-content">
-                    <div class="data-table">
-                        <div class="data-table-header">
-                            <h3 class="data-table-title">Role i Uprawnienia</h3>
-                            <div class="data-table-actions">
-                                <button class="btn btn-primary" onclick="adminApp.showPermissionsAnalytics()">
-                                    <i class="fas fa-chart-bar"></i> Analiza Uprawnień
-                                </button>
-                            </div>
-                        </div>
-                        <div id="rolesContent" class="loading">
-                            <div class="loading-spinner"></div>
-                            <p>Ładowanie ról i uprawnień...</p>
-                        </div>
+                    <div id="rolesContent" class="loading">
+                        <div class="loading-spinner"></div>
+                        <p>Ładowanie ról i uprawnień...</p>
                     </div>
                 </div>
+            </div>
 
-                <!-- Audit Tab -->
-                <div id="audit" class="tab-content">
-                    <div class="data-table">
-                        <div class="data-table-header">
-                            <h3 class="data-table-title">Logi Audytu</h3>
-                            <div class="data-table-actions">
-                                <button class="btn btn-secondary" onclick="adminApp.refreshAuditLogs()">
-                                    <i class="fas fa-refresh"></i> Odśwież
-                                </button>
-                                <button class="btn btn-warning" onclick="adminApp.exportAuditLogs()">
-                                    <i class="fas fa-download"></i> Eksportuj
-                                </button>
-                            </div>
-                        </div>
-                        <div id="auditLogs" class="loading">
-                            <div class="loading-spinner"></div>
-                            <p>Ładowanie logów audytu...</p>
+            <!-- Audit Tab -->
+            <div id="audit" class="tab-content">
+                <div class="data-table">
+                    <div class="data-table-header">
+                        <h3 class="data-table-title">Logi Audytu</h3>
+                        <div class="data-table-actions">
+                            <button class="btn btn-secondary" onclick="adminApp.refreshAuditLogs()">
+                                <i class="fas fa-refresh"></i> Odśwież
+                            </button>
+                            <button class="btn btn-warning" onclick="adminApp.exportAuditLogs()">
+                                <i class="fas fa-download"></i> Eksportuj
+                            </button>
                         </div>
                     </div>
+                    <div id="auditLogs" class="loading">
+                        <div class="loading-spinner"></div>
+                        <p>Ładowanie logów audytu...</p>
+                    </div>
                 </div>
+            </div>
 
-                <!-- Settings Tab -->
-                <div id="settings" class="tab-content">
-                    <div class="data-table">
-                        <div class="data-table-header">
-                            <h3 class="data-table-title">Ustawienia Systemu</h3>
-                        </div>
-                        <div id="systemSettings">
-                            <div class="alert alert-info">
-                                <i class="fas fa-info-circle"></i>
-                                <strong>Informacja:</strong> Ustawienia systemu będą dostępne w przyszłych wersjach.
-                            </div>
+            <!-- Settings Tab -->
+            <div id="settings" class="tab-content">
+                <div class="data-table">
+                    <div class="data-table-header">
+                        <h3 class="data-table-title">Ustawienia Systemu</h3>
+                    </div>
+                    <div id="systemSettings">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Informacja:</strong> Ustawienia systemu będą dostępne w przyszłych wersjach.
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- User Modal -->
-    <div id="userModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="userModalTitle">Dodaj Użytkownika</h3>
-                <button class="modal-close" onclick="adminApp.closeModal('userModal')">&times;</button>
-            </div>
-            <form id="userForm">
-                <div class="form-group">
-                    <label class="form-label">Imię</label>
-                    <input type="text" class="form-control" id="userFirstName" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Nazwisko</label>
-                    <input type="text" class="form-control" id="userLastName" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-control" id="userEmail" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Rola</label>
-                    <select class="form-select" id="userRole" required>
-                        <option value="user">Użytkownik</option>
-                        <option value="admin">Administrator</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Status</label>
-                    <select class="form-select" id="userStatus" required>
-                        <option value="active">Aktywny</option>
-                        <option value="inactive">Nieaktywny</option>
-                        <option value="suspended">Zawieszony</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Zapisz
-                    </button>
-                    <button type="button" class="btn btn-secondary" onclick="adminApp.closeModal('userModal')">
-                        <i class="fas fa-times"></i> Anuluj
-                    </button>
-                </div>
-            </form>
+<!-- User Modal -->
+<div id="userModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title" id="userModalTitle">Dodaj Użytkownika</h3>
+            <button class="modal-close" onclick="adminApp.closeModal('userModal')">&times;</button>
         </div>
+        <form id="userForm">
+            <div class="form-group">
+                <label class="form-label">Imię</label>
+                <input type="text" class="form-control" id="userFirstName" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Nazwisko</label>
+                <input type="text" class="form-control" id="userLastName" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" id="userEmail" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Rola</label>
+                <select class="form-select" id="userRole" required>
+                    <option value="user">Użytkownik</option>
+                    <option value="admin">Administrator</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Status</label>
+                <select class="form-select" id="userStatus" required>
+                    <option value="active">Aktywny</option>
+                    <option value="inactive">Nieaktywny</option>
+                    <option value="suspended">Zawieszony</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Zapisz
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="adminApp.closeModal('userModal')">
+                    <i class="fas fa-times"></i> Anuluj
+                </button>
+            </div>
+        </form>
     </div>
+</div>
 
-    <!-- Security Scripts -->
-    <script src="js/auth-manager.js"></script>
-    <script src="js/page-security.js"></script>
-    <script src="admin-dashboard-script.js"></script>
+<!-- Security Scripts -->
+<script src="js/auth-manager.js"></script>
+<script src="js/page-security.js"></script>
+<script src="admin-dashboard-script.js"></script>
 </body>
 </html>

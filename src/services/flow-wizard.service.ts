@@ -1,8 +1,8 @@
 import openAIService from './openai.service';
 import fs from 'fs';
 import path from 'path';
-import { v4 as uuidv4 } from 'uuid';
-import { ExecutionTimerService } from './execution-timer.service';
+import {v4 as uuidv4} from 'uuid';
+import {ExecutionTimerService} from './execution-timer.service';
 
 /**
  * FlowWizardService - AI-powered generator flows, intencji i promptów
@@ -40,31 +40,31 @@ export class FlowWizardService {
 
             // 1. Generuj strukturę flow
             const flowStructure = await this.generateFlowStructure(
-                businessContext, 
-                flowPurpose, 
+                businessContext,
+                flowPurpose,
                 avatarType
             );
 
             // 2. Generuj intencje dla flow
             const flowIntents = await this.generateFlowIntents(
-                flowStructure, 
-                businessContext, 
+                flowStructure,
+                businessContext,
                 avatarType
             );
 
             // 3. Generuj prompty dla każdego kroku
             const flowPrompts = await this.generateFlowPrompts(
-                flowStructure, 
-                flowIntents, 
-                businessContext, 
+                flowStructure,
+                flowIntents,
+                businessContext,
                 avatarType,
                 useRAG
             );
 
             // 4. Generuj knowledge base jeśli używamy RAG
             const knowledgeBase = useRAG ? await this.generateKnowledgeBase(
-                businessContext, 
-                flowPurpose, 
+                businessContext,
+                flowPurpose,
                 avatarType
             ) : null;
 
@@ -76,22 +76,22 @@ export class FlowWizardService {
                 business_context: businessContext,
                 avatar_type: avatarType,
                 created_at: new Date().toISOString(),
-                
+
                 flow_definition: flowStructure,
                 intent_definitions: flowIntents,
                 prompt_templates: flowPrompts,
                 knowledge_base: knowledgeBase,
-                
+
                 integration_instructions: this.generateIntegrationInstructions(
-                    flowStructure, 
-                    flowIntents, 
+                    flowStructure,
+                    flowIntents,
                     avatarType
                 )
             };
 
             timer.stop();
             console.log(`✅ Generated complete flow package: ${completePackage.name}`);
-            
+
             return completePackage;
 
         } catch (error) {
@@ -109,16 +109,16 @@ export class FlowWizardService {
         flowPurpose: string,
         avatarType: string
     ): Promise<GeneratedFlowDefinition> {
-        
+
         const prompt = this.buildFlowStructurePrompt(businessContext, flowPurpose, avatarType);
-        
+
         const userPrompt = {
             role: 'user' as const,
             content: prompt
         };
 
         const response = await this.openAIService.generateResponse(userPrompt);
-        
+
         try {
             // Spróbuj wyczyścić odpowiedź od AI przed parsowaniem
             const cleanResponse = this.cleanAIResponse(response);
@@ -127,7 +127,7 @@ export class FlowWizardService {
         } catch (parseError) {
             console.error('❌ Error parsing flow structure:', parseError);
             console.log('Raw AI response:', response);
-            
+
             // Fallback - stwórz podstawowy flow structure
             return this.createFallbackFlowStructure(businessContext, flowPurpose, avatarType);
         }
@@ -141,16 +141,16 @@ export class FlowWizardService {
         businessContext: string,
         avatarType: string
     ): Promise<GeneratedIntentDefinition[]> {
-        
+
         const prompt = this.buildIntentGenerationPrompt(flowStructure, businessContext, avatarType);
-        
+
         const userPrompt = {
             role: 'user' as const,
             content: prompt
         };
 
         const response = await this.openAIService.generateResponse(userPrompt);
-        
+
         try {
             const cleanResponse = this.cleanAIResponse(response);
             const parsedIntents = JSON.parse(cleanResponse);
@@ -158,7 +158,7 @@ export class FlowWizardService {
         } catch (parseError) {
             console.error('❌ Error parsing intents:', parseError);
             console.log('Raw AI response:', response);
-            
+
             // Fallback - stwórz podstawowe intencje
             return this.createFallbackIntents(flowStructure, businessContext);
         }
@@ -174,9 +174,9 @@ export class FlowWizardService {
         avatarType: string,
         useRAG: boolean
     ): Promise<GeneratedPromptTemplate[]> {
-        
+
         const prompts: GeneratedPromptTemplate[] = [];
-        
+
         // Generuj prompt dla każdej intencji
         for (const intent of flowIntents) {
             const prompt = await this.generateSinglePromptTemplate(
@@ -202,22 +202,22 @@ export class FlowWizardService {
         avatarType: string,
         useRAG: boolean
     ): Promise<GeneratedPromptTemplate> {
-        
+
         const prompt = this.buildPromptTemplatePrompt(
-            intent, 
-            flowStructure, 
-            businessContext, 
-            avatarType, 
+            intent,
+            flowStructure,
+            businessContext,
+            avatarType,
             useRAG
         );
-        
+
         const userPrompt = {
             role: 'user' as const,
             content: prompt
         };
 
         const response = await this.openAIService.generateResponse(userPrompt);
-        
+
         try {
             const cleanResponse = this.cleanAIResponse(response);
             const parsedPrompt = JSON.parse(cleanResponse);
@@ -225,7 +225,7 @@ export class FlowWizardService {
         } catch (parseError) {
             console.error('❌ Error parsing prompt template:', parseError);
             console.log('Raw AI response:', response);
-            
+
             // Fallback - stwórz podstawowy prompt template
             return this.createFallbackPromptTemplate(intent, businessContext, avatarType);
         }
@@ -239,16 +239,16 @@ export class FlowWizardService {
         flowPurpose: string,
         avatarType: string
     ): Promise<GeneratedKnowledgeBase> {
-        
+
         const prompt = this.buildKnowledgeBasePrompt(businessContext, flowPurpose, avatarType);
-        
+
         const userPrompt = {
             role: 'user' as const,
             content: prompt
         };
 
         const response = await this.openAIService.generateResponse(userPrompt);
-        
+
         try {
             const cleanResponse = this.cleanAIResponse(response);
             const parsedKB = JSON.parse(cleanResponse);
@@ -256,7 +256,7 @@ export class FlowWizardService {
         } catch (parseError) {
             console.error('❌ Error parsing knowledge base:', parseError);
             console.log('Raw AI response:', response);
-            
+
             // Fallback - stwórz podstawową knowledge base
             return this.createFallbackKnowledgeBase(businessContext, flowPurpose, avatarType);
         }
@@ -461,8 +461,8 @@ ODPOWIEDZ TYLKO POPRAWNYM JSON-EM.`;
     // ============ VALIDATION METHODS ============
 
     private validateAndCompleteFlowStructure(
-        parsedFlow: any, 
-        businessContext: string, 
+        parsedFlow: any,
+        businessContext: string,
         avatarType: string
     ): GeneratedFlowDefinition {
         // Walidacja i uzupełnienie flow structure
@@ -482,7 +482,7 @@ ODPOWIEDZ TYLKO POPRAWNYM JSON-EM.`;
     }
 
     private validateAndCompleteIntents(
-        parsedIntents: any[], 
+        parsedIntents: any[],
         flowStructure: GeneratedFlowDefinition
     ): GeneratedIntentDefinition[] {
         return parsedIntents.map(intent => ({
@@ -498,7 +498,7 @@ ODPOWIEDZ TYLKO POPRAWNYM JSON-EM.`;
     }
 
     private validateAndCompletePromptTemplate(
-        parsedPrompt: any, 
+        parsedPrompt: any,
         intent: GeneratedIntentDefinition
     ): GeneratedPromptTemplate {
         return {
@@ -513,7 +513,7 @@ ODPOWIEDZ TYLKO POPRAWNYM JSON-EM.`;
     }
 
     private validateAndCompleteKnowledgeBase(
-        parsedKB: any, 
+        parsedKB: any,
         businessContext: string
     ): GeneratedKnowledgeBase {
         return {
@@ -545,19 +545,19 @@ ODPOWIEDZ TYLKO POPRAWNYM JSON-EM.`;
     private cleanAIResponse(response: string): string {
         // Usuń markdown code blocks jeśli są
         let cleaned = response.replace(/```json\s*|\s*```/g, '');
-        
+
         // Usuń dodatkowe komentarze na początku i końcu
         cleaned = cleaned.replace(/^[^{]*/, ''); // Usuń wszystko przed pierwszym {
         cleaned = cleaned.replace(/[^}]*$/, ''); // Usuń wszystko po ostatnim }
-        
+
         // Znajdź pierwszy { i ostatni }
         const firstBrace = cleaned.indexOf('{');
         const lastBrace = cleaned.lastIndexOf('}');
-        
+
         if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
             cleaned = cleaned.substring(firstBrace, lastBrace + 1);
         }
-        
+
         return cleaned.trim();
     }
 
@@ -570,7 +570,7 @@ ODPOWIEDZ TYLKO POPRAWNYM JSON-EM.`;
         avatarType: string
     ): GeneratedFlowDefinition {
         const flowId = `generated_flow_${Date.now()}`;
-        
+
         return {
             id: flowId,
             name: `${flowPurpose} Flow`,
@@ -623,7 +623,7 @@ ODPOWIEDZ TYLKO POPRAWNYM JSON-EM.`;
         businessContext: string
     ): GeneratedIntentDefinition[] {
         const baseIntent = flowStructure.id.replace('generated_flow_', '');
-        
+
         return [
             {
                 name: `${baseIntent}_start`,
@@ -753,12 +753,12 @@ TWOJA ODPOWIEDŹ:`,
         try {
             const configDir = path.resolve(__dirname, '../config');
             const timestamp = new Date().toISOString().split('T')[0];
-            
+
             // Zapisz jako backup files z timestamp
             const backupDir = path.join(configDir, 'generated_flows', timestamp);
-            
+
             if (!fs.existsSync(backupDir)) {
-                fs.mkdirSync(backupDir, { recursive: true });
+                fs.mkdirSync(backupDir, {recursive: true});
             }
 
             // Zapisz każdy komponent osobno
@@ -973,7 +973,7 @@ export interface GeneratedFlowPackage {
     business_context: string;
     avatar_type: string;
     created_at: string;
-    
+
     flow_definition: GeneratedFlowDefinition;
     intent_definitions: GeneratedIntentDefinition[];
     prompt_templates: GeneratedPromptTemplate[];

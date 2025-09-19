@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flow Studio - Visual Flow Builder</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet">
     <link rel="stylesheet" href="homepage-styles.css">
     <link rel="stylesheet" href="flow-studio-styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
+
     <!-- ReactFlow Dependencies -->
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
@@ -16,83 +17,83 @@
     <link rel="stylesheet" href="https://unpkg.com/reactflow@11.11.4/dist/style.css">
 </head>
 <body>
-    <div class="flow-studio-container">
-        <!-- Header -->
-        <header class="studio-header">
-            <div class="header-left">
-                <button class="back-btn" id="backBtn">
-                    <i class="fas fa-arrow-left"></i>
-                    <span>Powrót</span>
-                </button>
-                <div class="header-title">
-                    <h1>Flow Studio</h1>
-                    <p>Wizualny edytor przepływów rozmowy</p>
-                    
-                    <!-- Flow Type Selector -->
-                    <div class="flow-type-selector">
-                        <button class="flow-type-btn active" data-type="basic" onclick="flowStudio.switchFlowType('basic')">
-                            <i class="fas fa-comments"></i>
-                            Basic Flow
-                        </button>
-                        <button class="flow-type-btn" data-type="advanced" onclick="flowStudio.switchFlowType('advanced')">
-                            <i class="fas fa-cogs"></i>
-                            Advanced Agent
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="header-center">
-                <div class="flow-selector">
-                    <select id="flowSelector">
-                        <option value="">Wybierz flow lub utwórz nowy</option>
-                    </select>
-                    <button class="btn-secondary" id="newFlowBtn">
-                        <i class="fas fa-plus"></i>
-                        Nowy Flow
-                    </button>
-                </div>
-            </div>
-            <div class="header-actions">
-                <button class="btn-secondary" id="saveFlowBtn">
-                    <i class="fas fa-save"></i>
-                    Zapisz
-                </button>
-                <button class="btn-secondary" id="testFlowBtn">
-                    <i class="fas fa-play"></i>
-                    Testuj
-                </button>
-                <button class="btn-primary" id="publishFlowBtn">
-                    <i class="fas fa-rocket"></i>
-                    Publikuj
-                </button>
-            </div>
-        </header>
+<div class="flow-studio-container">
+    <!-- Header -->
+    <header class="studio-header">
+        <div class="header-left">
+            <button class="back-btn" id="backBtn">
+                <i class="fas fa-arrow-left"></i>
+                <span>Powrót</span>
+            </button>
+            <div class="header-title">
+                <h1>Flow Studio</h1>
+                <p>Wizualny edytor przepływów rozmowy</p>
 
-        <div class="studio-content">
-            <!-- Left Sidebar - Node Palette & Intent Management -->
-            <div class="node-palette">
-                <div class="palette-tabs">
-                    <button class="tab-button active" onclick="flowStudio.switchTab('nodes')">
-                        <i class="fas fa-palette"></i> Węzły
+                <!-- Flow Type Selector -->
+                <div class="flow-type-selector">
+                    <button class="flow-type-btn active" data-type="basic" onclick="flowStudio.switchFlowType('basic')">
+                        <i class="fas fa-comments"></i>
+                        Basic Flow
                     </button>
-                    <button class="tab-button" onclick="flowStudio.switchTab('intents')">
-                        <i class="fas fa-brain"></i> Intenty
-                    </button>
-                    <button class="tab-button" onclick="flowStudio.switchTab('test')">
-                        <i class="fas fa-flask"></i> Test Flow
+                    <button class="flow-type-btn" data-type="advanced" onclick="flowStudio.switchFlowType('advanced')">
+                        <i class="fas fa-cogs"></i>
+                        Advanced Agent
                     </button>
                 </div>
-                
-                <!-- Nodes Tab -->
-                <div id="nodesTab" class="tab-content active">
-                    <div class="palette-header">
-                        <h3>Węzły</h3>
-                        <div class="palette-search">
-                            <i class="fas fa-search"></i>
-                            <input type="text" placeholder="Szukaj węzłów..." id="nodeSearch">
-                        </div>
+            </div>
+        </div>
+        <div class="header-center">
+            <div class="flow-selector">
+                <select id="flowSelector">
+                    <option value="">Wybierz flow lub utwórz nowy</option>
+                </select>
+                <button class="btn-secondary" id="newFlowBtn">
+                    <i class="fas fa-plus"></i>
+                    Nowy Flow
+                </button>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn-secondary" id="saveFlowBtn">
+                <i class="fas fa-save"></i>
+                Zapisz
+            </button>
+            <button class="btn-secondary" id="testFlowBtn">
+                <i class="fas fa-play"></i>
+                Testuj
+            </button>
+            <button class="btn-primary" id="publishFlowBtn">
+                <i class="fas fa-rocket"></i>
+                Publikuj
+            </button>
+        </div>
+    </header>
+
+    <div class="studio-content">
+        <!-- Left Sidebar - Node Palette & Intent Management -->
+        <div class="node-palette">
+            <div class="palette-tabs">
+                <button class="tab-button active" onclick="flowStudio.switchTab('nodes')">
+                    <i class="fas fa-palette"></i> Węzły
+                </button>
+                <button class="tab-button" onclick="flowStudio.switchTab('intents')">
+                    <i class="fas fa-brain"></i> Intenty
+                </button>
+                <button class="tab-button" onclick="flowStudio.switchTab('test')">
+                    <i class="fas fa-flask"></i> Test Flow
+                </button>
+            </div>
+
+            <!-- Nodes Tab -->
+            <div id="nodesTab" class="tab-content active">
+                <div class="palette-header">
+                    <h3>Węzły</h3>
+                    <div class="palette-search">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Szukaj węzłów..." id="nodeSearch">
                     </div>
-                
+                </div>
+
                 <div class="palette-categories">
                     <div class="category active" data-category="basic">
                         <i class="fas fa-play"></i>
@@ -115,351 +116,358 @@
                 <div class="palette-nodes" id="paletteNodes">
                     <!-- Nodes will be populated dynamically -->
                 </div>
-                </div>
-                
-                <!-- Intents Tab -->
-                <div id="intentsTab" class="tab-content">
-                    <div class="palette-header">
-                        <h3>Zarządzanie Intentami</h3>
-                        <button class="btn-small btn-primary" id="createIntentBtn">
-                            <i class="fas fa-plus"></i> Nowy Intent
-                        </button>
-                    </div>
-                    
-                    <div class="intent-search">
-                        <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Szukaj intentów..." id="intentSearch">
-                    </div>
-                    
-                    <div class="intent-categories">
-                        <div class="category-header">
-                            <h4>Kategorie Intentów</h4>
-                        </div>
-                        <div class="category-list">
-                            <div class="category-item active" data-category="all">
-                                <i class="fas fa-list"></i>
-                                <span>Wszystkie</span>
-                                <span class="count" id="allIntentsCount">0</span>
-                            </div>
-                            <div class="category-item" data-category="flow-specific">
-                                <i class="fas fa-project-diagram"></i>
-                                <span>Tego Flow</span>
-                                <span class="count" id="flowIntentsCount">0</span>
-                            </div>
-                            <div class="category-item" data-category="templates">
-                                <i class="fas fa-star"></i>
-                                <span>Szablony</span>
-                                <span class="count" id="templateIntentsCount">0</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="intent-list" id="intentList">
-                        <!-- Intents will be populated dynamically -->
-                    </div>
-                </div>
             </div>
 
-            <!-- Main Canvas -->
-            <div class="flow-canvas">
-                <div class="canvas-toolbar">
-                    <div class="toolbar-left">
-                        <button class="tool-btn" id="selectTool" title="Zaznacz">
-                            <i class="fas fa-mouse-pointer"></i>
-                        </button>
-                        <button class="tool-btn" id="panTool" title="Przesuwaj">
-                            <i class="fas fa-hand-paper"></i>
-                        </button>
-                        <div class="tool-divider"></div>
-                        <button class="tool-btn" id="zoomInBtn" title="Przybliż">
-                            <i class="fas fa-search-plus"></i>
-                        </button>
-                        <button class="tool-btn" id="zoomOutBtn" title="Oddal">
-                            <i class="fas fa-search-minus"></i>
-                        </button>
-                        <button class="tool-btn" id="fitViewBtn" title="Dopasuj widok">
-                            <i class="fas fa-expand-arrows-alt"></i>
-                        </button>
-                    </div>
-                    <div class="toolbar-center">
-                        <div class="zoom-indicator" id="zoomIndicator">100%</div>
-                    </div>
-                    <div class="toolbar-right">
-                        <button class="tool-btn" id="gridToggle" title="Pokaż siatkę">
-                            <i class="fas fa-th"></i>
-                        </button>
-                        <button class="tool-btn" id="minimapToggle" title="Miniatura">
-                            <i class="fas fa-map"></i>
-                        </button>
-                    </div>
+            <!-- Intents Tab -->
+            <div id="intentsTab" class="tab-content">
+                <div class="palette-header">
+                    <h3>Zarządzanie Intentami</h3>
+                    <button class="btn-small btn-primary" id="createIntentBtn">
+                        <i class="fas fa-plus"></i> Nowy Intent
+                    </button>
                 </div>
-                
-                <!-- Test Flow Tab -->
-                <div id="testTab" class="tab-content">
-                    <div class="palette-header">
-                        <h3>🧪 Test Flow</h3>
-                        <button class="btn-small btn-success" id="startTestBtn">
-                            <i class="fas fa-play"></i> Start Test
-                        </button>
+
+                <div class="intent-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Szukaj intentów..." id="intentSearch">
+                </div>
+
+                <div class="intent-categories">
+                    <div class="category-header">
+                        <h4>Kategorie Intentów</h4>
                     </div>
-                    
-                    <div class="test-panel">
-                        <!-- Test Chat Interface -->
-                        <div class="test-chat">
-                            <div class="chat-header">
-                                <h4>Symulacja Konwersacji</h4>
-                                <span class="status-indicator" id="testStatus">Gotowy do testu</span>
-                            </div>
-                            
-                            <div class="chat-messages" id="testChatMessages">
-                                <div class="system-message">
-                                    <i class="fas fa-info-circle"></i>
-                                    <p>Wprowadź wiadomość testową aby przetestować flow</p>
-                                </div>
-                            </div>
-                            
-                            <div class="chat-input">
-                                <input type="text" id="testMessageInput" placeholder="Napisz wiadomość testową..." disabled>
-                                <button id="sendTestMessageBtn" disabled>
-                                    <i class="fas fa-paper-plane"></i>
-                                </button>
-                            </div>
+                    <div class="category-list">
+                        <div class="category-item active" data-category="all">
+                            <i class="fas fa-list"></i>
+                            <span>Wszystkie</span>
+                            <span class="count" id="allIntentsCount">0</span>
                         </div>
-                        
-                        <!-- Flow Execution Tracker -->
-                        <div class="flow-tracker">
-                            <div class="tracker-header">
-                                <h4>Śledzenie Wykonania</h4>
-                                <button class="btn-small btn-secondary" id="clearTestBtn">
-                                    <i class="fas fa-trash"></i> Wyczyść
-                                </button>
-                            </div>
-                            
-                            <div class="execution-steps" id="executionSteps">
-                                <div class="no-execution">
-                                    <i class="fas fa-route"></i>
-                                    <p>Brak aktywnego testu</p>
-                                </div>
-                            </div>
+                        <div class="category-item" data-category="flow-specific">
+                            <i class="fas fa-project-diagram"></i>
+                            <span>Tego Flow</span>
+                            <span class="count" id="flowIntentsCount">0</span>
                         </div>
-                        
-                        <!-- Intent Confidence Monitor -->
-                        <div class="intent-monitor">
-                            <div class="monitor-header">
-                                <h4>Wykrycie Intentów</h4>
-                            </div>
-                            
-                            <div class="intent-results" id="intentResults">
-                                <div class="no-intent-data">
-                                    <i class="fas fa-brain"></i>
-                                    <p>Brak danych o intentach</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Test Results Export -->
-                        <div class="test-results">
-                            <div class="results-header">
-                                <h4>Wyniki Testu</h4>
-                                <button class="btn-small btn-primary" id="exportTestBtn" disabled>
-                                    <i class="fas fa-download"></i> Eksport
-                                </button>
-                            </div>
-                            
-                            <div class="results-summary" id="resultsSummary">
-                                <div class="summary-item">
-                                    <span class="label">Kroki wykonane:</span>
-                                    <span class="value" id="stepsCount">0</span>
-                                </div>
-                                <div class="summary-item">
-                                    <span class="label">Intenty wykryte:</span>
-                                    <span class="value" id="intentsCount">0</span>
-                                </div>
-                                <div class="summary-item">
-                                    <span class="label">Czas testu:</span>
-                                    <span class="value" id="testDuration">0s</span>
-                                </div>
-                            </div>
+                        <div class="category-item" data-category="templates">
+                            <i class="fas fa-star"></i>
+                            <span>Szablony</span>
+                            <span class="count" id="templateIntentsCount">0</span>
                         </div>
                     </div>
                 </div>
-                
-                <div class="reactflow-wrapper" id="reactflowWrapper">
-                    <!-- ReactFlow will be mounted here -->
+
+                <div class="intent-list" id="intentList">
+                    <!-- Intents will be populated dynamically -->
                 </div>
             </div>
+        </div>
 
-            <!-- Right Sidebar - Properties Panel -->
-            <div class="properties-panel">
-                <div class="panel-header">
-                    <h3>Właściwości</h3>
-                </div>
-                
-                <div class="panel-content" id="propertiesContent">
-                    <div class="no-selection">
+        <!-- Main Canvas -->
+        <div class="flow-canvas">
+            <div class="canvas-toolbar">
+                <div class="toolbar-left">
+                    <button class="tool-btn" id="selectTool" title="Zaznacz">
                         <i class="fas fa-mouse-pointer"></i>
-                        <p>Wybierz węzeł aby edytować właściwości</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Flow Creation Modal -->
-        <div class="modal-overlay" id="flowModalOverlay">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Nowy Flow</h3>
-                    <button class="modal-close" id="modalCloseBtn">
-                        <i class="fas fa-times"></i>
+                    </button>
+                    <button class="tool-btn" id="panTool" title="Przesuwaj">
+                        <i class="fas fa-hand-paper"></i>
+                    </button>
+                    <div class="tool-divider"></div>
+                    <button class="tool-btn" id="zoomInBtn" title="Przybliż">
+                        <i class="fas fa-search-plus"></i>
+                    </button>
+                    <button class="tool-btn" id="zoomOutBtn" title="Oddal">
+                        <i class="fas fa-search-minus"></i>
+                    </button>
+                    <button class="tool-btn" id="fitViewBtn" title="Dopasuj widok">
+                        <i class="fas fa-expand-arrows-alt"></i>
                     </button>
                 </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="flowName">Nazwa flow</label>
-                        <input type="text" id="flowName" placeholder="np. Onboarding nowego klienta">
-                    </div>
-                    <div class="form-group">
-                        <label for="flowDescription">Opis</label>
-                        <textarea id="flowDescription" rows="3" placeholder="Opisz cel i przebieg tego flow..."></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="flowCategory">Kategoria</label>
-                        <select id="flowCategory">
-                            <option value="sales">Sprzedaż</option>
-                            <option value="support">Wsparcie</option>
-                            <option value="training">Szkolenia</option>
-                            <option value="onboarding">Onboarding</option>
-                            <option value="general">Ogólne</option>
-                        </select>
-                    </div>
+                <div class="toolbar-center">
+                    <div class="zoom-indicator" id="zoomIndicator">100%</div>
                 </div>
-                <div class="modal-actions">
-                    <button class="btn-secondary" id="modalCancelBtn">Anuluj</button>
-                    <button class="btn-primary" id="modalCreateBtn">
-                        <i class="fas fa-plus"></i>
-                        Utwórz Flow
+                <div class="toolbar-right">
+                    <button class="tool-btn" id="gridToggle" title="Pokaż siatkę">
+                        <i class="fas fa-th"></i>
+                    </button>
+                    <button class="tool-btn" id="minimapToggle" title="Miniatura">
+                        <i class="fas fa-map"></i>
                     </button>
                 </div>
             </div>
-        </div>
 
-        <!-- Intent Editor Modal -->
-        <div class="modal-overlay" id="intentModalOverlay">
-            <div class="modal-content intent-modal">
-                <div class="modal-header">
-                    <h3 id="intentModalTitle">Edytuj Intent</h3>
-                    <button class="modal-close" id="intentModalCloseBtn">
-                        <i class="fas fa-times"></i>
+            <!-- Test Flow Tab -->
+            <div id="testTab" class="tab-content">
+                <div class="palette-header">
+                    <h3>🧪 Test Flow</h3>
+                    <button class="btn-small btn-success" id="startTestBtn">
+                        <i class="fas fa-play"></i> Start Test
                     </button>
                 </div>
-                <div class="modal-body intent-modal-body">
-                    <div class="intent-tabs">
-                        <button class="tab-btn active" data-tab="basic">Podstawowe</button>
-                        <button class="tab-btn" data-tab="prompts">Prompty</button>
-                        <button class="tab-btn" data-tab="keywords">Słowa kluczowe</button>
-                    </div>
-                    
-                    <!-- Basic Tab -->
-                    <div class="intent-tab-content active" id="basicTab">
-                        <div class="form-group">
-                            <label for="intentName">Nazwa intenta</label>
-                            <input type="text" id="intentName" placeholder="np. greeting, ask_question">
+
+                <div class="test-panel">
+                    <!-- Test Chat Interface -->
+                    <div class="test-chat">
+                        <div class="chat-header">
+                            <h4>Symulacja Konwersacji</h4>
+                            <span class="status-indicator" id="testStatus">Gotowy do testu</span>
                         </div>
-                        <div class="form-group">
-                            <label for="intentDescription">Opis</label>
-                            <textarea id="intentDescription" rows="3" placeholder="Opisz cel i zastosowanie tego intenta..."></textarea>
+
+                        <div class="chat-messages" id="testChatMessages">
+                            <div class="system-message">
+                                <i class="fas fa-info-circle"></i>
+                                <p>Wprowadź wiadomość testową aby przetestować flow</p>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="intentPriority">Priorytet</label>
-                            <input type="number" id="intentPriority" min="1" max="10" value="5">
-                            <small>1 = najwyższy, 10 = najniższy</small>
-                        </div>
-                        <div class="form-group">
-                            <label for="intentRequiresFlow">Wymaga flow</label>
-                            <input type="checkbox" id="intentRequiresFlow">
-                            <small>Czy intent automatycznie uruchamia flow</small>
+
+                        <div class="chat-input">
+                            <input type="text" id="testMessageInput" placeholder="Napisz wiadomość testową..." disabled>
+                            <button id="sendTestMessageBtn" disabled>
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
                         </div>
                     </div>
-                    
-                    <!-- Prompts Tab -->
-                    <div class="intent-tab-content" id="promptsTab">
-                        <div class="form-group">
-                            <label for="intentSystemPrompt">System Prompt</label>
-                            <div class="input-with-ai">
-                                <textarea id="intentSystemPrompt" rows="5" placeholder="Instrukcja systemowa dla AI..."></textarea>
-                                <button class="btn-ai-generate" onclick="flowStudio.generateSystemPrompt()" title="Generuj AI">
-                                    <i class="fas fa-magic"></i>
-                                </button>
-                            </div>
-                            <small>Jak ma się zachowywać AI dla tego intenta</small>
+
+                    <!-- Flow Execution Tracker -->
+                    <div class="flow-tracker">
+                        <div class="tracker-header">
+                            <h4>Śledzenie Wykonania</h4>
+                            <button class="btn-small btn-secondary" id="clearTestBtn">
+                                <i class="fas fa-trash"></i> Wyczyść
+                            </button>
                         </div>
-                        <div class="form-group">
-                            <label for="intentUserPrompt">User Prompt Template</label>
-                            <div class="input-with-ai">
-                                <textarea id="intentUserPrompt" rows="4" placeholder="Template dla user message..."></textarea>
-                                <button class="btn-ai-generate" onclick="flowStudio.generateUserPrompt()" title="Generuj AI">
-                                    <i class="fas fa-magic"></i>
-                                </button>
+
+                        <div class="execution-steps" id="executionSteps">
+                            <div class="no-execution">
+                                <i class="fas fa-route"></i>
+                                <p>Brak aktywnego testu</p>
                             </div>
-                            <small>Szablon wiadomości użytkownika z {{zmiennymi}}</small>
-                        </div>
-                        <div class="form-group">
-                            <label for="intentVariables">Zmienne</label>
-                            <div class="input-with-ai">
-                                <input type="text" id="intentVariables" placeholder="np. user_name, company_name">
-                                <button class="btn-ai-generate" onclick="flowStudio.generateVariables()" title="Generuj AI">
-                                    <i class="fas fa-magic"></i>
-                                </button>
-                            </div>
-                            <small>Lista zmiennych oddzielonych przecinkami</small>
                         </div>
                     </div>
-                    
-                    <!-- Keywords Tab -->
-                    <div class="intent-tab-content" id="keywordsTab">
-                        <div class="form-group">
-                            <label for="intentKeywords">Słowa kluczowe</label>
-                            <div class="input-with-ai">
-                                <textarea id="intentKeywords" rows="4" placeholder="cześć, dzień dobry, witaj, hello"></textarea>
-                                <button class="btn-ai-generate" onclick="flowStudio.generateKeywords()" title="Generuj AI">
-                                    <i class="fas fa-magic"></i>
-                                </button>
-                            </div>
-                            <small>Słowa/frazy wyzwalające intent (oddzielone przecinkami)</small>
+
+                    <!-- Intent Confidence Monitor -->
+                    <div class="intent-monitor">
+                        <div class="monitor-header">
+                            <h4>Wykrycie Intentów</h4>
                         </div>
-                        <div class="form-group">
-                            <label for="intentExamples">Przykłady</label>
-                            <div class="input-with-ai">
-                                <textarea id="intentExamples" rows="6" placeholder="Przykład 1&#10;Przykład 2&#10;Przykład 3"></textarea>
-                                <button class="btn-ai-generate" onclick="flowStudio.generateExamples()" title="Generuj AI">
-                                    <i class="fas fa-magic"></i>
-                                </button>
+
+                        <div class="intent-results" id="intentResults">
+                            <div class="no-intent-data">
+                                <i class="fas fa-brain"></i>
+                                <p>Brak danych o intentach</p>
                             </div>
-                            <small>Przykładowe wypowiedzi użytkownika (jedna na linię)</small>
+                        </div>
+                    </div>
+
+                    <!-- Test Results Export -->
+                    <div class="test-results">
+                        <div class="results-header">
+                            <h4>Wyniki Testu</h4>
+                            <button class="btn-small btn-primary" id="exportTestBtn" disabled>
+                                <i class="fas fa-download"></i> Eksport
+                            </button>
+                        </div>
+
+                        <div class="results-summary" id="resultsSummary">
+                            <div class="summary-item">
+                                <span class="label">Kroki wykonane:</span>
+                                <span class="value" id="stepsCount">0</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">Intenty wykryte:</span>
+                                <span class="value" id="intentsCount">0</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">Czas testu:</span>
+                                <span class="value" id="testDuration">0s</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="modal-actions">
-                    <button class="btn-secondary" id="intentModalCancelBtn">Anuluj</button>
-                    <button class="btn-warning" id="deleteIntentBtn" style="margin-right: auto;">
-                        <i class="fas fa-trash"></i> Usuń
-                    </button>
-                    <button class="btn-primary" id="saveIntentBtn">Zapisz Intent</button>
-                </div>
+            </div>
+
+            <div class="reactflow-wrapper" id="reactflowWrapper">
+                <!-- ReactFlow will be mounted here -->
             </div>
         </div>
 
-        <!-- Loading Overlay -->
-        <div class="loading-overlay" id="loadingOverlay">
-            <div class="loading-spinner"></div>
-            <div class="loading-text">Ładowanie Flow Studio...</div>
+        <!-- Right Sidebar - Properties Panel -->
+        <div class="properties-panel">
+            <div class="panel-header">
+                <h3>Właściwości</h3>
+            </div>
+
+            <div class="panel-content" id="propertiesContent">
+                <div class="no-selection">
+                    <i class="fas fa-mouse-pointer"></i>
+                    <p>Wybierz węzeł aby edytować właściwości</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <!-- Security Scripts -->
-    <script src="js/auth-manager.js"></script>
-    <script src="js/page-security.js"></script>
-    <script src="flow-studio-script.js"></script>
+    <!-- Flow Creation Modal -->
+    <div class="modal-overlay" id="flowModalOverlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Nowy Flow</h3>
+                <button class="modal-close" id="modalCloseBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="flowName">Nazwa flow</label>
+                    <input type="text" id="flowName" placeholder="np. Onboarding nowego klienta">
+                </div>
+                <div class="form-group">
+                    <label for="flowDescription">Opis</label>
+                    <textarea id="flowDescription" rows="3" placeholder="Opisz cel i przebieg tego flow..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="flowCategory">Kategoria</label>
+                    <select id="flowCategory">
+                        <option value="sales">Sprzedaż</option>
+                        <option value="support">Wsparcie</option>
+                        <option value="training">Szkolenia</option>
+                        <option value="onboarding">Onboarding</option>
+                        <option value="general">Ogólne</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="modalCancelBtn">Anuluj</button>
+                <button class="btn-primary" id="modalCreateBtn">
+                    <i class="fas fa-plus"></i>
+                    Utwórz Flow
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Intent Editor Modal -->
+    <div class="modal-overlay" id="intentModalOverlay">
+        <div class="modal-content intent-modal">
+            <div class="modal-header">
+                <h3 id="intentModalTitle">Edytuj Intent</h3>
+                <button class="modal-close" id="intentModalCloseBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body intent-modal-body">
+                <div class="intent-tabs">
+                    <button class="tab-btn active" data-tab="basic">Podstawowe</button>
+                    <button class="tab-btn" data-tab="prompts">Prompty</button>
+                    <button class="tab-btn" data-tab="keywords">Słowa kluczowe</button>
+                </div>
+
+                <!-- Basic Tab -->
+                <div class="intent-tab-content active" id="basicTab">
+                    <div class="form-group">
+                        <label for="intentName">Nazwa intenta</label>
+                        <input type="text" id="intentName" placeholder="np. greeting, ask_question">
+                    </div>
+                    <div class="form-group">
+                        <label for="intentDescription">Opis</label>
+                        <textarea id="intentDescription" rows="3"
+                                  placeholder="Opisz cel i zastosowanie tego intenta..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="intentPriority">Priorytet</label>
+                        <input type="number" id="intentPriority" min="1" max="10" value="5">
+                        <small>1 = najwyższy, 10 = najniższy</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="intentRequiresFlow">Wymaga flow</label>
+                        <input type="checkbox" id="intentRequiresFlow">
+                        <small>Czy intent automatycznie uruchamia flow</small>
+                    </div>
+                </div>
+
+                <!-- Prompts Tab -->
+                <div class="intent-tab-content" id="promptsTab">
+                    <div class="form-group">
+                        <label for="intentSystemPrompt">System Prompt</label>
+                        <div class="input-with-ai">
+                            <textarea id="intentSystemPrompt" rows="5"
+                                      placeholder="Instrukcja systemowa dla AI..."></textarea>
+                            <button class="btn-ai-generate" onclick="flowStudio.generateSystemPrompt()"
+                                    title="Generuj AI">
+                                <i class="fas fa-magic"></i>
+                            </button>
+                        </div>
+                        <small>Jak ma się zachowywać AI dla tego intenta</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="intentUserPrompt">User Prompt Template</label>
+                        <div class="input-with-ai">
+                            <textarea id="intentUserPrompt" rows="4"
+                                      placeholder="Template dla user message..."></textarea>
+                            <button class="btn-ai-generate" onclick="flowStudio.generateUserPrompt()"
+                                    title="Generuj AI">
+                                <i class="fas fa-magic"></i>
+                            </button>
+                        </div>
+                        <small>Szablon wiadomości użytkownika z {{zmiennymi}}</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="intentVariables">Zmienne</label>
+                        <div class="input-with-ai">
+                            <input type="text" id="intentVariables" placeholder="np. user_name, company_name">
+                            <button class="btn-ai-generate" onclick="flowStudio.generateVariables()" title="Generuj AI">
+                                <i class="fas fa-magic"></i>
+                            </button>
+                        </div>
+                        <small>Lista zmiennych oddzielonych przecinkami</small>
+                    </div>
+                </div>
+
+                <!-- Keywords Tab -->
+                <div class="intent-tab-content" id="keywordsTab">
+                    <div class="form-group">
+                        <label for="intentKeywords">Słowa kluczowe</label>
+                        <div class="input-with-ai">
+                            <textarea id="intentKeywords" rows="4"
+                                      placeholder="cześć, dzień dobry, witaj, hello"></textarea>
+                            <button class="btn-ai-generate" onclick="flowStudio.generateKeywords()" title="Generuj AI">
+                                <i class="fas fa-magic"></i>
+                            </button>
+                        </div>
+                        <small>Słowa/frazy wyzwalające intent (oddzielone przecinkami)</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="intentExamples">Przykłady</label>
+                        <div class="input-with-ai">
+                            <textarea id="intentExamples" rows="6"
+                                      placeholder="Przykład 1&#10;Przykład 2&#10;Przykład 3"></textarea>
+                            <button class="btn-ai-generate" onclick="flowStudio.generateExamples()" title="Generuj AI">
+                                <i class="fas fa-magic"></i>
+                            </button>
+                        </div>
+                        <small>Przykładowe wypowiedzi użytkownika (jedna na linię)</small>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="intentModalCancelBtn">Anuluj</button>
+                <button class="btn-warning" id="deleteIntentBtn" style="margin-right: auto;">
+                    <i class="fas fa-trash"></i> Usuń
+                </button>
+                <button class="btn-primary" id="saveIntentBtn">Zapisz Intent</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Ładowanie Flow Studio...</div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<!-- Security Scripts -->
+<script src="js/auth-manager.js"></script>
+<script src="js/page-security.js"></script>
+<script src="flow-studio-script.js"></script>
 </body>
 </html>

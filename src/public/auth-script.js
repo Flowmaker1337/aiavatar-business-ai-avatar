@@ -4,7 +4,7 @@ class AuthPageManager {
     constructor() {
         this.apiBaseUrl = '/api/auth';
         this.currentPage = this.detectCurrentPage();
-        
+
         // Wait for global auth manager to be ready
         this.waitForAuthManager().then(() => {
             this.init();
@@ -23,7 +23,7 @@ class AuthPageManager {
         this.initializePasswordToggles();
         this.initializePasswordStrength();
         this.checkAuthRedirect();
-        
+
         console.log('🔐 AuthManager initialized for page:', this.currentPage);
     }
 
@@ -56,11 +56,11 @@ class AuthPageManager {
         // Social login buttons
         const googleButton = document.querySelector('.google-button');
         const githubButton = document.querySelector('.github-button');
-        
+
         if (googleButton) {
             googleButton.addEventListener('click', () => this.handleSocialLogin('google'));
         }
-        
+
         if (githubButton) {
             githubButton.addEventListener('click', () => this.handleSocialLogin('github'));
         }
@@ -83,7 +83,7 @@ class AuthPageManager {
             toggle.addEventListener('click', () => {
                 const input = toggle.parentElement.querySelector('.form-input');
                 const icon = toggle.querySelector('i');
-                
+
                 if (input.type === 'password') {
                     input.type = 'text';
                     icon.className = 'fas fa-eye-slash';
@@ -104,10 +104,10 @@ class AuthPageManager {
             passwordInput.addEventListener('input', (e) => {
                 const password = e.target.value;
                 const strength = this.calculatePasswordStrength(password);
-                
+
                 strengthBar.style.width = `${strength.percentage}%`;
                 strengthText.textContent = strength.label;
-                
+
                 // Update color based on strength
                 if (strength.percentage < 30) {
                     strengthBar.style.background = '#ff4757';
@@ -136,7 +136,7 @@ class AuthPageManager {
         else if (score >= 40) label = 'Średnie';
         else if (score >= 20) label = 'Słabe';
 
-        return { percentage: score, label };
+        return {percentage: score, label};
     }
 
     initializeValidation() {
@@ -162,7 +162,7 @@ class AuthPageManager {
     validateEmail(email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const errorElement = document.getElementById('emailError');
-        
+
         if (!email) {
             this.showFieldError(errorElement, 'Email jest wymagany');
             return false;
@@ -177,7 +177,7 @@ class AuthPageManager {
 
     validatePassword(password) {
         const errorElement = document.getElementById('passwordError');
-        
+
         if (!password) {
             this.showFieldError(errorElement, 'Hasło jest wymagane');
             return false;
@@ -192,7 +192,7 @@ class AuthPageManager {
 
     validatePasswordConfirmation(password, confirmPassword) {
         const errorElement = document.getElementById('confirmPasswordError');
-        
+
         if (!confirmPassword) {
             this.showFieldError(errorElement, 'Potwierdź hasło');
             return false;
@@ -224,20 +224,20 @@ class AuthPageManager {
         document.querySelectorAll('.plan-item').forEach(item => {
             item.classList.remove('active');
         });
-        
+
         // Add active class to selected plan
         planItem.classList.add('active');
-        
+
         // Store selected plan
         const plan = planItem.getAttribute('data-plan');
         localStorage.setItem('selectedPlan', plan);
-        
+
         console.log('🎯 Selected plan:', plan);
     }
 
     async handleLogin(e) {
         e.preventDefault();
-        
+
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         const rememberMe = document.getElementById('rememberMe').checked;
@@ -255,17 +255,17 @@ class AuthPageManager {
 
             if (result.success) {
                 this.showSuccess('Logowanie pomyślne! Przekierowywanie...');
-                
+
                 // Check for intended destination
                 const intendedDestination = sessionStorage.getItem('intended_destination');
                 const redirectUrl = intendedDestination || '/';
                 sessionStorage.removeItem('intended_destination');
-                
+
                 // Redirect after short delay
                 setTimeout(() => {
                     window.location.href = redirectUrl;
                 }, 1500);
-                
+
             } else {
                 this.showError(result.error || 'Błąd logowania');
             }
@@ -281,7 +281,7 @@ class AuthPageManager {
 
     async handleRegister(e) {
         e.preventDefault();
-        
+
         const firstName = document.getElementById('firstName').value;
         const lastName = document.getElementById('lastName').value;
         const email = document.getElementById('email').value;
@@ -315,7 +315,7 @@ class AuthPageManager {
 
         try {
             const selectedPlan = localStorage.getItem('selectedPlan') || 'free';
-            
+
             // Use global AuthManager for registration
             const result = await window.authManager.register({
                 first_name: firstName,
@@ -329,12 +329,12 @@ class AuthPageManager {
 
             if (result.success) {
                 this.showSuccess('Konto utworzone pomyślnie! Przekierowywanie...');
-                
+
                 // Redirect after short delay
                 setTimeout(() => {
                     window.location.href = '/';
                 }, 1500);
-                
+
             } else {
                 this.showError(result.error || 'Błąd podczas tworzenia konta');
             }
@@ -351,7 +351,7 @@ class AuthPageManager {
     handleDemo() {
         // Store demo flag
         localStorage.setItem('demoMode', 'true');
-        
+
         // Redirect to homepage
         window.location.href = '/';
     }
@@ -362,11 +362,11 @@ class AuthPageManager {
 
     storeTokens(accessToken, refreshToken, remember = false) {
         const storage = remember ? localStorage : sessionStorage;
-        
+
         storage.setItem('accessToken', accessToken);
         storage.setItem('refreshToken', refreshToken);
         storage.setItem('tokenExpiry', Date.now() + (60 * 60 * 1000)); // 1 hour
-        
+
         console.log('🔐 Tokens stored successfully');
     }
 
@@ -379,7 +379,7 @@ class AuthPageManager {
             role: user.role,
             preferences: user.preferences
         };
-        
+
         localStorage.setItem('userInfo', JSON.stringify(userInfo));
         console.log('👤 User info stored:', userInfo);
     }
@@ -387,7 +387,7 @@ class AuthPageManager {
     checkAuthRedirect() {
         // Check if user is already logged in
         const accessToken = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-        
+
         if (accessToken) {
             // Validate token
             this.validateToken(accessToken).then(isValid => {
@@ -406,7 +406,7 @@ class AuthPageManager {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            
+
             return response.ok;
         } catch (error) {
             console.error('Token validation error:', error);
@@ -435,7 +435,7 @@ class AuthPageManager {
     showLoading(text = 'Ładowanie...') {
         const overlay = document.getElementById('loadingOverlay');
         const loadingText = overlay?.querySelector('.loading-text');
-        
+
         if (overlay) {
             overlay.classList.add('active');
             if (loadingText) loadingText.textContent = text;
@@ -454,13 +454,13 @@ class AuthPageManager {
         if (successElement) {
             successElement.querySelector('.message-text').textContent = message;
             successElement.style.display = 'flex';
-            
+
             // Hide error if visible
             const errorElement = document.getElementById('errorMessage');
             if (errorElement) {
                 errorElement.style.display = 'none';
             }
-            
+
             // Auto hide after 5 seconds
             setTimeout(() => {
                 successElement.style.display = 'none';
@@ -473,13 +473,13 @@ class AuthPageManager {
         if (errorElement) {
             errorElement.querySelector('.message-text').textContent = message;
             errorElement.style.display = 'flex';
-            
+
             // Hide success if visible
             const successElement = document.getElementById('successMessage');
             if (successElement) {
                 successElement.style.display = 'none';
             }
-            
+
             // Auto hide after 5 seconds
             setTimeout(() => {
                 errorElement.style.display = 'none';
@@ -507,9 +507,9 @@ class AuthUtils {
     static isLoggedIn() {
         const token = this.getToken();
         const expiry = localStorage.getItem('tokenExpiry') || sessionStorage.getItem('tokenExpiry');
-        
+
         if (!token || !expiry) return false;
-        
+
         return Date.now() < parseInt(expiry);
     }
 
@@ -522,14 +522,14 @@ class AuthUtils {
         sessionStorage.removeItem('accessToken');
         sessionStorage.removeItem('refreshToken');
         sessionStorage.removeItem('tokenExpiry');
-        
+
         // Redirect to login
         window.location.href = '/login.html';
     }
 
     static async makeAuthenticatedRequest(url, options = {}) {
         const token = this.getToken();
-        
+
         if (!token) {
             throw new Error('No authentication token');
         }
@@ -551,7 +551,7 @@ class AuthUtils {
             if (refreshed) {
                 // Retry with new token
                 headers.Authorization = `Bearer ${this.getToken()}`;
-                return fetch(url, { ...options, headers });
+                return fetch(url, {...options, headers});
             } else {
                 this.logout();
                 throw new Error('Authentication failed');
@@ -563,7 +563,7 @@ class AuthUtils {
 
     static async refreshToken() {
         const refreshToken = this.getRefreshToken();
-        
+
         if (!refreshToken) return false;
 
         try {
@@ -579,13 +579,13 @@ class AuthUtils {
 
             if (response.ok) {
                 const data = await response.json();
-                
+
                 // Update tokens
                 const storage = localStorage.getItem('accessToken') ? localStorage : sessionStorage;
                 storage.setItem('accessToken', data.data.access_token);
                 storage.setItem('refreshToken', data.data.refresh_token);
                 storage.setItem('tokenExpiry', Date.now() + (60 * 60 * 1000));
-                
+
                 return true;
             }
         } catch (error) {

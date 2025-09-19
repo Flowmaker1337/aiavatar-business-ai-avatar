@@ -1,8 +1,8 @@
-import { v4 as uuidv4 } from 'uuid';
-import { CustomAvatar, KnowledgeFile, CustomFlow, CustomIntent, AvatarUsageStats } from '../models/types';
+import {v4 as uuidv4} from 'uuid';
+import {CustomAvatar, KnowledgeFile, CustomFlow, CustomIntent, AvatarUsageStats} from '../models/types';
 import DatabaseService from './database.service';
 import KnowledgeFileProcessor from './knowledge-file-processor.service';
-import { ExecutionTimerService } from './execution-timer.service';
+import {ExecutionTimerService} from './execution-timer.service';
 import vectorDatabaseService from './vector-database.service';
 
 /**
@@ -57,16 +57,16 @@ export class CustomAvatarService {
                 created_at: Date.now(),
                 updated_at: Date.now(),
                 status: 'draft',
-                
+
                 // Konwertuj knowledge files
                 knowledge_files: avatarData.knowledge_files.map(file => this.convertToKnowledgeFile(file)),
-                
+
                 // Konwertuj intents first
                 intents: avatarData.intents.map(intent => this.convertToCustomIntent(intent)),
-                
+
                 // Konwertuj flows (with intent linking)
                 flows: avatarData.flows.map(flow => this.convertToCustomFlow(flow, avatarData.intents)),
-                
+
                 usage_stats: {
                     total_conversations: 0,
                     total_messages: 0,
@@ -82,7 +82,7 @@ export class CustomAvatarService {
 
             timer.stop();
             console.log(`✅ Custom avatar saved: ${customAvatar.name} (${customAvatar.id})`);
-            
+
             return customAvatar;
 
         } catch (error) {
@@ -123,9 +123,9 @@ export class CustomAvatarService {
     public async updateCustomAvatar(avatarId: string, updates: Partial<CustomAvatar>): Promise<CustomAvatar | null> {
         try {
             const updatedAvatar = await this.databaseService.update<CustomAvatar>(
-                this.collection, 
-                avatarId, 
-                { ...updates, updated_at: Date.now() }
+                this.collection,
+                avatarId,
+                {...updates, updated_at: Date.now()}
             );
 
             console.log(`✅ Custom avatar updated: ${avatarId}`);
@@ -139,13 +139,14 @@ export class CustomAvatarService {
     /**
      * Usuwa custom avatara
      */
+
     // deleteCustomAvatar method moved to end of class with enhanced functionality
 
     /**
      * Aktywuje custom avatara (zmienia status na 'active')
      */
     public async activateCustomAvatar(avatarId: string): Promise<CustomAvatar | null> {
-        return this.updateCustomAvatar(avatarId, { 
+        return this.updateCustomAvatar(avatarId, {
             status: 'active',
             updated_at: Date.now()
         });
@@ -174,11 +175,11 @@ export class CustomAvatarService {
         try {
             const avatar = await this.getCustomAvatarById(avatarId);
             if (avatar && avatar.usage_stats) {
-                const updatedStats: AvatarUsageStats = { 
-                    ...avatar.usage_stats, 
-                    ...stats 
+                const updatedStats: AvatarUsageStats = {
+                    ...avatar.usage_stats,
+                    ...stats
                 };
-                await this.updateCustomAvatar(avatarId, { usage_stats: updatedStats });
+                await this.updateCustomAvatar(avatarId, {usage_stats: updatedStats});
             }
         } catch (error) {
             console.error(`❌ Error updating usage stats for avatar ${avatarId}:`, error);
@@ -242,7 +243,11 @@ export class CustomAvatarService {
     /**
      * Przetwarza knowledge files dla avatara na RAG vectors
      */
-    public async processKnowledgeFiles(avatarId: string): Promise<{ success: boolean; totalVectors: number; errors: string[] }> {
+    public async processKnowledgeFiles(avatarId: string): Promise<{
+        success: boolean;
+        totalVectors: number;
+        errors: string[]
+    }> {
         try {
             const avatar = await this.getCustomAvatarById(avatarId);
             if (!avatar) {
@@ -288,8 +293,8 @@ export class CustomAvatarService {
      * Dodaje knowledge file do avatara i przetwarza go na vectors
      */
     public async addKnowledgeFileToAvatar(
-        avatarId: string, 
-        file: KnowledgeFile, 
+        avatarId: string,
+        file: KnowledgeFile,
         fileBuffer: Buffer
     ): Promise<{ success: boolean; vectorCount: number; error?: string }> {
         try {
@@ -323,14 +328,18 @@ export class CustomAvatarService {
 
         } catch (error: any) {
             console.error(`❌ Error adding knowledge file to avatar ${avatarId}:`, error);
-            return { success: false, vectorCount: 0, error: error.message };
+            return {success: false, vectorCount: 0, error: error.message};
         }
     }
 
     /**
      * Deletes a custom avatar and all associated data (vectors, files, etc.)
      */
-    public async deleteCustomAvatar(avatarId: string): Promise<{ success: boolean; deletedVectors?: number; error?: string }> {
+    public async deleteCustomAvatar(avatarId: string): Promise<{
+        success: boolean;
+        deletedVectors?: number;
+        error?: string
+    }> {
         const timer = new ExecutionTimerService('CustomAvatarService.deleteCustomAvatar');
         timer.start();
 
@@ -340,7 +349,7 @@ export class CustomAvatarService {
             // Get avatar data first
             const avatar = await this.getCustomAvatarById(avatarId);
             if (!avatar) {
-                return { success: false, error: 'Avatar not found' };
+                return {success: false, error: 'Avatar not found'};
             }
 
             let deletedVectors = 0;
@@ -357,23 +366,23 @@ export class CustomAvatarService {
 
             // Delete avatar from database
             const deleteResult = await this.databaseService.delete(this.collection, avatarId);
-            
+
             if (!deleteResult) {
-                return { success: false, error: 'Failed to delete avatar from database' };
+                return {success: false, error: 'Failed to delete avatar from database'};
             }
 
             timer.stop();
             console.log(`✅ Successfully deleted custom avatar: ${avatar.name} (${avatarId})`);
-            
-            return { 
-                success: true, 
-                deletedVectors 
+
+            return {
+                success: true,
+                deletedVectors
             };
 
         } catch (error: any) {
             timer.stop();
             console.error(`❌ Error deleting custom avatar ${avatarId}:`, error);
-            return { success: false, error: error.message };
+            return {success: false, error: error.message};
         }
     }
 }

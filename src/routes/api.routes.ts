@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import {Router} from 'express';
 import queryController from '../controllers/query.controller';
 import userController from '../controllers/user.controller';
 import avatarController from '../controllers/avatar.controller';
@@ -10,7 +10,7 @@ import SimulationController from '../controllers/simulation.controller';
 import PersonaController from '../controllers/persona.controller';
 import FlowWizardController from '../controllers/flow-wizard.controller';
 import CustomAvatarController from '../controllers/custom-avatar.controller';
-import { ReactiveAvatarController } from '../controllers/reactive-avatar.controller';
+import {ReactiveAvatarController} from '../controllers/reactive-avatar.controller';
 import CompanyProfileController from '../controllers/company-profile.controller';
 import ExtendedCompanyProfileController from '../controllers/extended-company-profile.controller';
 import SceneBuilderController from '../controllers/scene-builder.controller';
@@ -18,14 +18,14 @@ import AuthRoutes from './auth.routes';
 import ExtendedAvatarRoutes from './extended-avatar.routes';
 
 // Import enhanced authentication middleware
-import { 
-    authenticate, 
-    requireRole, 
-    requireAnyRole, 
-    requirePermission, 
-    requireOwnership, 
+import {
+    authenticate,
+    requireRole,
+    requireAnyRole,
+    requirePermission,
+    requireOwnership,
     optionalAuth,
-    rateLimit 
+    rateLimit
 } from '../middleware/enhanced-auth.middleware';
 
 const router = Router();
@@ -62,33 +62,33 @@ router.get('/health/detailed', healthController.getDetailedHealth.bind(healthCon
 
 // ============ QUERY & CHAT ENDPOINTS ============
 // Core AI interaction endpoints - require authentication and avatar access
-router.post('/query', 
-    authenticate, 
+router.post('/query',
+    authenticate,
     requirePermission('read', 'avatars'),
     queryController.handleQuery.bind(queryController)
 );
 
 router.post('/query/stream',
-    authenticate, 
+    authenticate,
     requirePermission('read', 'avatars'),
     queryController.handleStreamingQuery.bind(queryController)
 );
 
-router.get('/query/stream/listen', 
-    authenticate, 
+router.get('/query/stream/listen',
+    authenticate,
     requirePermission('read', 'avatars'),
     queryController.listenStreamingQuery.bind(queryController)
 );
 
 // ============ USER MANAGEMENT ENDPOINTS ============
-router.post('/users', 
-    authenticate, 
+router.post('/users',
+    authenticate,
     requireRole('admin'),
     userController.createUser
 );
 
-router.get('/users/:userId', 
-    authenticate, 
+router.get('/users/:userId',
+    authenticate,
     requireOwnership('userId'),
     userController.getUser
 );
@@ -98,76 +98,76 @@ router.get('/users/:userId',
 router.use('/avatars', authenticate, extendedAvatarRoutes.getRouter());
 
 // Legacy avatar endpoints
-router.post('/avatars', 
-    authenticate, 
+router.post('/avatars',
+    authenticate,
     requirePermission('create', 'avatars'),
     avatarController.createAvatar
 );
 
-router.get('/avatars/:avatarId', 
-    authenticate, 
+router.get('/avatars/:avatarId',
+    authenticate,
     requirePermission('read', 'avatars'),
     avatarController.getAvatar
 );
 
 // ============ CHAT & SESSION ENDPOINTS ============
-router.get('/chat/:sessionId', 
-    authenticate, 
+router.get('/chat/:sessionId',
+    authenticate,
     requireOwnership('sessionId'),
     sessionController.getChatHistory
 );
 
-router.get('/state/:sessionId', 
-    authenticate, 
+router.get('/state/:sessionId',
+    authenticate,
     requireOwnership('sessionId'),
     sessionController.getSessionState.bind(sessionController)
 );
 
 // ============ FLOW ENDPOINTS ============
-router.get('/flows', 
-    authenticate, 
+router.get('/flows',
+    authenticate,
     requirePermission('read', 'flows'),
     flowController.getFlowDefinitions.bind(flowController)
 );
 
-router.get('/prompt-templates', 
-    authenticate, 
+router.get('/prompt-templates',
+    authenticate,
     requirePermission('read', 'flows'),
     flowController.getPromptTemplates.bind(flowController)
 );
 
-router.get('/intent-definitions', 
-    authenticate, 
+router.get('/intent-definitions',
+    authenticate,
     requirePermission('read', 'intents'),
     flowController.getIntentDefinitions.bind(flowController)
 );
 
 // ============ TEXT-TO-SPEECH ENDPOINTS ============
-router.get('/tts/health', 
+router.get('/tts/health',
     authenticate,
     queryController.checkTTSHealth.bind(queryController)
 );
 
 // ============ KNOWLEDGE PREPARATION ENGINE ENDPOINTS ============
-router.post('/knowledge/process', 
-    authenticate, 
+router.post('/knowledge/process',
+    authenticate,
     requirePermission('create', 'avatars'),
     knowledgePrepareController.processTrainingFile.bind(knowledgePrepareController)
 );
 
-router.get('/knowledge/flows/:courseId', 
-    authenticate, 
+router.get('/knowledge/flows/:courseId',
+    authenticate,
     requirePermission('read', 'flows'),
     knowledgePrepareController.getProcessedFlows.bind(knowledgePrepareController)
 );
 
-router.post('/knowledge/test-12archetypes', 
-    authenticate, 
+router.post('/knowledge/test-12archetypes',
+    authenticate,
     requireRole('admin'),
     knowledgePrepareController.test12Archetypes.bind(knowledgePrepareController)
 );
 
-router.get('/knowledge/health', 
+router.get('/knowledge/health',
     authenticate,
     knowledgePrepareController.healthCheck.bind(knowledgePrepareController)
 );
@@ -313,7 +313,7 @@ router.get('/simulation-avatars', (req, res) => {
         res.json(simulationAvatars);
     } catch (error) {
         console.error('Error loading simulation avatars:', error);
-        res.status(500).json({ error: 'Failed to load simulation avatars' });
+        res.status(500).json({error: 'Failed to load simulation avatars'});
     }
 });
 

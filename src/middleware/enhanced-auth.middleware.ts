@@ -1,9 +1,9 @@
 // ============ SIMPLIFIED AUTHENTICATION MIDDLEWARE ============
 
-import { Request, Response, NextFunction } from 'express';
+import {Request, Response, NextFunction} from 'express';
 import jwt from 'jsonwebtoken';
-import { config } from '../config/env';
-import { JWTPayload, UserRole } from '../models/auth-types';
+import {config} from '../config/env';
+import {JWTPayload, UserRole} from '../models/auth-types';
 import ExtendedDatabaseService from '../services/extended-database.service';
 
 const db = ExtendedDatabaseService.getInstance();
@@ -174,7 +174,10 @@ export const requireOwnership = (paramName: string) => {
             next();
         } catch (error) {
             console.error('Ownership check error:', error);
-            res.status(500).json({ error: 'Internal server error during ownership check', code: 'OWNERSHIP_CHECK_ERROR' });
+            res.status(500).json({
+                error: 'Internal server error during ownership check',
+                code: 'OWNERSHIP_CHECK_ERROR'
+            });
         }
     };
 };
@@ -183,20 +186,20 @@ export const requireOwnership = (paramName: string) => {
 
 export const rateLimit = (maxRequests: number, windowMs: number) => {
     const requests = new Map<string, { count: number; resetTime: number }>();
-    
+
     return (req: Request, res: Response, next: NextFunction): void => {
         const clientId = req.ip || 'unknown';
         const now = Date.now();
-        
+
         const clientData = requests.get(clientId);
-        
+
         if (!clientData || now > clientData.resetTime) {
             // Reset or initialize
-            requests.set(clientId, { count: 1, resetTime: now + windowMs });
+            requests.set(clientId, {count: 1, resetTime: now + windowMs});
             next();
             return;
         }
-        
+
         if (clientData.count >= maxRequests) {
             res.status(429).json({
                 error: 'Too many requests from this IP, please try again after some time',
@@ -204,7 +207,7 @@ export const rateLimit = (maxRequests: number, windowMs: number) => {
             });
             return;
         }
-        
+
         clientData.count++;
         next();
     };

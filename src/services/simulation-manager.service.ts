@@ -193,7 +193,7 @@ export class SimulationManager {
             //     lastMessage.content
             // );
 
-            const intentResult:IntentClassificationResult = {
+            const intentResult: IntentClassificationResult = {
                 intent: '',
                 confidence: 0
             };

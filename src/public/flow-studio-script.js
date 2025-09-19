@@ -7,7 +7,7 @@ class FlowStudio {
         this.selectedNode = null;
         this.nodeIdCounter = 1;
         this.isUpdatingProperties = false; // Flag to prevent update loops
-        
+
         // Node definitions
         this.nodeDefinitions = {
             basic: [
@@ -156,7 +156,7 @@ class FlowStudio {
                 }
             ]
         };
-        
+
         this.currentFlowType = 'basic'; // basic | advanced
         this.init();
     }
@@ -167,7 +167,7 @@ class FlowStudio {
         this.loadNodePalette();
         this.loadUserFlows();
         this.loadIntentLibrary();
-        
+
         console.log('🌊 Flow Studio initialized');
     }
 
@@ -197,11 +197,11 @@ class FlowStudio {
         document.getElementById('modalCloseBtn')?.addEventListener('click', () => this.hideNewFlowModal());
         document.getElementById('modalCancelBtn')?.addEventListener('click', () => this.hideNewFlowModal());
         document.getElementById('modalCreateBtn')?.addEventListener('click', () => this.createNewFlow());
-        
+
         // Intent management events
         document.getElementById('createIntentBtn')?.addEventListener('click', () => this.showCreateIntentModal());
         document.getElementById('intentSearch')?.addEventListener('input', (e) => this.filterIntents(e.target.value));
-        
+
         // Intent modal events
         document.getElementById('intentModalCloseBtn')?.addEventListener('click', () => this.hideIntentModal());
         document.getElementById('intentModalCancelBtn')?.addEventListener('click', () => this.hideIntentModal());
@@ -271,10 +271,10 @@ class FlowStudio {
                 // Debug: Check what types of changes are happening
                 const changeTypes = changes.map(c => c.type);
                 const nonPositionChanges = changes.filter(c => c.type !== 'position');
-                
+
                 if (nonPositionChanges.length > 0) {
                     console.log('🔄 Non-position changes detected:', changeTypes, nonPositionChanges);
-                    
+
                     // Check if it's just initial loading or something else
                     if (changeTypes.includes('add') || changeTypes.includes('remove')) {
                         console.log('📝 Node add/remove operation - applying changes');
@@ -282,7 +282,7 @@ class FlowStudio {
                     } else if (changeTypes.includes('select')) {
                         console.log('👆 Node selection change - applying changes');
                         setNodes(nds => window.ReactFlow.applyNodeChanges(changes, nds));
-                        
+
                         // Handle selection
                         setTimeout(() => {
                             if (!this.isUpdatingProperties) {
@@ -348,7 +348,7 @@ class FlowStudio {
                     size: 1,
                     color: 'rgba(57, 229, 117, 0.2)'
                 }),
-                
+
                 // Controls
                 React.createElement(window.ReactFlow.Controls, {
                     key: 'controls',
@@ -356,13 +356,13 @@ class FlowStudio {
                     showFitView: false,
                     showInteractive: false
                 }),
-                
+
                 // Minimap
                 React.createElement(window.ReactFlow.MiniMap, {
                     key: 'minimap',
                     nodeColor: '#39e575',
                     maskColor: 'rgba(0, 0, 0, 0.8)',
-                    style: { display: 'none' },
+                    style: {display: 'none'},
                     id: 'minimap'
                 })
             ]);
@@ -375,14 +375,14 @@ class FlowStudio {
 
     getCustomNodeTypes() {
         const self = this; // Capture reference to FlowStudio instance
-        
+
         return {
-            flowNode: ({ data, selected }) => {
+            flowNode: ({data, selected}) => {
                 const nodeType = self.getNodeTypeDefinition(data.type);
-                
+
                 const hasInputs = nodeType?.inputs > 0;
                 const hasOutputs = nodeType?.outputs > 0;
-                
+
                 return React.createElement('div', {
                     className: `flow-node ${selected ? 'selected' : ''}`,
                     style: {
@@ -412,7 +412,7 @@ class FlowStudio {
                             height: '12px'
                         }
                     }),
-                    
+
                     // Node header
                     React.createElement('div', {
                         key: 'header',
@@ -433,10 +433,10 @@ class FlowStudio {
                         }),
                         React.createElement('span', {
                             key: 'title',
-                            style: { fontWeight: '600' }
+                            style: {fontWeight: '600'}
                         }, data.label || nodeType?.name || 'Node')
                     ]),
-                    
+
                     // Node description
                     data.description && React.createElement('div', {
                         key: 'description',
@@ -446,7 +446,7 @@ class FlowStudio {
                             lineHeight: '1.4'
                         }
                     }, data.description),
-                    
+
                     // Output Handle (right side)
                     hasOutputs && React.createElement(window.ReactFlow.Handle, {
                         key: 'output-handle',
@@ -470,7 +470,7 @@ class FlowStudio {
             const nodeType = category.find(node => node.type === type);
             if (nodeType) return nodeType;
         }
-        
+
         // Then check nodeTypes (new structure)
         for (const category of Object.values(this.nodeTypes || {})) {
             const nodeType = category.find(node => node.type === type);
@@ -484,7 +484,7 @@ class FlowStudio {
         if (!paletteNodes) return;
 
         const nodes = this.nodeDefinitions[category] || this.nodeTypes[category] || [];
-        
+
         // Filter nodes based on current flow type
         const filteredNodes = nodes.filter(node => {
             if (this.currentFlowType === 'basic') {
@@ -492,7 +492,7 @@ class FlowStudio {
             }
             return true; // Show all nodes in advanced mode
         });
-        
+
         paletteNodes.innerHTML = filteredNodes.map(node => `
             <div class="node-item ${node.advanced ? 'advanced-node' : ''}" draggable="true" data-node-type="${node.type}">
                 <div class="node-icon" style="background: ${node.color}">
@@ -528,7 +528,7 @@ class FlowStudio {
         const newNode = {
             id: `node_${this.nodeIdCounter++}`,
             type: 'flowNode',
-            position: position || { x: Math.random() * 300, y: Math.random() * 300 },
+            position: position || {x: Math.random() * 300, y: Math.random() * 300},
             data: {
                 type: nodeType,
                 label: nodeDefinition.name,
@@ -558,7 +558,7 @@ class FlowStudio {
     onConnect(connection) {
         // Handle new connections
         console.log('New connection attempt:', connection);
-        
+
         if (!this.setEdges || !this.edges) {
             console.log('Missing setEdges or edges');
             return;
@@ -591,21 +591,21 @@ class FlowStudio {
             target: connection.target,
             type: 'smoothstep',
             animated: true,
-            style: { stroke: '#39e575', strokeWidth: 2 }
+            style: {stroke: '#39e575', strokeWidth: 2}
         };
-        
+
         this.setEdges(edges => [...edges, newEdge]);
-        
+
         // Update next_steps in source node
         this.updateNodeNextSteps(connection.source, connection.target);
-        
+
         this.showNotification('Połączenie utworzone', 'success');
     }
 
     updateNodeNextSteps(sourceNodeId, targetNodeId) {
         if (!this.setNodes || !this.nodes) return;
 
-        this.setNodes(nodes => 
+        this.setNodes(nodes =>
             nodes.map(node => {
                 if (node.id === sourceNodeId) {
                     return {
@@ -635,15 +635,15 @@ class FlowStudio {
         console.log('Updating properties panel for node:', node);
         const propertiesContent = document.getElementById('propertiesContent');
         console.log('Properties content element:', propertiesContent);
-        
+
         if (!propertiesContent || !node) {
-            console.log('Missing element or node:', { propertiesContent, node });
+            console.log('Missing element or node:', {propertiesContent, node});
             return;
         }
 
         const nodeDefinition = this.getNodeTypeDefinition(node.data.type);
         console.log('Node definition:', nodeDefinition);
-        
+
         propertiesContent.innerHTML = `
             <div class="property-section">
                 <div class="property-header">
@@ -793,7 +793,7 @@ class FlowStudio {
             const template = this.promptTemplates.find(t => t.intent === value);
             if (template) {
                 // Auto-fill system prompt, user prompt and variables
-                this.setNodes(nodes => 
+                this.setNodes(nodes =>
                     nodes.map(node => {
                         if (node.id === this.selectedNode.id) {
                             return {
@@ -821,48 +821,52 @@ class FlowStudio {
 
                 // Refresh specific input values without rebuilding panel
                 this.refreshPropertiesPanelValues();
-                
+
                 this.showNotification(`Auto-wypełniono prompty dla intent: ${value}`, 'success');
-                
+
                 // Clear flag and return
-                setTimeout(() => { this.isUpdatingProperties = false; }, 100);
+                setTimeout(() => {
+                    this.isUpdatingProperties = false;
+                }, 100);
                 return;
             }
         }
 
         // Update node data
-        this.setNodes(nodes => 
-            nodes.map(node => 
-                node.id === this.selectedNode.id 
-                    ? { ...node, data: { ...node.data, [property]: value } }
+        this.setNodes(nodes =>
+            nodes.map(node =>
+                node.id === this.selectedNode.id
+                    ? {...node, data: {...node.data, [property]: value}}
                     : node
             )
         );
 
         // Update selected node reference
         this.selectedNode.data[property] = value;
-        
+
         // Clear flag after update
-        setTimeout(() => { this.isUpdatingProperties = false; }, 100);
+        setTimeout(() => {
+            this.isUpdatingProperties = false;
+        }, 100);
     }
 
     refreshPropertiesPanelValues() {
         // Only refresh input values, don't rebuild the entire panel
         if (!this.selectedNode) return;
-        
+
         const node = this.selectedNode;
-        
+
         // Update form values without triggering events
         const systemPrompt = document.getElementById('nodeSystemPrompt');
-        const userPrompt = document.getElementById('nodeUserPrompt'); 
+        const userPrompt = document.getElementById('nodeUserPrompt');
         const variables = document.getElementById('nodeVariables');
         const priority = document.getElementById('nodePriority');
-        
+
         if (systemPrompt) systemPrompt.value = node.data.system_prompt || '';
         if (userPrompt) userPrompt.value = node.data.user_prompt_template || '';
         if (variables) variables.value = (node.data.variables || []).join(', ');
         if (priority) priority.value = node.data.priority || 5;
-        
+
         console.log('🔄 Refreshed properties panel values');
     }
 
@@ -870,30 +874,30 @@ class FlowStudio {
         if (!this.selectedNode || !this.setNodes) return;
 
         const nodeId = this.selectedNode.id;
-        
+
         // Remove connected edges first
         if (this.setEdges) {
-            this.setEdges(edges => edges.filter(edge => 
+            this.setEdges(edges => edges.filter(edge =>
                 edge.source !== nodeId && edge.target !== nodeId
             ));
         }
 
         // Update next_steps in other nodes that pointed to this node
-        this.setNodes(nodes => 
+        this.setNodes(nodes =>
             nodes.filter(node => node.id !== nodeId) // Remove the node
-                 .map(node => ({
-                     ...node,
-                     data: {
-                         ...node.data,
-                         next_steps: (node.data.next_steps || []).filter(step => step !== nodeId)
-                     }
-                 }))
+                .map(node => ({
+                    ...node,
+                    data: {
+                        ...node.data,
+                        next_steps: (node.data.next_steps || []).filter(step => step !== nodeId)
+                    }
+                }))
         );
-        
+
         // Clear selection
         this.selectedNode = null;
         this.clearPropertiesPanel();
-        
+
         this.showNotification('Węzeł został usunięty', 'success');
     }
 
@@ -913,7 +917,7 @@ class FlowStudio {
     setTool(tool) {
         document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
         document.getElementById(`${tool}Tool`)?.classList.add('active');
-        
+
         // Implement tool logic here
         console.log('Tool selected:', tool);
     }
@@ -932,7 +936,7 @@ class FlowStudio {
 
     fitView() {
         if (this.reactFlowInstance) {
-            this.reactFlowInstance.fitView({ padding: 0.2 });
+            this.reactFlowInstance.fitView({padding: 0.2});
         }
     }
 
@@ -984,7 +988,7 @@ class FlowStudio {
                 nodes: [{
                     id: 'start_1',
                     type: 'flowNode',
-                    position: { x: 100, y: 100 },
+                    position: {x: 100, y: 100},
                     data: {
                         type: 'start',
                         label: 'Start',
@@ -999,10 +1003,10 @@ class FlowStudio {
             this.currentFlow = newFlow;
             this.loadFlowToCanvas(newFlow);
             this.addFlowToSelector(newFlow);
-            
+
             this.hideNewFlowModal();
             this.showNotification(`Flow "${name}" został utworzony!`, 'success');
-            
+
         } catch (error) {
             console.error('Error creating flow:', error);
             this.showNotification('Błąd podczas tworzenia flow', 'error');
@@ -1014,10 +1018,10 @@ class FlowStudio {
 
         this.setNodes(flow.nodes || []);
         this.setEdges(flow.edges || []);
-        
+
         setTimeout(() => {
             if (this.reactFlowInstance) {
-                this.reactFlowInstance.fitView({ padding: 0.2 });
+                this.reactFlowInstance.fitView({padding: 0.2});
             }
         }, 100);
     }
@@ -1051,7 +1055,7 @@ class FlowStudio {
         try {
             // Load prompt templates first
             await this.loadPromptTemplates();
-            
+
             // Load flows for different avatar types
             const avatarTypes = ['networker', 'trainer'];
             const allFlows = [];
@@ -1083,7 +1087,7 @@ class FlowStudio {
                 // Use AuthManager for authenticated requests
                 if (window.authManager && window.authManager.isAuthenticated()) {
                     const avatarsResponse = await window.authManager.makeAuthenticatedRequest('/api/avatars');
-                    
+
                     if (avatarsResponse.ok) {
                         const avatarsData = await avatarsResponse.json();
                         if (avatarsData.success && avatarsData.avatars) {
@@ -1136,7 +1140,7 @@ class FlowStudio {
 
                 console.log(`✅ Loaded ${allFlows.length} flows from system`);
             }
-            
+
         } catch (error) {
             console.error('Error loading flows:', error);
             this.showNotification('Błąd podczas ładowania flows', 'error');
@@ -1148,47 +1152,47 @@ class FlowStudio {
             this.clearCanvas();
             return;
         }
-        
+
         try {
             this.showNotification('Ładowanie flow...', 'info');
-            
+
             // Get flow data from selector option
             const selector = document.getElementById('flowSelector');
             const selectedOption = selector.querySelector(`option[value="${flowId}"]`);
-            
+
             if (!selectedOption || !selectedOption.dataset.flowData) {
                 throw new Error('Flow data not found');
             }
-            
+
             const flowData = JSON.parse(selectedOption.dataset.flowData);
             console.log('Loading flow:', flowData);
-            
+
             // Convert flow steps to nodes
             const nodes = this.convertFlowToNodes(flowData);
             const edges = this.convertFlowToEdges(flowData);
-            
+
             // Load to canvas
             if (this.setNodes && this.setEdges) {
                 this.setNodes(nodes);
                 this.setEdges(edges);
-                
+
                 // Set as current flow
                 this.currentFlow = {
                     ...flowData,
                     nodes: nodes,
                     edges: edges
                 };
-                
+
                 // Fit view after loading
                 setTimeout(() => {
                     if (this.reactFlowInstance) {
-                        this.reactFlowInstance.fitView({ padding: 0.2 });
+                        this.reactFlowInstance.fitView({padding: 0.2});
                     }
                 }, 100);
-                
+
                 this.showNotification(`Flow "${flowData.name}" załadowany!`, 'success');
             }
-            
+
         } catch (error) {
             console.error('Error loading flow:', error);
             this.showNotification(`Błąd podczas ładowania flow: ${error.message}`, 'error');
@@ -1198,34 +1202,34 @@ class FlowStudio {
     convertFlowToNodes(flowData) {
         const nodes = [];
         const steps = flowData.steps || [];
-        
+
         // Create nodes for each step
         steps.forEach((step, index) => {
             const nodeType = this.getNodeTypeForStep(step);
-            
+
             // Find matching prompt template for this step's intent
             let promptTemplate = null;
             let inferredIntent = step.intent_name;
-            
+
             // If no intent_name, try to infer from step id/name and flow entry_intents
             if (!inferredIntent && this.promptTemplates) {
                 // Try to map step to intent based on step id patterns
                 inferredIntent = this.inferIntentFromStep(step, flowData);
             }
-            
+
             if (inferredIntent && this.promptTemplates) {
                 promptTemplate = this.promptTemplates.find(t => t.intent === inferredIntent);
                 if (promptTemplate) {
                     // console.log(`✅ Mapped step "${step.id}" to intent "${inferredIntent}"`);
                 }
             }
-            
+
             const node = {
                 id: step.id,
                 type: 'flowNode',
-                position: { 
-                    x: 100 + (index * 250), 
-                    y: 100 + Math.floor(index / 4) * 200 
+                position: {
+                    x: 100 + (index * 250),
+                    y: 100 + Math.floor(index / 4) * 200
                 },
                 data: {
                     type: nodeType,
@@ -1243,17 +1247,17 @@ class FlowStudio {
                     ...step
                 }
             };
-            
+
             nodes.push(node);
         });
-        
+
         return nodes;
     }
 
     convertFlowToEdges(flowData) {
         const edges = [];
         const steps = flowData.steps || [];
-        
+
         // Create edges based on next_steps
         steps.forEach(step => {
             if (step.next_steps && step.next_steps.length > 0) {
@@ -1267,14 +1271,14 @@ class FlowStudio {
                             target: nextStepId,
                             type: 'smoothstep',
                             animated: true,
-                            style: { stroke: '#39e575', strokeWidth: 2 }
+                            style: {stroke: '#39e575', strokeWidth: 2}
                         };
                         edges.push(edge);
                     }
                 });
             }
         });
-        
+
         return edges;
     }
 
@@ -1283,7 +1287,7 @@ class FlowStudio {
         const stepId = step.id.toLowerCase();
         const stepName = (step.name || '').toLowerCase();
         const flowEntryIntents = flowData.entry_intents || [];
-        
+
         // Direct mappings based on step ID patterns
         if (stepId.includes('greeting') || stepId.includes('initial_greeting')) {
             return 'greeting';
@@ -1306,7 +1310,7 @@ class FlowStudio {
         if (stepId.includes('expectation') || stepId.includes('expect')) {
             return 'user_expectations';
         }
-        
+
         // For training flows
         if (stepId.includes('theory') || stepName.includes('teoria')) {
             return 'theory_request';
@@ -1323,12 +1327,12 @@ class FlowStudio {
         if (stepId.includes('show_me') || stepName.includes('pokaż')) {
             return 'show_me_how';
         }
-        
+
         // If flow has entry_intents, use the first one as fallback
         if (flowEntryIntents.length > 0) {
             return flowEntryIntents[0];
         }
-        
+
         // Default fallback
         return 'user_questions';
     }
@@ -1350,7 +1354,7 @@ class FlowStudio {
         if (step.id.includes('ai') || step.id.includes('response')) {
             return 'ai_response';
         }
-        
+
         // Default to message node
         return 'message';
     }
@@ -1374,7 +1378,7 @@ class FlowStudio {
         try {
             // Convert nodes back to steps format
             const steps = this.convertNodesToSteps(this.nodes);
-            
+
             // Update flow data
             const updatedFlow = {
                 ...this.currentFlow,
@@ -1384,12 +1388,12 @@ class FlowStudio {
 
             // Save to system (for now just log - later we'll add API endpoint)
             console.log('Saving flow to system:', updatedFlow);
-            
+
             // Show save data for now
             this.showFlowSaveData(updatedFlow);
-            
+
             this.showNotification('Flow zapisany pomyślnie!', 'success');
-            
+
         } catch (error) {
             console.error('Error saving flow:', error);
             this.showNotification('Błąd podczas zapisywania flow', 'error');
@@ -1456,7 +1460,7 @@ class FlowStudio {
                 </div>
             </div>
         `;
-        
+
         document.body.appendChild(modal);
     }
 
@@ -1481,11 +1485,11 @@ class FlowStudio {
     filterNodes(searchTerm) {
         const nodeItems = document.querySelectorAll('.node-item');
         const term = searchTerm.toLowerCase();
-        
+
         nodeItems.forEach(item => {
             const name = item.querySelector('.node-name')?.textContent?.toLowerCase() || '';
             const description = item.querySelector('.node-description')?.textContent?.toLowerCase() || '';
-            
+
             if (name.includes(term) || description.includes(term)) {
                 item.style.display = 'block';
             } else {
@@ -1564,11 +1568,11 @@ class FlowStudio {
         // Switch tab buttons
         document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
         document.querySelector(`[onclick="flowStudio.switchTab('${tabName}')"]`).classList.add('active');
-        
+
         // Switch tab content
         document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
         document.getElementById(`${tabName}Tab`).classList.add('active');
-        
+
         if (tabName === 'intents') {
             this.loadIntentLibrary();
         } else if (tabName === 'test') {
@@ -1579,7 +1583,7 @@ class FlowStudio {
     async loadIntentLibrary() {
         try {
             console.log('🧠 Loading intent library...');
-            
+
             // Load initial data for selectors
             try {
                 const [promptsRes, intentsRes] = await Promise.all([
@@ -1597,7 +1601,7 @@ class FlowStudio {
                 this.promptTemplates = [];
                 this.intentTemplates = [];
             }
-            
+
             // Load intent definitions and prompt templates
             const [intentResponse, promptResponse] = await Promise.all([
                 window.authManager.makeAuthenticatedRequest('/api/intent-definitions'),
@@ -1612,8 +1616,8 @@ class FlowStudio {
 
             // Combine intents from both sources
             this.allIntents = [
-                ...this.intentDefinitions.map(intent => ({ ...intent, source: 'definition' })),
-                ...this.promptTemplates.map(template => ({ 
+                ...this.intentDefinitions.map(intent => ({...intent, source: 'definition'})),
+                ...this.promptTemplates.map(template => ({
                     name: template.intent,
                     description: template.name,
                     keywords: [],
@@ -1624,7 +1628,7 @@ class FlowStudio {
 
             this.renderIntentList();
             this.updateIntentCounts();
-            
+
             console.log(`✅ Loaded ${this.allIntents.length} intents`);
         } catch (error) {
             console.error('❌ Error loading intent library:', error);
@@ -1651,7 +1655,7 @@ class FlowStudio {
         }
 
         if (searchTerm) {
-            filteredIntents = filteredIntents.filter(intent => 
+            filteredIntents = filteredIntents.filter(intent =>
                 intent.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 intent.description?.toLowerCase().includes(searchTerm.toLowerCase())
             );
@@ -1699,7 +1703,7 @@ class FlowStudio {
         // Update active category
         document.querySelectorAll('.category-item').forEach(item => item.classList.remove('active'));
         document.querySelector(`[data-category="${category}"]`).classList.add('active');
-        
+
         // Re-render list
         this.renderIntentList(category);
     }
@@ -1713,7 +1717,7 @@ class FlowStudio {
         // Update selected intent
         document.querySelectorAll('.intent-item').forEach(item => item.classList.remove('selected'));
         document.querySelector(`[data-intent="${intentName}"]`)?.classList.add('selected');
-        
+
         // If node is selected, update its intent
         if (this.selectedNode && this.setNodes) {
             this.updateNodeProperty('intent_name', intentName);
@@ -1731,28 +1735,28 @@ class FlowStudio {
 
         console.log('🎯 Editing intent:', intent);
         this.currentEditingIntent = intent;
-        
+
         // Update modal title
         document.getElementById('intentModalTitle').textContent = `Edytuj Intent: ${intent.name}`;
-        
+
         // Fill basic info
         document.getElementById('intentName').value = intent.name || '';
         document.getElementById('intentDescription').value = intent.description || '';
         document.getElementById('intentPriority').value = intent.priority || 5;
         document.getElementById('intentRequiresFlow').checked = intent.requires_flow || false;
-        
+
         // Fill prompts (look in both intent definition AND prompt templates)
         let systemPrompt = intent.system_prompt || '';
         let userPrompt = intent.user_prompt_template || '';
         let variables = intent.variables || [];
-        
+
         // If intent has template, use template data
         if (intent.template) {
             systemPrompt = intent.template.system_prompt || systemPrompt;
             userPrompt = intent.template.user_prompt_template || userPrompt;
             variables = intent.template.variables || variables;
         }
-        
+
         // Also check prompt templates by intent name
         const promptTemplate = this.promptTemplates?.find(t => t.intent === intent.name);
         if (promptTemplate) {
@@ -1760,25 +1764,25 @@ class FlowStudio {
             userPrompt = promptTemplate.user_prompt_template || userPrompt;
             variables = promptTemplate.variables || variables;
         }
-        
+
         document.getElementById('intentSystemPrompt').value = systemPrompt;
         document.getElementById('intentUserPrompt').value = userPrompt;
         document.getElementById('intentVariables').value = Array.isArray(variables) ? variables.join(', ') : (variables || '');
-        
+
         // Fill keywords
         document.getElementById('intentKeywords').value = Array.isArray(intent.keywords) ? intent.keywords.join(', ') : (intent.keywords || '');
         document.getElementById('intentExamples').value = Array.isArray(intent.examples) ? intent.examples.join('\n') : (intent.examples || '');
-        
+
         // Show modal
         this.showIntentModal();
     }
 
     showCreateIntentModal() {
         this.currentEditingIntent = null;
-        
+
         // Update modal title
         document.getElementById('intentModalTitle').textContent = 'Nowy Intent';
-        
+
         // Clear all fields
         document.getElementById('intentName').value = '';
         document.getElementById('intentDescription').value = '';
@@ -1789,10 +1793,10 @@ class FlowStudio {
         document.getElementById('intentVariables').value = '';
         document.getElementById('intentKeywords').value = '';
         document.getElementById('intentExamples').value = '';
-        
+
         // Hide delete button for new intents
         document.getElementById('deleteIntentBtn').style.display = 'none';
-        
+
         this.showIntentModal();
     }
 
@@ -1800,13 +1804,13 @@ class FlowStudio {
         const modal = document.getElementById('intentModalOverlay');
         if (modal) {
             modal.style.display = 'flex';
-            
+
             // Show/hide delete button based on editing state
             const deleteBtn = document.getElementById('deleteIntentBtn');
             if (deleteBtn) {
                 deleteBtn.style.display = this.currentEditingIntent ? 'inline-flex' : 'none';
             }
-            
+
             // Setup tab switching
             this.setupIntentModalTabs();
         }
@@ -1824,11 +1828,11 @@ class FlowStudio {
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const tabName = btn.dataset.tab;
-                
+
                 // Update active tab button
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                
+
                 // Update active tab content
                 document.querySelectorAll('.intent-tab-content').forEach(content => content.classList.remove('active'));
                 document.getElementById(`${tabName}Tab`).classList.add('active');
@@ -1855,29 +1859,29 @@ class FlowStudio {
         }
 
         console.log('💾 Saving intent:', intentData);
-        
+
         // TODO: Implement actual save to backend
         if (this.currentEditingIntent) {
             this.showNotification(`Intent "${intentData.name}" został zaktualizowany`, 'success');
         } else {
             this.showNotification(`Intent "${intentData.name}" został utworzony`, 'success');
         }
-        
+
         this.hideIntentModal();
         this.loadIntentLibrary(); // Refresh the list
     }
 
     deleteIntent() {
         if (!this.currentEditingIntent) return;
-        
+
         const intentName = this.currentEditingIntent.name;
-        
+
         if (confirm(`Czy na pewno chcesz usunąć intent "${intentName}"?`)) {
             console.log('🗑️ Deleting intent:', intentName);
-            
+
             // TODO: Implement actual delete from backend
             this.showNotification(`Intent "${intentName}" został usunięty`, 'warning');
-            
+
             this.hideIntentModal();
             this.loadIntentLibrary(); // Refresh the list
         }
@@ -1890,12 +1894,12 @@ class FlowStudio {
         const textarea = document.getElementById('intentSystemPrompt');
         const intentName = document.getElementById('intentName').value || 'unknown';
         const description = document.getElementById('intentDescription').value || '';
-        
+
         if (!textarea) return;
-        
+
         button.classList.add('loading');
         button.innerHTML = '<i class="fas fa-spinner"></i>';
-        
+
         try {
             const prompt = `Wygeneruj system prompt dla AI avatara na podstawie:
 - Intent: ${intentName}
@@ -1923,12 +1927,12 @@ Zwróć tylko treść promptu, bez dodatkowych komentarzy.`;
         const textarea = document.getElementById('intentUserPrompt');
         const intentName = document.getElementById('intentName').value || 'unknown';
         const description = document.getElementById('intentDescription').value || '';
-        
+
         if (!textarea) return;
-        
+
         button.classList.add('loading');
         button.innerHTML = '<i class="fas fa-spinner"></i>';
-        
+
         try {
             const prompt = `Wygeneruj user prompt template dla intenta:
 - Intent: ${intentName}
@@ -1957,12 +1961,12 @@ Zwróć tylko treść template, bez dodatkowych komentarzy.`;
         const input = document.getElementById('intentVariables');
         const intentName = document.getElementById('intentName').value || 'unknown';
         const description = document.getElementById('intentDescription').value || '';
-        
+
         if (!input) return;
-        
+
         button.classList.add('loading');
         button.innerHTML = '<i class="fas fa-spinner"></i>';
-        
+
         try {
             const prompt = `Wygeneruj listę zmiennych dla intenta:
 - Intent: ${intentName}
@@ -1991,12 +1995,12 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
         const textarea = document.getElementById('intentKeywords');
         const intentName = document.getElementById('intentName').value || 'unknown';
         const description = document.getElementById('intentDescription').value || '';
-        
+
         if (!textarea) return;
-        
+
         button.classList.add('loading');
         button.innerHTML = '<i class="fas fa-spinner"></i>';
-        
+
         try {
             const prompt = `Wygeneruj słowa kluczowe i frazy dla intenta:
 - Intent: ${intentName}
@@ -2024,12 +2028,12 @@ Zwróć tylko słowa oddzielone przecinkami, bez dodatkowych komentarzy.`;
         const textarea = document.getElementById('intentExamples');
         const intentName = document.getElementById('intentName').value || 'unknown';
         const description = document.getElementById('intentDescription').value || '';
-        
+
         if (!textarea) return;
-        
+
         button.classList.add('loading');
         button.innerHTML = '<i class="fas fa-spinner"></i>';
-        
+
         try {
             const prompt = `Wygeneruj przykładowe wypowiedzi użytkownika dla intenta:
 - Intent: ${intentName}
@@ -2074,20 +2078,20 @@ Zwróć każdy przykład w osobnej linii, bez numeracji.`;
 
     switchFlowType(type) {
         console.log(`🔄 Switching flow type to: ${type}`);
-        
+
         this.currentFlowType = type;
-        
+
         // Update UI
         document.querySelectorAll('.flow-type-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelector(`[data-type="${type}"]`).classList.add('active');
-        
+
         // Update main container class for styling
         const container = document.querySelector('.flow-studio');
         if (container) {
             container.classList.remove('basic-mode', 'advanced-mode');
             container.classList.add(`${type}-mode`);
         }
-        
+
         // Update header description
         const description = document.querySelector('.header-title p');
         if (description) {
@@ -2097,10 +2101,10 @@ Zwróć każdy przykład w osobnej linii, bez numeracji.`;
                 description.textContent = 'Buduj zaawansowanych AI agentów z narzędziami i logiką';
             }
         }
-        
+
         // Reload node palette with appropriate nodes
         this.loadNodePalette();
-        
+
         // Show notification
         const typeName = type === 'basic' ? 'Basic Flow' : 'Advanced Agent';
         this.showNotification(`Przełączono na tryb: ${typeName}`, 'info');
@@ -2111,17 +2115,17 @@ Zwróć każdy przykład w osobnej linii, bez numeracji.`;
     async generateNodeSystemPrompt() {
         const button = event.target.closest('.btn-ai-generate');
         const textarea = document.getElementById('nodeSystemPrompt');
-        
+
         if (!textarea || !this.selectedNode) return;
-        
+
         const node = this.selectedNode;
         const nodeType = node.data.type || 'unknown';
         const intentName = node.data.intent_name || 'unknown';
         const description = node.data.description || '';
-        
+
         button.classList.add('loading');
         button.innerHTML = '<i class="fas fa-spinner"></i>';
-        
+
         try {
             const prompt = `Wygeneruj system prompt dla węzła w flow:
 - Typ węzła: ${nodeType}
@@ -2150,17 +2154,17 @@ Zwróć tylko treść promptu, bez dodatkowych komentarzy.`;
     async generateNodeUserPrompt() {
         const button = event.target.closest('.btn-ai-generate');
         const textarea = document.getElementById('nodeUserPrompt');
-        
+
         if (!textarea || !this.selectedNode) return;
-        
+
         const node = this.selectedNode;
         const nodeType = node.data.type || 'unknown';
         const intentName = node.data.intent_name || 'unknown';
         const description = node.data.description || '';
-        
+
         button.classList.add('loading');
         button.innerHTML = '<i class="fas fa-spinner"></i>';
-        
+
         try {
             const prompt = `Wygeneruj user prompt template dla węzła w flow:
 - Typ węzła: ${nodeType}
@@ -2189,17 +2193,17 @@ Zwróć tylko treść template, bez dodatkowych komentarzy.`;
     async generateNodeVariables() {
         const button = event.target.closest('.btn-ai-generate');
         const input = document.getElementById('nodeVariables');
-        
+
         if (!input || !this.selectedNode) return;
-        
+
         const node = this.selectedNode;
         const nodeType = node.data.type || 'unknown';
         const intentName = node.data.intent_name || 'unknown';
         const description = node.data.description || '';
-        
+
         button.classList.add('loading');
         button.innerHTML = '<i class="fas fa-spinner"></i>';
-        
+
         try {
             const prompt = `Wygeneruj listę zmiennych dla węzła w flow:
 - Typ węzła: ${nodeType}
@@ -2230,7 +2234,7 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
 
     initializeTestInterface() {
         console.log('🧪 Initializing Test Interface...');
-        
+
         // Initialize test session
         this.testSession = {
             isActive: false,
@@ -2240,10 +2244,10 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
             intentResults: [],
             currentStep: null
         };
-        
+
         // Bind test interface events
         this.bindTestEvents();
-        
+
         // Small delay to ensure ReactFlow is loaded
         setTimeout(() => {
             console.log('🔄 Checking ReactFlow instance:', this.reactFlowInstance);
@@ -2251,20 +2255,20 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
             this.validateFlowForTesting();
         }, 500);
     }
-    
+
     bindTestEvents() {
         // Start Test button
         const startTestBtn = document.getElementById('startTestBtn');
         if (startTestBtn) {
             startTestBtn.addEventListener('click', () => this.startFlowTest());
         }
-        
+
         // Send Test Message button
         const sendTestBtn = document.getElementById('sendTestMessageBtn');
         if (sendTestBtn) {
             sendTestBtn.addEventListener('click', () => this.sendTestMessage());
         }
-        
+
         // Test Message Input (Enter key)
         const testInput = document.getElementById('testMessageInput');
         if (testInput) {
@@ -2274,46 +2278,46 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
                 }
             });
         }
-        
+
         // Clear Test button
         const clearTestBtn = document.getElementById('clearTestBtn');
         if (clearTestBtn) {
             clearTestBtn.addEventListener('click', () => this.clearTestSession());
         }
-        
+
         // Export Test button
         const exportTestBtn = document.getElementById('exportTestBtn');
         if (exportTestBtn) {
             exportTestBtn.addEventListener('click', () => this.exportTestResults());
         }
     }
-    
+
     validateFlowForTesting() {
         const nodes = this.reactFlowInstance?.getNodes() || [];
-        
+
         console.log('🔍 Validating flow for testing. Nodes found:', nodes.length, nodes);
-        
+
         if (nodes.length === 0) {
             console.warn('⚠️ No nodes found in flow for testing');
             this.showTestError('Brak węzłów w flow. Dodaj węzły aby móc testować.');
             return false;
         }
-        
+
         console.log('✅ Flow validation passed');
         this.updateTestStatus('Gotowy do testu', 'ready');
         return true;
     }
-    
+
     startFlowTest() {
         console.log('🚀 Starting flow test...');
-        
+
         if (!this.validateFlowForTesting()) {
             console.error('❌ Flow validation failed - cannot start test');
             return;
         }
-        
+
         console.log('✅ Flow validation passed - starting test session');
-        
+
         // Initialize test session
         this.testSession = {
             isActive: true,
@@ -2323,77 +2327,77 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
             intentResults: [],
             currentStep: null
         };
-        
+
         // Update UI
         this.updateTestStatus('Test aktywny', 'testing');
-        
+
         const testInput = document.getElementById('testMessageInput');
         const sendBtn = document.getElementById('sendTestMessageBtn');
         const startBtn = document.getElementById('startTestBtn');
         const exportBtn = document.getElementById('exportTestBtn');
-        
+
         if (testInput) {
             testInput.disabled = false;
             console.log('✅ Test input enabled');
         } else {
             console.error('❌ Test input not found');
         }
-        
+
         if (sendBtn) {
             sendBtn.disabled = false;
             console.log('✅ Send button enabled');
         } else {
             console.error('❌ Send button not found');
         }
-        
+
         if (startBtn) {
             startBtn.disabled = true;
             console.log('✅ Start button disabled');
         }
-        
+
         if (exportBtn) {
             exportBtn.disabled = false;
             console.log('✅ Export button enabled');
         }
-        
+
         // Clear previous test data
         this.clearTestDisplays();
-        
+
         // Start with greeting
         this.addTestMessage('bot', 'Test flow rozpoczęty! Napisz wiadomość aby przetestować reakcje avatara.');
-        
+
         console.log('🚀 Flow test started successfully');
     }
-    
+
     sendTestMessage() {
         const input = document.getElementById('testMessageInput');
         const message = input.value.trim();
-        
+
         if (!message || !this.testSession.isActive) {
             return;
         }
-        
+
         // Add user message to chat
         this.addTestMessage('user', message);
-        
+
         // Clear input
         input.value = '';
-        
+
         // Process message and simulate response
         this.processTestMessage(message);
     }
-    
+
     async processTestMessage(message) {
         console.log('🔍 Processing test message:', message);
-        
+
         try {
             // Use REAL intent detection from production system
             const detectedIntent = await this.classifyIntentWithAPI(message);
-            
+
             // Find matching node
             const nodes = this.reactFlowInstance?.getNodes() || [];
             const matchingNode = this.findMatchingNode(nodes, message, detectedIntent);
-            
+
             if (matchingNode) {
                 setTimeout(() => {
                     this.executeNode(matchingNode, message);
@@ -2410,48 +2414,48 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
             }, 500);
         }
     }
-    
+
     findMatchingNode(nodes, message, detectedIntent) {
         console.log('🔍 Finding matching node for intent:', detectedIntent);
         console.log('🔍 Available nodes:', nodes.map(n => ({
-            id: n.id, 
-            type: n.type, 
+            id: n.id,
+            type: n.type,
             intent_name: n.data?.intent_name,
             label: n.data?.label
         })));
-        
+
         // Try to find node by intent
         let matchingNode = nodes.find(node => {
             const nodeData = node.data || {};
             return nodeData.intent_name === detectedIntent;
         });
-        
+
         console.log('🔍 Intent match result:', matchingNode?.id || 'none');
-        
+
         // If no intent match, try first available message node
         if (!matchingNode) {
             matchingNode = nodes.find(node => node.type === 'message');
             console.log('🔍 Message node fallback:', matchingNode?.id || 'none');
         }
-        
+
         // If still no match, try first node with system_prompt (conversational node)
         if (!matchingNode) {
             matchingNode = nodes.find(node => node.data?.system_prompt);
             console.log('🔍 System prompt fallback:', matchingNode?.id || 'none');
         }
-        
+
         // Last resort - first node
         if (!matchingNode && nodes.length > 0) {
             matchingNode = nodes[0];
             console.log('🔍 First node fallback:', matchingNode?.id || 'none');
         }
-        
+
         return matchingNode;
     }
-    
+
     executeNode(node, userMessage) {
         console.log(`🎯 Executing node: ${node.id}`, node);
-        
+
         // Add execution step
         const step = {
             id: `step-${Date.now()}`,
@@ -2462,24 +2466,24 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
             timestamp: new Date(),
             status: 'completed'
         };
-        
+
         this.testSession.executionSteps.push(step);
         this.testSession.currentStep = step;
-        
+
         // Update execution tracker UI
         this.updateExecutionTracker();
-        
+
         // Simulate node response
         this.simulateNodeResponse(node);
-        
+
         // Update test statistics
         this.updateTestStatistics();
     }
-    
+
     simulateNodeResponse(node) {
         const nodeData = node.data || {};
         let response = '';
-        
+
         // Generate response based on node content
         if (nodeData.system_prompt) {
             response = `${nodeData.system_prompt}`;
@@ -2488,7 +2492,7 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
         } else {
             response = `Przykładowa odpowiedź z węzła: ${nodeData.label || node.id}`;
         }
-        
+
         // Add bot message to chat
         this.addTestMessage('bot', response, {
             nodeId: node.id,
@@ -2496,17 +2500,17 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
             executedAt: new Date()
         });
     }
-    
+
     async classifyIntentWithAPI(input) {
         console.log('🧪 Using REAL intent classifier for:', input);
-        
+
         try {
             // Get current avatar info from the loaded flow
             const avatarType = this.currentFlow?.avatar_type || 'networker';
             const avatarId = this.currentFlow?.avatar_id || null;
-            
-            console.log('🎯 Avatar context:', { avatarType, avatarId });
-            
+
+            console.log('🎯 Avatar context:', {avatarType, avatarId});
+
             // Call the real intent classification API
             const response = await fetch('/api/classify-intent', {
                 method: 'POST',
@@ -2519,14 +2523,14 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
                     avatar_id: avatarId
                 })
             });
-            
+
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
-            
+
             const result = await response.json();
             console.log('✅ Real intent classification result:', result);
-            
+
             // Add intent result to test session
             const intentResult = {
                 intent: result.intent,
@@ -2538,15 +2542,15 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
                 timestamp: new Date(),
                 source: 'production_api'
             };
-            
+
             this.testSession.intentResults.push(intentResult);
             this.updateIntentMonitor();
-            
+
             return result.intent;
-            
+
         } catch (error) {
             console.error('❌ Error calling real intent classifier:', error);
-            
+
             // Fallback to simulation if API fails
             console.log('⚠️ Falling back to simulation...');
             return this.simulateIntentDetection(input);
@@ -2556,7 +2560,7 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
     simulateIntentDetection(input) {
         let detectedIntent = 'unknown';
         let confidence = Math.random() * 0.4 + 0.6; // 0.6-1.0
-        
+
         // Enhanced intent detection simulation (fallback only)
         const intentKeywords = {
             greeting: ['cześć', 'witaj', 'hej', 'hello', 'dzień dobry'],
@@ -2571,9 +2575,9 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
             contact: ['kontakt', 'contact', 'telefon', 'email', 'adres', 'spotkanie'],
             business_model: ['model', 'działanie', 'business', 'jak działacie', 'sposób pracy']
         };
-        
+
         const lowerInput = input.toLowerCase();
-        
+
         for (const [intent, keywords] of Object.entries(intentKeywords)) {
             if (keywords.some(keyword => lowerInput.includes(keyword))) {
                 detectedIntent = intent;
@@ -2581,7 +2585,7 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
                 break;
             }
         }
-        
+
         // Add intent result
         const intentResult = {
             intent: detectedIntent,
@@ -2590,13 +2594,13 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
             timestamp: new Date(),
             source: 'simulation_fallback'
         };
-        
+
         this.testSession.intentResults.push(intentResult);
         this.updateIntentMonitor();
-        
+
         return detectedIntent;
     }
-    
+
     addTestMessage(sender, text, metadata = {}) {
         const message = {
             id: `msg-${Date.now()}`,
@@ -2605,20 +2609,20 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
             timestamp: new Date(),
             metadata: metadata
         };
-        
+
         this.testSession.messages.push(message);
         this.updateChatDisplay();
     }
-    
+
     updateChatDisplay() {
         const chatContainer = document.getElementById('testChatMessages');
         if (!chatContainer) return;
-        
+
         // Clear system message if this is first real message
         if (this.testSession.messages.length === 1) {
             chatContainer.innerHTML = '';
         }
-        
+
         // Add new messages
         this.testSession.messages.forEach(message => {
             if (!chatContainer.querySelector(`[data-message-id="${message.id}"]`)) {
@@ -2626,16 +2630,16 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
                 chatContainer.appendChild(messageElement);
             }
         });
-        
+
         // Scroll to bottom
         chatContainer.scrollTop = chatContainer.scrollHeight;
     }
-    
+
     createMessageElement(message) {
         const div = document.createElement('div');
         div.className = `test-message ${message.sender}`;
         div.setAttribute('data-message-id', message.id);
-        
+
         div.innerHTML = `
             <p class="message-text">${message.text}</p>
             <div class="message-meta">
@@ -2643,14 +2647,14 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
                 ${message.metadata?.nodeId ? `• Node: ${message.metadata.nodeId}` : ''}
             </div>
         `;
-        
+
         return div;
     }
-    
+
     updateExecutionTracker() {
         const stepsContainer = document.getElementById('executionSteps');
         if (!stepsContainer) return;
-        
+
         if (this.testSession.executionSteps.length === 0) {
             stepsContainer.innerHTML = `
                 <div class="no-execution">
@@ -2660,13 +2664,13 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
             `;
             return;
         }
-        
+
         stepsContainer.innerHTML = '';
-        
+
         this.testSession.executionSteps.forEach((step, index) => {
             const stepElement = document.createElement('div');
             stepElement.className = 'execution-step';
-            
+
             stepElement.innerHTML = `
                 <div class="step-icon completed">
                     ${index + 1}
@@ -2678,17 +2682,17 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
                     </p>
                 </div>
             `;
-            
+
             stepsContainer.appendChild(stepElement);
         });
-        
+
         stepsContainer.scrollTop = stepsContainer.scrollHeight;
     }
-    
+
     updateIntentMonitor() {
         const intentContainer = document.getElementById('intentResults');
         if (!intentContainer) return;
-        
+
         if (this.testSession.intentResults.length === 0) {
             intentContainer.innerHTML = `
                 <div class="no-intent-data">
@@ -2698,23 +2702,23 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
             `;
             return;
         }
-        
+
         intentContainer.innerHTML = '';
-        
+
         // Show last 3 intent results
         const recentIntents = this.testSession.intentResults.slice(-3);
-        
+
         recentIntents.forEach(result => {
             const resultElement = document.createElement('div');
             resultElement.className = 'intent-result';
-            
-            const confidenceClass = result.confidence > 0.8 ? 'high' : 
-                                  result.confidence > 0.6 ? 'medium' : 'low';
-            
-            const sourceIcon = result.source === 'production_api' ? 
-                '<i class="fas fa-robot" title="Production API" style="color: #00ff88;"></i>' : 
+
+            const confidenceClass = result.confidence > 0.8 ? 'high' :
+                result.confidence > 0.6 ? 'medium' : 'low';
+
+            const sourceIcon = result.source === 'production_api' ?
+                '<i class="fas fa-robot" title="Production API" style="color: #00ff88;"></i>' :
                 '<i class="fas fa-code" title="Simulation Fallback" style="color: #ffa500;"></i>';
-            
+
             resultElement.innerHTML = `
                 <div class="intent-name">
                     ${sourceIcon} ${result.intent}
@@ -2724,21 +2728,21 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
                     ${Math.round(result.confidence * 100)}%
                 </div>
             `;
-            
+
             intentContainer.appendChild(resultElement);
         });
     }
-    
+
     updateTestStatistics() {
         document.getElementById('stepsCount').textContent = this.testSession.executionSteps.length;
         document.getElementById('intentsCount').textContent = this.testSession.intentResults.length;
-        
+
         if (this.testSession.startTime) {
             const duration = Math.round((new Date() - this.testSession.startTime) / 1000);
             document.getElementById('testDuration').textContent = `${duration}s`;
         }
     }
-    
+
     clearTestSession() {
         if (confirm('Czy na pewno chcesz wyczyścić sesję testową?')) {
             this.testSession = {
@@ -2749,20 +2753,20 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
                 intentResults: [],
                 currentStep: null
             };
-            
+
             this.clearTestDisplays();
             this.updateTestStatus('Gotowy do testu', 'ready');
-            
+
             // Reset UI
             document.getElementById('testMessageInput').disabled = true;
             document.getElementById('sendTestMessageBtn').disabled = true;
             document.getElementById('startTestBtn').disabled = false;
             document.getElementById('exportTestBtn').disabled = true;
-            
+
             console.log('🧹 Test session cleared');
         }
     }
-    
+
     clearTestDisplays() {
         // Clear chat
         const chatContainer = document.getElementById('testChatMessages');
@@ -2774,25 +2778,25 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
                 </div>
             `;
         }
-        
+
         // Clear execution tracker
         this.updateExecutionTracker();
-        
+
         // Clear intent monitor
         this.updateIntentMonitor();
-        
+
         // Reset statistics
         document.getElementById('stepsCount').textContent = '0';
         document.getElementById('intentsCount').textContent = '0';
         document.getElementById('testDuration').textContent = '0s';
     }
-    
+
     exportTestResults() {
         if (!this.testSession.isActive && this.testSession.messages.length === 0) {
             alert('Brak danych testowych do eksportu.');
             return;
         }
-        
+
         const testData = {
             flowName: this.currentFlow?.name || 'Unnamed Flow',
             testSession: this.testSession,
@@ -2801,16 +2805,16 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
                 totalMessages: this.testSession.messages.length,
                 executionSteps: this.testSession.executionSteps.length,
                 intentResults: this.testSession.intentResults.length,
-                duration: this.testSession.startTime ? 
+                duration: this.testSession.startTime ?
                     Math.round((new Date() - this.testSession.startTime) / 1000) : 0
             }
         };
-        
+
         // Create and download JSON file
         const blob = new Blob([JSON.stringify(testData, null, 2)], {
             type: 'application/json'
         });
-        
+
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -2819,10 +2823,10 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        
+
         console.log('📤 Test results exported');
     }
-    
+
     updateTestStatus(message, status = 'ready') {
         const statusElement = document.getElementById('testStatus');
         if (statusElement) {
@@ -2830,7 +2834,7 @@ Zwróć tylko nazwy zmiennych oddzielone przecinkami, bez dodatkowych komentarzy
             statusElement.className = `status-indicator ${status}`;
         }
     }
-    
+
     showTestError(message) {
         this.updateTestStatus(message, 'error');
         console.error('❌ Test Error:', message);
@@ -2843,7 +2847,7 @@ let flowStudio;
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     flowStudio = new FlowStudio();
-    
+
     // Add CSS animations
     const style = document.createElement('style');
     style.textContent = `

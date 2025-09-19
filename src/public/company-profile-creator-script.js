@@ -10,19 +10,19 @@ class CompanyProfileCreator {
             doNotUse: []
         };
         this.teamRoles = [];
-        
+
         this.init();
     }
 
     async init() {
         console.log('🏢 Company Profile Creator initialized');
-        
+
         // Setup event listeners
         this.setupEventListeners();
-        
+
         // Load existing profiles
         await this.loadExistingProfiles();
-        
+
         // Add default team role
         this.addTeamRole();
     }
@@ -57,7 +57,7 @@ class CompanyProfileCreator {
     addTagFromInput(tagType) {
         const input = document.getElementById(`${tagType}Input`);
         const value = input.value.trim();
-        
+
         if (value && !this.tags[tagType].includes(value)) {
             this.tags[tagType].push(value);
             input.value = '';
@@ -76,10 +76,10 @@ class CompanyProfileCreator {
 
         const tags = this.tags[tagType];
         const addButton = display.querySelector('.add-tag-btn');
-        
+
         // Clear existing tags but keep add button
         display.innerHTML = '';
-        
+
         // Add tag items
         tags.forEach((tag, index) => {
             const tagElement = document.createElement('div');
@@ -90,7 +90,7 @@ class CompanyProfileCreator {
             `;
             display.appendChild(tagElement);
         });
-        
+
         // Re-add the add button
         display.appendChild(addButton);
     }
@@ -103,10 +103,10 @@ class CompanyProfileCreator {
             description: '',
             responsibilities: []
         };
-        
+
         this.teamRoles.push(role);
         this.updateTeamRolesDisplay();
-        
+
         // Focus on the new role input
         setTimeout(() => {
             const newInput = document.querySelector(`#${roleId}_title`);
@@ -124,7 +124,7 @@ class CompanyProfileCreator {
         if (!container) return;
 
         container.innerHTML = '';
-        
+
         this.teamRoles.forEach((role, index) => {
             const roleElement = document.createElement('div');
             roleElement.className = 'role-item';
@@ -156,16 +156,16 @@ class CompanyProfileCreator {
 
     async generateWithAI(field) {
         console.log(`🤖 Generating ${field} with AI...`);
-        
+
         const button = event.target;
         const originalText = button.innerHTML;
         button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generowanie...';
         button.disabled = true;
-        
+
         try {
             // Get context from current form data
             const context = this.getFormData();
-            
+
             const response = await fetch('/api/flow-wizard/generate-avatar-field', {
                 method: 'POST',
                 headers: {
@@ -187,7 +187,7 @@ class CompanyProfileCreator {
             }
 
             const result = await response.json();
-            
+
             if (result.success && result.generated_content) {
                 // Fill the appropriate field
                 const fieldElement = document.getElementById(this.getFieldElementId(field));
@@ -200,7 +200,7 @@ class CompanyProfileCreator {
             } else {
                 throw new Error(result.error || 'Nie udało się wygenerować treści');
             }
-            
+
         } catch (error) {
             console.error(`❌ Error generating ${field}:`, error);
             this.showNotification(`❌ Błąd generowania: ${error.message}`, 'error');
@@ -241,29 +241,29 @@ class CompanyProfileCreator {
 
     async saveProfile() {
         console.log('💾 Saving company profile...');
-        
+
         const formData = this.getFormData();
-        
+
         // Validation
         if (!formData.name.trim()) {
             this.showNotification('❌ Nazwa firmy jest wymagana', 'error');
             return;
         }
-        
+
         if (!formData.industry) {
             this.showNotification('❌ Branża jest wymagana', 'error');
             return;
         }
-        
+
         const saveButton = document.querySelector('.btn-primary');
         const originalText = saveButton.innerHTML;
         saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Zapisywanie...';
         saveButton.disabled = true;
-        
+
         try {
             // Generate unique ID for the profile
             const profileId = this.currentProfile?.id || `company_${Date.now()}`;
-            
+
             const profileData = {
                 ...formData,
                 id: profileId,
@@ -272,9 +272,9 @@ class CompanyProfileCreator {
                 updated_at: new Date().toISOString(),
                 is_template: false
             };
-            
+
             console.log('📤 Sending profile data:', profileData);
-            
+
             // For now, use the extended database service endpoint
             // TODO: Create proper company profile endpoint
             const response = await fetch('/api/company-profiles', {
@@ -284,24 +284,24 @@ class CompanyProfileCreator {
                 },
                 body: JSON.stringify(profileData)
             });
-            
+
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
-            
+
             const result = await response.json();
             console.log('✅ Profile saved:', result);
-            
+
             this.showNotification('✅ Profil firmy został zapisany!', 'success');
-            
+
             // Refresh the profiles list
             await this.loadExistingProfiles();
-            
+
             // Clear form if it was a new profile
             if (!this.currentProfile) {
                 this.clearForm();
             }
-            
+
         } catch (error) {
             console.error('❌ Error saving profile:', error);
             this.showNotification(`❌ Błąd zapisywania: ${error.message}`, 'error');
@@ -313,19 +313,19 @@ class CompanyProfileCreator {
 
     async loadExistingProfiles() {
         console.log('📂 Loading existing profiles...');
-        
+
         try {
             const response = await fetch('/api/company-profiles');
-            
+
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
-            
+
             const result = await response.json();
             console.log('📥 Loaded profiles:', result);
-            
+
             this.displayProfiles(result.data || {});
-            
+
         } catch (error) {
             console.error('❌ Error loading profiles:', error);
             document.getElementById('existingProfiles').innerHTML = `
@@ -338,7 +338,7 @@ class CompanyProfileCreator {
 
     displayProfiles(profiles) {
         const container = document.getElementById('existingProfiles');
-        
+
         if (Object.keys(profiles).length === 0) {
             container.innerHTML = `
                 <p style="text-align: center; color: #a0aec0;">
@@ -347,9 +347,9 @@ class CompanyProfileCreator {
             `;
             return;
         }
-        
+
         container.innerHTML = '';
-        
+
         Object.entries(profiles).forEach(([profileId, profile]) => {
             const profileCard = document.createElement('div');
             profileCard.className = 'profile-card';
@@ -395,7 +395,7 @@ class CompanyProfileCreator {
     previewProfile() {
         const formData = this.getFormData();
         console.log('👁️ Profile preview:', formData);
-        
+
         // Create preview modal/popup
         const preview = JSON.stringify(formData, null, 2);
         alert(`Profile Preview:\n\n${preview}`);
@@ -409,18 +409,18 @@ class CompanyProfileCreator {
     clearForm() {
         // Clear all form fields
         document.getElementById('companyProfileForm').reset();
-        
+
         // Clear tags
         Object.keys(this.tags).forEach(tagType => {
             this.tags[tagType] = [];
             this.updateTagsDisplay(tagType);
         });
-        
+
         // Clear team roles
         this.teamRoles = [];
         this.updateTeamRolesDisplay();
         this.addTeamRole(); // Add one default role
-        
+
         this.currentProfile = null;
     }
 
@@ -428,9 +428,9 @@ class CompanyProfileCreator {
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
         notification.textContent = message;
-        
+
         document.body.appendChild(notification);
-        
+
         setTimeout(() => {
             notification.remove();
         }, 4000);

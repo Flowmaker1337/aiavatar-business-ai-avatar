@@ -34,14 +34,14 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #0d1117;
             color: #c9d1d9;
             line-height: 1.6;
         }
-        
+
         .header {
             background: #161b22;
             border-bottom: 1px solid #30363d;
@@ -49,7 +49,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
         .header h1 {
@@ -126,7 +126,7 @@
         .avatar-dropdown:focus {
             outline: none;
             border-color: #58a6ff;
-            box-shadow: 0 0 0 2px rgba(88,166,255,0.2);
+            box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
         }
 
         .avatar-dropdown option {
@@ -230,11 +230,11 @@
             padding: 12px;
             position: relative; /* For absolute positioned sidebar */
         }
-        
+
         .main-content.debug-hidden {
             grid-template-rows: 1fr; /* Full height when debug hidden */
         }
-        
+
         .debug-panel.collapsed {
             height: 0;
             overflow: hidden;
@@ -264,7 +264,7 @@
         .flows-right-sidebar.visible {
             transform: translateX(0); /* Slide in when visible */
         }
-        
+
         .panel {
             background: #161b22;
             border: 1px solid #30363d;
@@ -274,7 +274,7 @@
             display: flex;
             flex-direction: column;
         }
-        
+
         .panel-header {
             display: flex;
             justify-content: space-between;
@@ -283,45 +283,45 @@
             padding-bottom: 8px;
             border-bottom: 1px solid #30363d;
         }
-        
+
         .panel-title {
             font-size: 16px;
             font-weight: 600;
             color: #f0f6fc;
         }
-        
+
         .status-badge {
             padding: 4px 8px;
             border-radius: 4px;
             font-size: 12px;
             font-weight: 500;
         }
-        
+
         .status-online {
             background: #238636;
             color: #fff;
         }
-        
+
         .status-offline {
             background: #da3633;
             color: #fff;
         }
-        
+
         .chat-panel {
             grid-column: 1 / 2;
             grid-row: 1 / 2;
         }
-        
+
         .flow-panel {
             grid-column: 2 / 3;
             grid-row: 1 / 2;
         }
-        
+
         .debug-panel {
             grid-column: 1 / -1;
             grid-row: 2 / 3;
         }
-        
+
         .chat-messages {
             flex: 1;
             overflow-y: auto;
@@ -331,36 +331,36 @@
             border-radius: 6px;
             border: 1px solid #30363d;
         }
-        
+
         .message {
             margin-bottom: 12px;
             padding: 8px 12px;
             border-radius: 6px;
             max-width: 90%;
         }
-        
+
         .message-user {
             background: #1f6feb;
             color: #fff;
             margin-left: auto;
         }
-        
+
         .message-avatar {
             background: #262c36;
             color: #c9d1d9;
         }
-        
+
         .message-time {
             font-size: 11px;
             opacity: 0.7;
             margin-bottom: 4px;
         }
-        
+
         .chat-input {
             display: flex;
             gap: 8px;
         }
-        
+
         .chat-input input {
             flex: 1;
             padding: 12px;
@@ -370,12 +370,12 @@
             color: #c9d1d9;
             font-size: 14px;
         }
-        
+
         .chat-input input:focus {
             outline: none;
             border-color: #1f6feb;
         }
-        
+
         .btn {
             padding: 12px 16px;
             border: none;
@@ -385,25 +385,25 @@
             font-weight: 500;
             transition: all 0.2s;
         }
-        
+
         .btn-primary {
             background: #238636;
             color: #fff;
         }
-        
+
         .btn-primary:hover {
             background: #2ea043;
         }
-        
+
         .btn-secondary {
             background: #30363d;
             color: #c9d1d9;
         }
-        
+
         .btn-secondary:hover {
             background: #484f58;
         }
-        
+
         .flow-graph {
             flex: 1;
             overflow: auto;
@@ -414,56 +414,56 @@
             width: 100%;
             padding: 10px;
         }
-        
+
         .flow-graph svg {
             background: #0d1117;
             border-radius: 6px;
             width: 100%;
             min-width: 800px;
         }
-        
+
         /* Flow Graph Node Styles */
         .flow-graph .node rect {
             rx: 8px;
             ry: 8px;
             stroke-width: 2px;
         }
-        
+
         .flow-graph .type-normal rect {
             fill: #21262d;
             stroke: #30363d;
         }
-        
+
         .flow-graph .type-active rect {
             fill: #1f6feb;
             stroke: #58a6ff;
             stroke-width: 3px;
         }
-        
+
         .flow-graph .type-completed rect {
             fill: #238636;
             stroke: #56d364;
         }
-        
+
         /* Flow Overview Styles */
         .flow-graph .type-flow-normal rect {
             fill: #21262d;
             stroke: #30363d;
             stroke-width: 2px;
         }
-        
+
         .flow-graph .type-flow-active rect {
             fill: #1f6feb;
             stroke: #58a6ff;
             stroke-width: 3px;
         }
-        
+
         .flow-graph .type-flow-completed rect {
             fill: #238636;
             stroke: #56d364;
             stroke-width: 2px;
         }
-        
+
         .flow-graph .node text {
             fill: #f0f6fc;
             font-size: 11px;
@@ -478,7 +478,7 @@
 
         .flow-node:hover {
             transform: scale(1.05);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.3) !important;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3) !important;
         }
 
         .flow-node.selected {
@@ -588,7 +588,7 @@
             opacity: 1 !important;
             display: block !important;
             visibility: visible !important;
-            pointer-events: none !important;  /* Don't block clicks */
+            pointer-events: none !important; /* Don't block clicks */
         }
 
         /* Fix black overlay issues */
@@ -612,37 +612,37 @@
         .react-flow__node {
             pointer-events: auto !important;
         }
-        
+
         .flow-graph .type-active text,
         .flow-graph .type-flow-active text {
             fill: #ffffff;
             font-weight: 600;
         }
-        
+
         .flow-graph .edgePath path {
             stroke: #30363d;
             stroke-width: 2px;
             fill: none;
         }
-        
+
         .flow-graph .edgePath .arrowhead {
             fill: #30363d;
         }
-        
+
         /* Step Indicator Styles */
         .flow-graph .step-indicator rect {
             cursor: pointer;
         }
-        
+
         .flow-graph .step-indicator text {
             pointer-events: none;
         }
-        
+
         .mindstate-list {
             flex: 1;
             overflow-y: auto;
         }
-        
+
         .mindstate-item {
             padding: 8px 12px;
             margin-bottom: 8px;
@@ -650,23 +650,23 @@
             border-radius: 6px;
             border-left: 3px solid #1f6feb;
         }
-        
+
         .mindstate-item.fulfilled {
             border-left-color: #238636;
             opacity: 0.7;
         }
-        
+
         .mindstate-intent {
             font-weight: 500;
             color: #f0f6fc;
         }
-        
+
         .mindstate-meta {
             font-size: 12px;
             color: #8b949e;
             margin-top: 4px;
         }
-        
+
         .debug-logs {
             flex: 1;
             overflow-y: auto;
@@ -677,35 +677,35 @@
             font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
             font-size: 12px;
         }
-        
+
         .log-entry {
             margin-bottom: 4px;
             padding: 2px 4px;
             border-radius: 3px;
         }
-        
+
         .log-info {
             color: #79c0ff;
         }
-        
+
         .log-success {
             color: #56d364;
         }
-        
+
         .log-error {
             color: #ff7b72;
         }
-        
+
         .log-warning {
             color: #f0883e;
         }
-        
+
         .loading {
             text-align: center;
             padding: 40px;
             color: #8b949e;
         }
-        
+
         .spinner {
             border: 2px solid #30363d;
             border-top: 2px solid #1f6feb;
@@ -715,12 +715,16 @@
             animation: spin 1s linear infinite;
             margin: 0 auto 16px;
         }
-        
+
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
-        
+
         .error-message {
             color: #ff7b72;
             text-align: center;
@@ -732,774 +736,777 @@
     </style>
 </head>
 <body>
-    <div id="root"></div>
-    
-    <script type="text/babel">
-        const { useState, useEffect, useCallback } = React;
-        
-        // API Service
-        const apiService = {
-            async health() {
-                const response = await fetch('/api/health');
-                return response.json();
-            },
-            
-            async query(message, sessionId, avatarType) {
-                const response = await fetch('/api/query', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        user_message: message,
-                        session_id: sessionId,
-                        avatar_type: avatarType
-                    })
-                });
-                return response.json();
-            },
-            
-            async getChatHistory(sessionId) {
-                const response = await fetch(`/api/chat/${sessionId}`);
-                return response.json();
-            },
-            
-            async getSessionState(sessionId) {
-                if (!sessionId) return null;
-                const response = await fetch(`/api/state/${sessionId}`);
-                return response.json();
-            },
-            
-            async getFlowDefinitions(avatarType) {
-                const url = avatarType ? `/api/flows?avatar_type=${avatarType}` : '/api/flows';
-                const response = await fetch(url);
-                return response.json();
-            },
+<div id="root"></div>
 
-            async getFlowDefinitionsForCustomAvatar(avatarId) {
-                const response = await fetch(`/api/avatar/${avatarId}/flow-definitions`);
-                return response.json();
+<script type="text/babel">
+    const {useState, useEffect, useCallback} = React;
+
+    // API Service
+    const apiService = {
+        async health() {
+            const response = await fetch('/api/health');
+            return response.json();
+        },
+
+        async query(message, sessionId, avatarType) {
+            const response = await fetch('/api/query', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_message: message,
+                    session_id: sessionId,
+                    avatar_type: avatarType
+                })
+            });
+            return response.json();
+        },
+
+        async getChatHistory(sessionId) {
+            const response = await fetch(`/api/chat/${sessionId}`);
+            return response.json();
+        },
+
+        async getSessionState(sessionId) {
+            if (!sessionId) return null;
+            const response = await fetch(`/api/state/${sessionId}`);
+            return response.json();
+        },
+
+        async getFlowDefinitions(avatarType) {
+            const url = avatarType ? `/api/flows?avatar_type=${avatarType}` : '/api/flows';
+            const response = await fetch(url);
+            return response.json();
+        },
+
+        async getFlowDefinitionsForCustomAvatar(avatarId) {
+            const response = await fetch(`/api/avatar/${avatarId}/flow-definitions`);
+            return response.json();
+        }
+    };
+
+    // Chat Panel Component
+    const ChatPanel = ({sessionId, onSessionChange, avatarConfig, currentAvatar}) => {
+        const [messages, setMessages] = useState([]);
+        const [inputMessage, setInputMessage] = useState('');
+        const [isLoading, setIsLoading] = useState(false);
+        const [error, setError] = useState(null);
+
+        const sendMessage = async (e) => {
+            e.preventDefault();
+            if (!inputMessage.trim() || isLoading) return;
+
+            const userMessage = inputMessage.trim();
+            setInputMessage('');
+            setIsLoading(true);
+            setError(null);
+
+            // Add user message immediately
+            const userMsg = {
+                id: Date.now(),
+                content: userMessage,
+                isUser: true,
+                timestamp: new Date().toISOString()
+            };
+            setMessages(prev => [...prev, userMsg]);
+
+            try {
+                const response = await apiService.query(userMessage, sessionId, currentAvatar);
+
+                if (response.status === 'success') {
+                    const avatarMsg = {
+                        id: Date.now() + 1,
+                        content: response.message,
+                        isUser: false,
+                        timestamp: new Date().toISOString(),
+                        analysis: response.analysis
+                    };
+                    setMessages(prev => [...prev, avatarMsg]);
+
+                    // Update session if needed
+                    if (response.session_id && response.session_id !== sessionId) {
+                        onSessionChange(response.session_id);
+                    }
+                } else {
+                    setError(response.message || 'Wystąpił błąd podczas przetwarzania wiadomości');
+                }
+            } catch (err) {
+                setError('Błąd połączenia z serwerem');
+                console.error('Chat error:', err);
+            } finally {
+                setIsLoading(false);
             }
         };
-        
-        // Chat Panel Component
-        const ChatPanel = ({ sessionId, onSessionChange, avatarConfig, currentAvatar }) => {
-            const [messages, setMessages] = useState([]);
-            const [inputMessage, setInputMessage] = useState('');
-            const [isLoading, setIsLoading] = useState(false);
-            const [error, setError] = useState(null);
-            
-            const sendMessage = async (e) => {
-                e.preventDefault();
-                if (!inputMessage.trim() || isLoading) return;
-                
-                const userMessage = inputMessage.trim();
-                setInputMessage('');
-                setIsLoading(true);
-                setError(null);
-                
-                // Add user message immediately
-                const userMsg = {
-                    id: Date.now(),
-                    content: userMessage,
-                    isUser: true,
-                    timestamp: new Date().toISOString()
+
+        useEffect(() => {
+            if (sessionId) {
+                const fetchHistory = async () => {
+                    try {
+                        const response = await apiService.getChatHistory(sessionId);
+                        if (response.status === 'success') {
+                            const formattedMessages = response.history.map(item => ({
+                                id: item._id,
+                                content: item.content,
+                                isUser: item.isUser,
+                                timestamp: item.timestamp,
+                                analysis: item.analysis
+                            }));
+                            setMessages(formattedMessages);
+                        }
+                    } catch (err) {
+                        console.error('Failed to fetch chat history:', err);
+                        setError('Nie można załadować historii czatu.');
+                    }
                 };
-                setMessages(prev => [...prev, userMsg]);
-                
-                try {
-                    const response = await apiService.query(userMessage, sessionId, currentAvatar);
-                    
-                    if (response.status === 'success') {
-                        const avatarMsg = {
-                            id: Date.now() + 1,
-                            content: response.message,
-                            isUser: false,
-                            timestamp: new Date().toISOString(),
-                            analysis: response.analysis
-                        };
-                        setMessages(prev => [...prev, avatarMsg]);
-                        
-                        // Update session if needed
-                        if (response.session_id && response.session_id !== sessionId) {
-                            onSessionChange(response.session_id);
-                        }
-                    } else {
-                        setError(response.message || 'Wystąpił błąd podczas przetwarzania wiadomości');
-                    }
-                } catch (err) {
-                    setError('Błąd połączenia z serwerem');
-                    console.error('Chat error:', err);
-                } finally {
-                    setIsLoading(false);
-                }
-            };
-            
-            useEffect(() => {
-                if (sessionId) {
-                    const fetchHistory = async () => {
-                        try {
-                            const response = await apiService.getChatHistory(sessionId);
-                            if (response.status === 'success') {
-                                const formattedMessages = response.history.map(item => ({
-                                    id: item._id,
-                                    content: item.content,
-                                    isUser: item.isUser,
-                                    timestamp: item.timestamp,
-                                    analysis: item.analysis
-                                }));
-                                setMessages(formattedMessages);
-                            }
-                        } catch (err) {
-                            console.error('Failed to fetch chat history:', err);
-                            setError('Nie można załadować historii czatu.');
-                        }
-                    };
-                    fetchHistory();
-                }
-            }, [sessionId]);
-            
-            return (
-                <div className="panel chat-panel">
-                    <div className="panel-header">
-                        <h3 className="panel-title">Chat z AI Avatar</h3>
-                        <div className="status-badge status-online">Online</div>
-                    </div>
-                    
-                    <div className="chat-messages">
-                        {messages.map((msg) => (
-                            <div key={msg.id} className={`message ${msg.isUser ? 'message-user' : 'message-avatar'}`}>
-                                <div className="message-time">
-                                    {new Date(msg.timestamp).toLocaleTimeString()}
-                                </div>
-                                <div>{msg.content}</div>
-                                {msg.analysis && (
-                                    <div className="message-meta">
-                                        Intent: {msg.analysis.intent} | Relevant: {msg.analysis.topic_relevant ? 'Yes' : 'No'}
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                        {isLoading && (
-                            <div className="loading">
-                                <div className="spinner"></div>
-                                Avatar myśli...
-                            </div>
-                        )}
-                        {error && (
-                            <div className="error-message">
-                                {error}
-                            </div>
-                        )}
-                    </div>
-                    
-                    <form onSubmit={sendMessage} className="chat-input">
-                        <input
-                            type="text"
-                            value={inputMessage}
-                            onChange={(e) => setInputMessage(e.target.value)}
-                            placeholder="Napisz wiadomość..."
-                            disabled={isLoading}
-                        />
-                        <button type="submit" className="btn btn-primary" disabled={isLoading}>
-                            Wyślij
-                        </button>
-                    </form>
+                fetchHistory();
+            }
+        }, [sessionId]);
+
+        return (
+            <div className="panel chat-panel">
+                <div className="panel-header">
+                    <h3 className="panel-title">Chat z AI Avatar</h3>
+                    <div className="status-badge status-online">Online</div>
                 </div>
-            );
-        };
-        
-        // Flows Right Sidebar Component
-        const FlowsRightSidebar = ({ flows, activeFlow, isVisible }) => {
-            return React.createElement('div', {
-                className: `flows-right-sidebar ${isVisible ? 'visible' : ''}`
-            }, [
-                React.createElement('h3', {
-                    key: 'sidebar-title',
-                    style: { 
-                        color: '#ffffff', 
-                        marginBottom: '16px', 
-                        fontSize: '16px',
-                        borderBottom: '1px solid #374151',
-                        paddingBottom: '8px'
-                    }
-                }, '📋 Flow List'),
-                
-                React.createElement('div', {
-                    key: 'flows-list'
-                }, flows && flows.length > 0 ? flows.map(flow => {
-                    const isActiveFlow = activeFlow?.flow_id === flow.id;
-                    
-                    return React.createElement('div', {
-                        key: flow.id,
-                        style: {
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '12px',
-                            padding: '12px',
-                            marginBottom: '8px',
-                            borderRadius: '8px',
-                            backgroundColor: isActiveFlow ? '#22c55e20' : '#374151',
-                            border: isActiveFlow ? '2px solid #22c55e' : '1px solid #4b5563',
-                            cursor: 'pointer',
-                            transition: 'all 0.2s ease'
-                        },
-                        onClick: () => {
-                            console.log('🎯 Flow clicked:', flow.name);
-                        }
-                    }, [
-                        // Flow indicator dot
-                        React.createElement('div', {
-                            key: 'dot',
-                            style: {
-                                width: '10px',
-                                height: '10px',
-                                borderRadius: '50%',
-                                backgroundColor: isActiveFlow ? '#22c55e' : '#6b7280'
-                            }
-                        }),
-                        
-                        // Flow name and info
-                        React.createElement('div', {
-                            key: 'info',
-                            style: { flex: 1 }
-                        }, [
-                            React.createElement('div', {
-                                key: 'name',
-                                style: {
-                                    color: isActiveFlow ? '#22c55e' : '#ffffff',
-                                    fontSize: '13px',
-                                    fontWeight: 'bold'
-                                }
-                            }, flow.name),
-                            React.createElement('div', {
-                                key: 'steps',
-                                style: {
-                                    color: isActiveFlow ? '#16a34a' : '#9ca3af',
-                                    fontSize: '11px',
-                                    marginTop: '4px'
-                                }
-                            }, `${(flow.steps || []).length} steps`)
-                        ])
-                    ]);
-                }) : [
-                    React.createElement('div', {
-                        key: 'empty-state',
-                        style: {
-                            color: '#6b7280',
-                            fontSize: '14px',
-                            textAlign: 'center',
-                            padding: '20px'
-                        }
-                    }, 'No flows available')
-                ])
-            ]);
-        };
 
-        // Flow Graph Component
-        const FlowGraph = ({ sessionId, flows, activeFlow, flowSidebarVisible, sessionState }) => {
-            const graphRef = React.useRef(null);
-            const [useReactFlow, setUseReactFlow] = React.useState(true); // ReactFlow nodes + card layout!
-            
-            useEffect(() => {
-                if (!graphRef.current) return;
-                
-                // Clear previous graph first
-                d3.select(graphRef.current).selectAll("*").remove();
-                
-                // If no flows, show empty state
-                if (!flows || !flows.length) {
-                    const svg = d3.select(graphRef.current);
-                    const containerWidth = graphRef.current.parentElement.clientWidth - 20;
-                    svg.attr("width", Math.max(400, containerWidth));
-                    svg.attr("height", 100);
-                    
-                    svg.append("text")
-                        .attr("x", 200)
-                        .attr("y", 50)
-                        .attr("text-anchor", "middle")
-                        .style("fill", "#8b949e")
-                        .style("font-size", "14px")
-                        .text("Brak flows dla tego avatara");
-                    
-                    return;
-                }
-                const svg = d3.select(graphRef.current);
-                const margin = { top: 20, right: 20, bottom: 20, left: 200 };
-                const flowHeight = 80;
-                const stepWidth = 120;
-                const stepHeight = 40;
-                const stepSpacing = 10;
-                const flowSpacing = 20;
-                
-                // Calculate dimensions
-                const maxSteps = Math.max(...flows.map(f => f.steps.length));
-                const minSvgWidth = margin.left + margin.right + (maxSteps * (stepWidth + stepSpacing));
-                const svgHeight = margin.top + margin.bottom + (flows.length * (flowHeight + flowSpacing));
-                
-                // Use container width or minimum width, whichever is larger
-                const containerWidth = graphRef.current.parentElement.clientWidth - 20; // minus padding
-                const svgWidth = Math.max(minSvgWidth, containerWidth);
-                
-                svg.attr("width", svgWidth);
-                svg.attr("height", svgHeight);
-                
-                const g = svg.append("g")
-                    .attr("transform", `translate(${margin.left}, ${margin.top})`);
-                
-                // Sort flows by priority
-                const sortedFlows = [...flows].sort((a, b) => b.priority - a.priority);
-                
-                // Render each flow as a row
-                sortedFlows.forEach((flow, flowIndex) => {
-                    const isActive = flow.id === activeFlow?.flow_id;
-                    const isCompleted = activeFlow?.status === 'completed' && flow.id === activeFlow?.flow_id;
-                    
-                    const flowY = flowIndex * (flowHeight + flowSpacing);
-                    
-                    // Flow background and border
-                    let flowColor = '#21262d';
-                    let strokeColor = '#30363d';
-                    let strokeWidth = 2;
-                    
-                    if (isActive) {
-                        flowColor = '#1f6feb';
-                        strokeColor = '#58a6ff';
-                        strokeWidth = 3;
-                    } else if (isCompleted) {
-                        flowColor = '#238636';
-                        strokeColor = '#56d364';
-                    }
-                    
-                    // Flow label background
-                    g.append("rect")
-                        .attr("x", -180)
-                        .attr("y", flowY)
-                        .attr("width", 170)
-                        .attr("height", flowHeight)
-                        .attr("rx", 6)
-                        .attr("ry", 6)
-                        .style("fill", flowColor)
-                        .style("stroke", strokeColor)
-                        .style("stroke-width", strokeWidth + "px");
-                    
-                    // Flow name
-                    g.append("text")
-                        .attr("x", -95)
-                        .attr("y", flowY + 20)
-                        .attr("text-anchor", "middle")
-                        .style("fill", "#f0f6fc")
-                        .style("font-size", "12px")
-                        .style("font-weight", isActive ? "600" : "500")
-                        .text(flow.name);
-                    
-                    // Flow entry intents
-                    const entryIntents = flow.entry_intents.join(', ');
-                    g.append("text")
-                        .attr("x", -95)
-                        .attr("y", flowY + 35)
-                        .attr("text-anchor", "middle")
-                        .style("fill", "#8b949e")
-                        .style("font-size", "10px")
-                        .text(`(${entryIntents})`);
-                    
-                    // Flow priority
-                    g.append("text")
-                        .attr("x", -95)
-                        .attr("y", flowY + 50)
-                        .attr("text-anchor", "middle")
-                        .style("fill", "#8b949e")
-                        .style("font-size", "10px")
-                        .text(`Priority: ${flow.priority}`);
-                    
-                    // Render all steps for this flow
-                    flow.steps.forEach((step, stepIndex) => {
-                        const isCurrentStep = isActive && activeFlow.current_step === step.id;
-                        const isCompletedStep = isActive && activeFlow.completed_steps?.includes(step.id);
-                        
-                        let stepColor = '#21262d';
-                        let stepStroke = '#30363d';
-                        let stepStrokeWidth = 1;
-                        
-                        if (isCurrentStep) {
-                            stepColor = '#1f6feb';
-                            stepStroke = '#58a6ff';
-                            stepStrokeWidth = 3;
-                        } else if (isCompletedStep) {
-                            stepColor = '#238636';
-                            stepStroke = '#56d364';
-                            stepStrokeWidth = 2;
-                        }
-                        
-                        const stepX = stepIndex * (stepWidth + stepSpacing);
-                        const stepY = flowY + (flowHeight - stepHeight) / 2;
-                        
-                        // Step background
-                        g.append("rect")
-                            .attr("x", stepX)
-                            .attr("y", stepY)
-                            .attr("width", stepWidth)
-                            .attr("height", stepHeight)
-                            .attr("rx", 4)
-                            .attr("ry", 4)
-                            .style("fill", stepColor)
-                            .style("stroke", stepStroke)
-                            .style("stroke-width", stepStrokeWidth + "px")
-                            .style("cursor", "pointer");
-                        
-                        // Step name
-                        g.append("text")
-                            .attr("x", stepX + stepWidth / 2)
-                            .attr("y", stepY + stepHeight / 2 + 4)
-                            .attr("text-anchor", "middle")
-                            .style("fill", "#f0f6fc")
-                            .style("font-size", "11px")
-                            .style("font-weight", isCurrentStep ? "600" : "400")
-                            .text(step.name);
-                        
-                        // Add arrow between steps
-                        if (stepIndex < flow.steps.length - 1) {
-                            const arrowX = stepX + stepWidth + stepSpacing / 2;
-                            const arrowY = stepY + stepHeight / 2;
-                            
-                            g.append("path")
-                                .attr("d", `M ${arrowX - 5} ${arrowY} L ${arrowX + 5} ${arrowY}`)
-                                .style("stroke", "#30363d")
-                                .style("stroke-width", "2px")
-                                .style("marker-end", "url(#arrowhead)");
-                        }
-                    });
-                });
-                
-                // Add arrow marker definition
-                const defs = svg.append("defs");
-                defs.append("marker")
-                    .attr("id", "arrowhead")
-                    .attr("viewBox", "0 -5 10 10")
-                    .attr("refX", 5)
-                    .attr("refY", 0)
-                    .attr("markerWidth", 4)
-                    .attr("markerHeight", 4)
-                    .attr("orient", "auto")
-                    .append("path")
-                    .attr("d", "M0,-5L10,0L0,5")
-                    .style("fill", "#30363d");
-
-            }, [flows, activeFlow]);
-
-            const currentFlow = flows.find(f => f.id === activeFlow?.flow_id);
-
-            return (
-                <div className="panel flow-panel">
-                    <div className="panel-header">
-                        <h3 className="panel-title">Flow Overview</h3>
-                        <div className="status-badge status-online">
-                            {flows.length} Flows
-                            <button 
-                                onClick={() => setUseReactFlow(!useReactFlow)}
-                                style={{
-                                    marginLeft: '10px',
-                                    padding: '4px 8px',
-                                    fontSize: '10px',
-                                    backgroundColor: useReactFlow ? '#22c55e' : '#64748b',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '4px',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                {useReactFlow ? 'Zoomable Cards' : 'D3.js'}
-                            </button>
+                <div className="chat-messages">
+                    {messages.map((msg) => (
+                        <div key={msg.id} className={`message ${msg.isUser ? 'message-user' : 'message-avatar'}`}>
+                            <div className="message-time">
+                                {new Date(msg.timestamp).toLocaleTimeString()}
+                            </div>
+                            <div>{msg.content}</div>
+                            {msg.analysis && (
+                                <div className="message-meta">
+                                    Intent: {msg.analysis.intent} |
+                                    Relevant: {msg.analysis.topic_relevant ? 'Yes' : 'No'}
+                                </div>
+                            )}
                         </div>
-                    </div>
-                    
-                    <div className="flow-graph">
-                        {console.log('🔍 DEBUG useReactFlow:', useReactFlow, 'ZoomableFlowEditor available:', !!window.ZoomableFlowEditor)}
-                        {console.log('🎯 [DASHBOARD] sessionState:', sessionState)}
-                        {console.log('🎯 [DASHBOARD] current_step:', sessionState?.activeFlow?.current_step)}
-                        {useReactFlow && window.ZoomableFlowEditor ? (
-                            React.createElement(window.ZoomableFlowEditor, {
-                                flowDefinitions: flows,
-                                activeFlow: activeFlow,
-                                currentStep: sessionState?.activeFlow?.current_step, // Pass current step for highlighting
-                                onNodeClick: (node) => {
-                                    console.log('🎯 Node clicked:', node);
-                                },
-                                editable: true // Enable editing mode for testing
-                            })
-                        ) : (
-                            <svg ref={graphRef}></svg>
-                        )}
-                    </div>
-                    
-                    <div style={{ padding: '16px', fontSize: '12px', color: '#8b949e' }}>
-                        <div><strong>Active Flow:</strong> {currentFlow?.name || 'Brak aktywnego flow'}</div>
-                        <div><strong>Current Step:</strong> {activeFlow?.current_step || 'Brak aktywnego kroku'}</div>
-                        <div><strong>Flow Progress:</strong> {activeFlow?.completed_steps?.length || 0}/{currentFlow?.steps?.length || 0} kroków</div>
-                        <div><strong>Flow Status:</strong> {activeFlow?.status || 'Nieaktywny'}</div>
-                        <div><strong>Graph Engine:</strong> {useReactFlow ? 'ReactFlow Professional' : 'D3.js Legacy'}</div>
-                    </div>
-                </div>
-            );
-        };
-        
-        // MindState Horizontal Component
-        const MindStateHorizontal = ({ sessionId, mindState, isVisible = true }) => {
-            return (
-                <div className={`mindstate-horizontal ${!isVisible ? 'collapsed' : ''}`}>
-                    <h3 className="panel-title">🧠 MindState Monitor</h3>
-                    <div className="mindstate-items-horizontal">
-                        {!mindState || !mindState.stack ? (
-                            <div className="mindstate-item-horizontal">
-                                <div className="intent-name">Oczekiwanie...</div>
-                                <div className="confidence">Brak aktywnej sesji</div>
-                            </div>
-                        ) : (
-                            mindState.stack.slice(-5).map((item, index) => (
-                                <div key={index} className="mindstate-item-horizontal">
-                                    <div className="intent-name">{item.intent}</div>
-                                    <div className="confidence">
-                                        {(item.confidence * 100).toFixed(1)}%
-                                    </div>
-                                    <div className="timestamp">
-                                        {new Date(item.timestamp).toLocaleTimeString()}
-                                    </div>
-                                </div>
-                            ))
-                        )}
-                    </div>
-                </div>
-            );
-        };
-        
-        // Debug Panel Component
-        const DebugPanel = ({ isVisible = true }) => {
-            const [logs, setLogs] = useState([]);
-            
-            useEffect(() => {
-                // Mock debug logs
-                const mockLogs = [
-                    { type: 'info', message: 'Dashboard initialized', timestamp: Date.now() - 5000 },
-                    { type: 'success', message: 'API connection established', timestamp: Date.now() - 4000 },
-                    { type: 'info', message: 'Chat session started', timestamp: Date.now() - 3000 },
-                    { type: 'warning', message: 'TTS service unavailable', timestamp: Date.now() - 2000 },
-                    { type: 'success', message: 'Query processed successfully', timestamp: Date.now() - 1000 }
-                ];
-                setLogs(mockLogs);
-            }, []);
-            
-            return (
-                <div className={`panel debug-panel ${!isVisible ? 'collapsed' : ''}`}>
-                    <div className="panel-header">
-                        <h3 className="panel-title">Debug Console</h3>
-
-                    </div>
-                    
-                    {isVisible && (
-                        <div className="debug-logs">
-                            {logs.map((log, index) => (
-                                <div key={index} className={`log-entry log-${log.type}`}>
-                                    [{new Date(log.timestamp).toLocaleTimeString()}] {log.message}
-                                </div>
-                            ))}
+                    ))}
+                    {isLoading && (
+                        <div className="loading">
+                            <div className="spinner"></div>
+                            Avatar myśli...
+                        </div>
+                    )}
+                    {error && (
+                        <div className="error-message">
+                            {error}
                         </div>
                     )}
                 </div>
-            );
-        };
-        
-        // Main Dashboard Component
-        const Dashboard = () => {
-            const [sessionId, setSessionId] = useState(null);
-            const [isHealthy, setIsHealthy] = useState(false);
-            const [sessionState, setSessionState] = useState(null);
-            const [flowDefinitions, setFlowDefinitions] = useState([]);
-            const [currentAvatar, setCurrentAvatar] = useState('networker');
-            const [customAvatars, setCustomAvatars] = useState([]);
-            const [mindStateVisible, setMindStateVisible] = useState(false); // MindState Monitor collapsed by default
-            const [flowSidebarVisible, setFlowSidebarVisible] = useState(false); // Flow sidebar collapsed by default
-            const [debugVisible, setDebugVisible] = useState(false); // Debug console collapsed by default
-            
-            const fetchSessionState = useCallback(async () => {
-                if (!sessionId) return;
+
+                <form onSubmit={sendMessage} className="chat-input">
+                    <input
+                        type="text"
+                        value={inputMessage}
+                        onChange={(e) => setInputMessage(e.target.value)}
+                        placeholder="Napisz wiadomość..."
+                        disabled={isLoading}
+                    />
+                    <button type="submit" className="btn btn-primary" disabled={isLoading}>
+                        Wyślij
+                    </button>
+                </form>
+            </div>
+        );
+    };
+
+    // Flows Right Sidebar Component
+    const FlowsRightSidebar = ({flows, activeFlow, isVisible}) => {
+        return React.createElement('div', {
+            className: `flows-right-sidebar ${isVisible ? 'visible' : ''}`
+        }, [
+            React.createElement('h3', {
+                key: 'sidebar-title',
+                style: {
+                    color: '#ffffff',
+                    marginBottom: '16px',
+                    fontSize: '16px',
+                    borderBottom: '1px solid #374151',
+                    paddingBottom: '8px'
+                }
+            }, '📋 Flow List'),
+
+            React.createElement('div', {
+                key: 'flows-list'
+            }, flows && flows.length > 0 ? flows.map(flow => {
+                const isActiveFlow = activeFlow?.flow_id === flow.id;
+
+                return React.createElement('div', {
+                    key: flow.id,
+                    style: {
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        padding: '12px',
+                        marginBottom: '8px',
+                        borderRadius: '8px',
+                        backgroundColor: isActiveFlow ? '#22c55e20' : '#374151',
+                        border: isActiveFlow ? '2px solid #22c55e' : '1px solid #4b5563',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                    },
+                    onClick: () => {
+                        console.log('🎯 Flow clicked:', flow.name);
+                    }
+                }, [
+                    // Flow indicator dot
+                    React.createElement('div', {
+                        key: 'dot',
+                        style: {
+                            width: '10px',
+                            height: '10px',
+                            borderRadius: '50%',
+                            backgroundColor: isActiveFlow ? '#22c55e' : '#6b7280'
+                        }
+                    }),
+
+                    // Flow name and info
+                    React.createElement('div', {
+                        key: 'info',
+                        style: {flex: 1}
+                    }, [
+                        React.createElement('div', {
+                            key: 'name',
+                            style: {
+                                color: isActiveFlow ? '#22c55e' : '#ffffff',
+                                fontSize: '13px',
+                                fontWeight: 'bold'
+                            }
+                        }, flow.name),
+                        React.createElement('div', {
+                            key: 'steps',
+                            style: {
+                                color: isActiveFlow ? '#16a34a' : '#9ca3af',
+                                fontSize: '11px',
+                                marginTop: '4px'
+                            }
+                        }, `${(flow.steps || []).length} steps`)
+                    ])
+                ]);
+            }) : [
+                React.createElement('div', {
+                    key: 'empty-state',
+                    style: {
+                        color: '#6b7280',
+                        fontSize: '14px',
+                        textAlign: 'center',
+                        padding: '20px'
+                    }
+                }, 'No flows available')
+            ])
+        ]);
+    };
+
+    // Flow Graph Component
+    const FlowGraph = ({sessionId, flows, activeFlow, flowSidebarVisible, sessionState}) => {
+        const graphRef = React.useRef(null);
+        const [useReactFlow, setUseReactFlow] = React.useState(true); // ReactFlow nodes + card layout!
+
+        useEffect(() => {
+            if (!graphRef.current) return;
+
+            // Clear previous graph first
+            d3.select(graphRef.current).selectAll("*").remove();
+
+            // If no flows, show empty state
+            if (!flows || !flows.length) {
+                const svg = d3.select(graphRef.current);
+                const containerWidth = graphRef.current.parentElement.clientWidth - 20;
+                svg.attr("width", Math.max(400, containerWidth));
+                svg.attr("height", 100);
+
+                svg.append("text")
+                    .attr("x", 200)
+                    .attr("y", 50)
+                    .attr("text-anchor", "middle")
+                    .style("fill", "#8b949e")
+                    .style("font-size", "14px")
+                    .text("Brak flows dla tego avatara");
+
+                return;
+            }
+            const svg = d3.select(graphRef.current);
+            const margin = {top: 20, right: 20, bottom: 20, left: 200};
+            const flowHeight = 80;
+            const stepWidth = 120;
+            const stepHeight = 40;
+            const stepSpacing = 10;
+            const flowSpacing = 20;
+
+            // Calculate dimensions
+            const maxSteps = Math.max(...flows.map(f => f.steps.length));
+            const minSvgWidth = margin.left + margin.right + (maxSteps * (stepWidth + stepSpacing));
+            const svgHeight = margin.top + margin.bottom + (flows.length * (flowHeight + flowSpacing));
+
+            // Use container width or minimum width, whichever is larger
+            const containerWidth = graphRef.current.parentElement.clientWidth - 20; // minus padding
+            const svgWidth = Math.max(minSvgWidth, containerWidth);
+
+            svg.attr("width", svgWidth);
+            svg.attr("height", svgHeight);
+
+            const g = svg.append("g")
+                .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+            // Sort flows by priority
+            const sortedFlows = [...flows].sort((a, b) => b.priority - a.priority);
+
+            // Render each flow as a row
+            sortedFlows.forEach((flow, flowIndex) => {
+                const isActive = flow.id === activeFlow?.flow_id;
+                const isCompleted = activeFlow?.status === 'completed' && flow.id === activeFlow?.flow_id;
+
+                const flowY = flowIndex * (flowHeight + flowSpacing);
+
+                // Flow background and border
+                let flowColor = '#21262d';
+                let strokeColor = '#30363d';
+                let strokeWidth = 2;
+
+                if (isActive) {
+                    flowColor = '#1f6feb';
+                    strokeColor = '#58a6ff';
+                    strokeWidth = 3;
+                } else if (isCompleted) {
+                    flowColor = '#238636';
+                    strokeColor = '#56d364';
+                }
+
+                // Flow label background
+                g.append("rect")
+                    .attr("x", -180)
+                    .attr("y", flowY)
+                    .attr("width", 170)
+                    .attr("height", flowHeight)
+                    .attr("rx", 6)
+                    .attr("ry", 6)
+                    .style("fill", flowColor)
+                    .style("stroke", strokeColor)
+                    .style("stroke-width", strokeWidth + "px");
+
+                // Flow name
+                g.append("text")
+                    .attr("x", -95)
+                    .attr("y", flowY + 20)
+                    .attr("text-anchor", "middle")
+                    .style("fill", "#f0f6fc")
+                    .style("font-size", "12px")
+                    .style("font-weight", isActive ? "600" : "500")
+                    .text(flow.name);
+
+                // Flow entry intents
+                const entryIntents = flow.entry_intents.join(', ');
+                g.append("text")
+                    .attr("x", -95)
+                    .attr("y", flowY + 35)
+                    .attr("text-anchor", "middle")
+                    .style("fill", "#8b949e")
+                    .style("font-size", "10px")
+                    .text(`(${entryIntents})`);
+
+                // Flow priority
+                g.append("text")
+                    .attr("x", -95)
+                    .attr("y", flowY + 50)
+                    .attr("text-anchor", "middle")
+                    .style("fill", "#8b949e")
+                    .style("font-size", "10px")
+                    .text(`Priority: ${flow.priority}`);
+
+                // Render all steps for this flow
+                flow.steps.forEach((step, stepIndex) => {
+                    const isCurrentStep = isActive && activeFlow.current_step === step.id;
+                    const isCompletedStep = isActive && activeFlow.completed_steps?.includes(step.id);
+
+                    let stepColor = '#21262d';
+                    let stepStroke = '#30363d';
+                    let stepStrokeWidth = 1;
+
+                    if (isCurrentStep) {
+                        stepColor = '#1f6feb';
+                        stepStroke = '#58a6ff';
+                        stepStrokeWidth = 3;
+                    } else if (isCompletedStep) {
+                        stepColor = '#238636';
+                        stepStroke = '#56d364';
+                        stepStrokeWidth = 2;
+                    }
+
+                    const stepX = stepIndex * (stepWidth + stepSpacing);
+                    const stepY = flowY + (flowHeight - stepHeight) / 2;
+
+                    // Step background
+                    g.append("rect")
+                        .attr("x", stepX)
+                        .attr("y", stepY)
+                        .attr("width", stepWidth)
+                        .attr("height", stepHeight)
+                        .attr("rx", 4)
+                        .attr("ry", 4)
+                        .style("fill", stepColor)
+                        .style("stroke", stepStroke)
+                        .style("stroke-width", stepStrokeWidth + "px")
+                        .style("cursor", "pointer");
+
+                    // Step name
+                    g.append("text")
+                        .attr("x", stepX + stepWidth / 2)
+                        .attr("y", stepY + stepHeight / 2 + 4)
+                        .attr("text-anchor", "middle")
+                        .style("fill", "#f0f6fc")
+                        .style("font-size", "11px")
+                        .style("font-weight", isCurrentStep ? "600" : "400")
+                        .text(step.name);
+
+                    // Add arrow between steps
+                    if (stepIndex < flow.steps.length - 1) {
+                        const arrowX = stepX + stepWidth + stepSpacing / 2;
+                        const arrowY = stepY + stepHeight / 2;
+
+                        g.append("path")
+                            .attr("d", `M ${arrowX - 5} ${arrowY} L ${arrowX + 5} ${arrowY}`)
+                            .style("stroke", "#30363d")
+                            .style("stroke-width", "2px")
+                            .style("marker-end", "url(#arrowhead)");
+                    }
+                });
+            });
+
+            // Add arrow marker definition
+            const defs = svg.append("defs");
+            defs.append("marker")
+                .attr("id", "arrowhead")
+                .attr("viewBox", "0 -5 10 10")
+                .attr("refX", 5)
+                .attr("refY", 0)
+                .attr("markerWidth", 4)
+                .attr("markerHeight", 4)
+                .attr("orient", "auto")
+                .append("path")
+                .attr("d", "M0,-5L10,0L0,5")
+                .style("fill", "#30363d");
+
+        }, [flows, activeFlow]);
+
+        const currentFlow = flows.find(f => f.id === activeFlow?.flow_id);
+
+        return (
+            <div className="panel flow-panel">
+                <div className="panel-header">
+                    <h3 className="panel-title">Flow Overview</h3>
+                    <div className="status-badge status-online">
+                        {flows.length} Flows
+                        <button
+                            onClick={() => setUseReactFlow(!useReactFlow)}
+                            style={{
+                                marginLeft: '10px',
+                                padding: '4px 8px',
+                                fontSize: '10px',
+                                backgroundColor: useReactFlow ? '#22c55e' : '#64748b',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '4px',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            {useReactFlow ? 'Zoomable Cards' : 'D3.js'}
+                        </button>
+                    </div>
+                </div>
+
+                <div className="flow-graph">
+                    {console.log('🔍 DEBUG useReactFlow:', useReactFlow, 'ZoomableFlowEditor available:', !!window.ZoomableFlowEditor)}
+                    {console.log('🎯 [DASHBOARD] sessionState:', sessionState)}
+                    {console.log('🎯 [DASHBOARD] current_step:', sessionState?.activeFlow?.current_step)}
+                    {useReactFlow && window.ZoomableFlowEditor ? (
+                        React.createElement(window.ZoomableFlowEditor, {
+                            flowDefinitions: flows,
+                            activeFlow: activeFlow,
+                            currentStep: sessionState?.activeFlow?.current_step, // Pass current step for highlighting
+                            onNodeClick: (node) => {
+                                console.log('🎯 Node clicked:', node);
+                            },
+                            editable: true // Enable editing mode for testing
+                        })
+                    ) : (
+                        <svg ref={graphRef}></svg>
+                    )}
+                </div>
+
+                <div style={{padding: '16px', fontSize: '12px', color: '#8b949e'}}>
+                    <div><strong>Active Flow:</strong> {currentFlow?.name || 'Brak aktywnego flow'}</div>
+                    <div><strong>Current Step:</strong> {activeFlow?.current_step || 'Brak aktywnego kroku'}</div>
+                    <div><strong>Flow
+                        Progress:</strong> {activeFlow?.completed_steps?.length || 0}/{currentFlow?.steps?.length || 0} kroków
+                    </div>
+                    <div><strong>Flow Status:</strong> {activeFlow?.status || 'Nieaktywny'}</div>
+                    <div><strong>Graph Engine:</strong> {useReactFlow ? 'ReactFlow Professional' : 'D3.js Legacy'}</div>
+                </div>
+            </div>
+        );
+    };
+
+    // MindState Horizontal Component
+    const MindStateHorizontal = ({sessionId, mindState, isVisible = true}) => {
+        return (
+            <div className={`mindstate-horizontal ${!isVisible ? 'collapsed' : ''}`}>
+                <h3 className="panel-title">🧠 MindState Monitor</h3>
+                <div className="mindstate-items-horizontal">
+                    {!mindState || !mindState.stack ? (
+                        <div className="mindstate-item-horizontal">
+                            <div className="intent-name">Oczekiwanie...</div>
+                            <div className="confidence">Brak aktywnej sesji</div>
+                        </div>
+                    ) : (
+                        mindState.stack.slice(-5).map((item, index) => (
+                            <div key={index} className="mindstate-item-horizontal">
+                                <div className="intent-name">{item.intent}</div>
+                                <div className="confidence">
+                                    {(item.confidence * 100).toFixed(1)}%
+                                </div>
+                                <div className="timestamp">
+                                    {new Date(item.timestamp).toLocaleTimeString()}
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+            </div>
+        );
+    };
+
+    // Debug Panel Component
+    const DebugPanel = ({isVisible = true}) => {
+        const [logs, setLogs] = useState([]);
+
+        useEffect(() => {
+            // Mock debug logs
+            const mockLogs = [
+                {type: 'info', message: 'Dashboard initialized', timestamp: Date.now() - 5000},
+                {type: 'success', message: 'API connection established', timestamp: Date.now() - 4000},
+                {type: 'info', message: 'Chat session started', timestamp: Date.now() - 3000},
+                {type: 'warning', message: 'TTS service unavailable', timestamp: Date.now() - 2000},
+                {type: 'success', message: 'Query processed successfully', timestamp: Date.now() - 1000}
+            ];
+            setLogs(mockLogs);
+        }, []);
+
+        return (
+            <div className={`panel debug-panel ${!isVisible ? 'collapsed' : ''}`}>
+                <div className="panel-header">
+                    <h3 className="panel-title">Debug Console</h3>
+
+                </div>
+
+                {isVisible && (
+                    <div className="debug-logs">
+                        {logs.map((log, index) => (
+                            <div key={index} className={`log-entry log-${log.type}`}>
+                                [{new Date(log.timestamp).toLocaleTimeString()}] {log.message}
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        );
+    };
+
+    // Main Dashboard Component
+    const Dashboard = () => {
+        const [sessionId, setSessionId] = useState(null);
+        const [isHealthy, setIsHealthy] = useState(false);
+        const [sessionState, setSessionState] = useState(null);
+        const [flowDefinitions, setFlowDefinitions] = useState([]);
+        const [currentAvatar, setCurrentAvatar] = useState('networker');
+        const [customAvatars, setCustomAvatars] = useState([]);
+        const [mindStateVisible, setMindStateVisible] = useState(false); // MindState Monitor collapsed by default
+        const [flowSidebarVisible, setFlowSidebarVisible] = useState(false); // Flow sidebar collapsed by default
+        const [debugVisible, setDebugVisible] = useState(false); // Debug console collapsed by default
+
+        const fetchSessionState = useCallback(async () => {
+            if (!sessionId) return;
+            try {
+                const state = await apiService.getSessionState(sessionId);
+                if (state.status === 'success') {
+                    setSessionState(state);
+                }
+            } catch (err) {
+                console.error('Failed to fetch session state:', err);
+            }
+        }, [sessionId]);
+
+        useEffect(() => {
+            const checkHealth = async () => {
                 try {
-                    const state = await apiService.getSessionState(sessionId);
-                    if (state.status === 'success') {
-                        setSessionState(state);
+                    const health = await apiService.health();
+                    setIsHealthy(health.status === 'ok');
+                } catch (err) {
+                    console.error('Health check failed:', err);
+                    setIsHealthy(false);
+                }
+            };
+
+            const fetchFlows = async (avatarType) => {
+                try {
+                    console.log('🔧 Dashboard: fetchFlows called with avatarType:', avatarType);
+
+                    // Check if it's a custom avatar (UUID format: 8-4-4-4-12 characters)
+                    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+                    if (avatarType && uuidRegex.test(avatarType)) {
+                        console.log('✅ Dashboard: Detected UUID, fetching custom flows');
+                        // Custom avatar - use different endpoint
+                        const response = await apiService.getFlowDefinitionsForCustomAvatar(avatarType);
+                        console.log('🔧 Dashboard: Custom flow response:', response);
+                        console.log('🔧 Dashboard: response.status:', response.status);
+                        console.log('🔧 Dashboard: response.flows:', response.flows);
+                        if (response.status === 'success' && response.flows) {
+                            console.log('✅ Dashboard: Loaded', response.flows.length, 'custom flows');
+                            console.log('🔧 Dashboard: First flow:', response.flows[0]);
+                            console.log('🔧 Dashboard: About to call setFlowDefinitions with:', response.flows);
+                            setFlowDefinitions(response.flows);
+                            console.log('✅ Dashboard: setFlowDefinitions called with custom flows');
+
+                            // Force debug - sprawdź czy state się zmienił
+                            setTimeout(() => {
+                                console.log('🔧 Dashboard: Current flowDefinitions state after 100ms - should be updated now');
+                            }, 100);
+                        } else {
+                            console.log('❌ Dashboard: No custom flows found or error');
+                            setFlowDefinitions([]);
+                        }
+                    } else {
+                        console.log('✅ Dashboard: Standard avatar, fetching standard flows');
+                        // Standard avatar
+                        const response = await apiService.getFlowDefinitions(avatarType);
+                        if (response.status === 'success' && response.flows) {
+                            console.log('✅ Dashboard: Loaded', response.flows.length, 'standard flows');
+                            setFlowDefinitions(response.flows);
+                        }
                     }
                 } catch (err) {
-                    console.error('Failed to fetch session state:', err);
+                    console.error('Failed to fetch flow definitions:', err);
+                    setFlowDefinitions([]); // Fallback to empty array
                 }
-            }, [sessionId]);
-            
-            useEffect(() => {
-                const checkHealth = async () => {
-                    try {
-                        const health = await apiService.health();
-                        setIsHealthy(health.status === 'ok');
-                    } catch (err) {
-                        console.error('Health check failed:', err);
-                        setIsHealthy(false);
-                    }
-                };
-                
-                const fetchFlows = async (avatarType) => {
-                    try {
-                        console.log('🔧 Dashboard: fetchFlows called with avatarType:', avatarType);
-                        
-                        // Check if it's a custom avatar (UUID format: 8-4-4-4-12 characters)
-                        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-                        if (avatarType && uuidRegex.test(avatarType)) {
-                            console.log('✅ Dashboard: Detected UUID, fetching custom flows');
-                            // Custom avatar - use different endpoint
-                            const response = await apiService.getFlowDefinitionsForCustomAvatar(avatarType);
-                            console.log('🔧 Dashboard: Custom flow response:', response);
-                            console.log('🔧 Dashboard: response.status:', response.status);
-                            console.log('🔧 Dashboard: response.flows:', response.flows);
-                            if (response.status === 'success' && response.flows) {
-                                console.log('✅ Dashboard: Loaded', response.flows.length, 'custom flows');
-                                console.log('🔧 Dashboard: First flow:', response.flows[0]);
-                                console.log('🔧 Dashboard: About to call setFlowDefinitions with:', response.flows);
-                                setFlowDefinitions(response.flows);
-                                console.log('✅ Dashboard: setFlowDefinitions called with custom flows');
-                                
-                                // Force debug - sprawdź czy state się zmienił
-                                setTimeout(() => {
-                                    console.log('🔧 Dashboard: Current flowDefinitions state after 100ms - should be updated now');
-                                }, 100);
-                            } else {
-                                console.log('❌ Dashboard: No custom flows found or error');
-                                setFlowDefinitions([]);
-                            }
-                        } else {
-                            console.log('✅ Dashboard: Standard avatar, fetching standard flows');
-                            // Standard avatar
-                            const response = await apiService.getFlowDefinitions(avatarType);
-                            if (response.status === 'success' && response.flows) {
-                                console.log('✅ Dashboard: Loaded', response.flows.length, 'standard flows');
-                                setFlowDefinitions(response.flows);
-                            }
-                        }
-                    } catch (err) {
-                        console.error('Failed to fetch flow definitions:', err);
-                        setFlowDefinitions([]); // Fallback to empty array
-                    }
-                };
+            };
 
-                const fetchCustomAvatars = async () => {
-                    try {
-                        const response = await fetch('/api/avatars');
-                        if (response.ok) {
-                            const data = await response.json();
-                            if (data.success && Array.isArray(data.data)) {
-                                setCustomAvatars(data.data);
-                            } else {
-                                setCustomAvatars([]);
-                            }
+            const fetchCustomAvatars = async () => {
+                try {
+                    const response = await fetch('/api/avatars');
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success && Array.isArray(data.data)) {
+                            setCustomAvatars(data.data);
                         } else {
                             setCustomAvatars([]);
                         }
-                    } catch (err) {
-                        console.error('Error fetching custom avatars:', err);
+                    } else {
                         setCustomAvatars([]);
                     }
-                };
-                
-                checkHealth();
-                fetchFlows(currentAvatar);
-                fetchCustomAvatars();
-                const interval = setInterval(checkHealth, 30000);
-                
-                return () => clearInterval(interval);
-            }, [currentAvatar]);
-            
-            useEffect(() => {
-                fetchSessionState();
-                const stateInterval = setInterval(fetchSessionState, 5000); // Poll every 5 seconds
-                return () => clearInterval(stateInterval);
-            }, [fetchSessionState]);
-            
-            const handleSessionChange = (newSessionId) => {
-                setSessionId(newSessionId);
-                // Fetch initial history for new session
-                // The ChatPanel will do this itself via its useEffect
-            };
-
-            const handleAvatarChange = async (avatarType) => {
-                console.log(`Switching to avatar: ${avatarType}`);
-                setCurrentAvatar(avatarType);
-                // Clear session when switching avatars
-                setSessionId(null);
-                setSessionState(null);
-                
-                // Reload flow definitions for new avatar type
-                try {
-                    const response = await apiService.getFlowDefinitions(avatarType);
-                    if (response.status === 'success') {
-                        setFlowDefinitions(response.flows);
-                        console.log(`✅ Reloaded ${response.flows.length} flows for avatar: ${avatarType}`);
-                    }
                 } catch (err) {
-                    console.error('Failed to reload flow definitions after avatar change:', err);
+                    console.error('Error fetching custom avatars:', err);
+                    setCustomAvatars([]);
                 }
             };
 
-            const getAvatarConfig = (avatarType) => {
-                // Check if it's a custom avatar (and customAvatars is loaded)
-                if (customAvatars && Array.isArray(customAvatars)) {
-                    const customAvatar = customAvatars.find(avatar => avatar.id === avatarType);
-                    if (customAvatar) {
-                        return {
-                            name: customAvatar.name,
-                            company: 'Custom Avatar',
-                            expertise: customAvatar.specialization || customAvatar.description
-                        };
-                    }
+            checkHealth();
+            fetchFlows(currentAvatar);
+            fetchCustomAvatars();
+            const interval = setInterval(checkHealth, 30000);
+
+            return () => clearInterval(interval);
+        }, [currentAvatar]);
+
+        useEffect(() => {
+            fetchSessionState();
+            const stateInterval = setInterval(fetchSessionState, 5000); // Poll every 5 seconds
+            return () => clearInterval(stateInterval);
+        }, [fetchSessionState]);
+
+        const handleSessionChange = (newSessionId) => {
+            setSessionId(newSessionId);
+            // Fetch initial history for new session
+            // The ChatPanel will do this itself via its useEffect
+        };
+
+        const handleAvatarChange = async (avatarType) => {
+            console.log(`Switching to avatar: ${avatarType}`);
+            setCurrentAvatar(avatarType);
+            // Clear session when switching avatars
+            setSessionId(null);
+            setSessionState(null);
+
+            // Reload flow definitions for new avatar type
+            try {
+                const response = await apiService.getFlowDefinitions(avatarType);
+                if (response.status === 'success') {
+                    setFlowDefinitions(response.flows);
+                    console.log(`✅ Reloaded ${response.flows.length} flows for avatar: ${avatarType}`);
                 }
+            } catch (err) {
+                console.error('Failed to reload flow definitions after avatar change:', err);
+            }
+        };
 
-                // Standard avatars
-                const avatarConfigs = {
-                    networker: {
-                        name: 'Anna Kowalczyk',
-                        company: 'LogisPol International',
-                        expertise: 'Ekspansja zagraniczna, logistyka, networking biznesowy'
-                    },
-                    trainer: {
-                        name: 'Prof. Anna Kowalska',
-                        company: 'Instytut Archetypów Osobowości',
-                        expertise: '12 Archetypów Osobowości, psychologia biznesu, coaching'
-                    }
-                };
-                return avatarConfigs[avatarType] || avatarConfigs.networker;
+        const getAvatarConfig = (avatarType) => {
+            // Check if it's a custom avatar (and customAvatars is loaded)
+            if (customAvatars && Array.isArray(customAvatars)) {
+                const customAvatar = customAvatars.find(avatar => avatar.id === avatarType);
+                if (customAvatar) {
+                    return {
+                        name: customAvatar.name,
+                        company: 'Custom Avatar',
+                        expertise: customAvatar.specialization || customAvatar.description
+                    };
+                }
+            }
+
+            // Standard avatars
+            const avatarConfigs = {
+                networker: {
+                    name: 'Anna Kowalczyk',
+                    company: 'LogisPol International',
+                    expertise: 'Ekspansja zagraniczna, logistyka, networking biznesowy'
+                },
+                trainer: {
+                    name: 'Prof. Anna Kowalska',
+                    company: 'Instytut Archetypów Osobowości',
+                    expertise: '12 Archetypów Osobowości, psychologia biznesu, coaching'
+                }
             };
+            return avatarConfigs[avatarType] || avatarConfigs.networker;
+        };
 
-            const avatarConfig = getAvatarConfig(currentAvatar);
-            
-            return (
-                <div>
-                    <header className="header">
-                        <h1>AI Avatar</h1>
-                        <nav className="nav-links">
-                            <a href="/react-dashboard.html" className="nav-link active">📊 Dashboard</a>
-                            <a href="/simulation-chat.html" className="nav-link">🎭 Simulation Chat</a>
-                            <a href="/avatar-flow-creator.html" className="nav-link">🎨 Creator</a>
-                        </nav>
-                        <div className="header-controls">
-                            <button 
-                                className={`mindstate-toggle ${mindStateVisible ? 'active' : ''}`}
-                                onClick={() => setMindStateVisible(!mindStateVisible)}
-                                title={mindStateVisible ? 'Zwiń MindState Monitor' : 'Rozwiń MindState Monitor'}
-                            >
-                                🧠 MindState {mindStateVisible ? '⬆️' : '⬇️'}
-                            </button>
-                                                    <button
+        const avatarConfig = getAvatarConfig(currentAvatar);
+
+        return (
+            <div>
+                <header className="header">
+                    <h1>AI Avatar</h1>
+                    <nav className="nav-links">
+                        <a href="/react-dashboard.html" className="nav-link active">📊 Dashboard</a>
+                        <a href="/simulation-chat.html" className="nav-link">🎭 Simulation Chat</a>
+                        <a href="/avatar-flow-creator.html" className="nav-link">🎨 Creator</a>
+                    </nav>
+                    <div className="header-controls">
+                        <button
+                            className={`mindstate-toggle ${mindStateVisible ? 'active' : ''}`}
+                            onClick={() => setMindStateVisible(!mindStateVisible)}
+                            title={mindStateVisible ? 'Zwiń MindState Monitor' : 'Rozwiń MindState Monitor'}
+                        >
+                            🧠 MindState {mindStateVisible ? '⬆️' : '⬇️'}
+                        </button>
+                        <button
                             className={`mindstate-toggle ${flowSidebarVisible ? 'active' : ''}`}
                             onClick={() => setFlowSidebarVisible(!flowSidebarVisible)}
                             title={flowSidebarVisible ? 'Zwiń Flow Lista' : 'Rozwiń Flow Lista'}
                         >
                             📋 Flows {flowSidebarVisible ? '⬆️' : '⬇️'}
                         </button>
-                        
+
                         <button
                             className={`mindstate-toggle ${debugVisible ? 'active' : ''}`}
                             onClick={() => setDebugVisible(!debugVisible)}
@@ -1507,66 +1514,66 @@
                         >
                             🐛 Debug {debugVisible ? '⬆️' : '⬇️'}
                         </button>
-                            <div className="avatar-selector">
-                                <label htmlFor="avatar-type">👤 Avatar:</label>
-                                <select 
-                                    id="avatar-type" 
-                                    className="avatar-dropdown"
-                                    value={currentAvatar}
-                                    onChange={(e) => handleAvatarChange(e.target.value)}
-                                >
-                                    <optgroup label="🏢 Standard Avatars">
-                                        <option value="networker">🤝 Networker (Anna Kowalczyk)</option>
-                                        <option value="trainer">🎓 Trener (Prof. Anna Kowalska)</option>
+                        <div className="avatar-selector">
+                            <label htmlFor="avatar-type">👤 Avatar:</label>
+                            <select
+                                id="avatar-type"
+                                className="avatar-dropdown"
+                                value={currentAvatar}
+                                onChange={(e) => handleAvatarChange(e.target.value)}
+                            >
+                                <optgroup label="🏢 Standard Avatars">
+                                    <option value="networker">🤝 Networker (Anna Kowalczyk)</option>
+                                    <option value="trainer">🎓 Trener (Prof. Anna Kowalska)</option>
+                                </optgroup>
+                                {customAvatars && Array.isArray(customAvatars) && customAvatars.length > 0 && (
+                                    <optgroup label="🎭 Custom Avatars">
+                                        {customAvatars.map(avatar => (
+                                            <option key={avatar.id} value={avatar.id}>
+                                                🎯 {avatar.name}
+                                            </option>
+                                        ))}
                                     </optgroup>
-                                    {customAvatars && Array.isArray(customAvatars) && customAvatars.length > 0 && (
-                                        <optgroup label="🎭 Custom Avatars">
-                                            {customAvatars.map(avatar => (
-                                                <option key={avatar.id} value={avatar.id}>
-                                                    🎯 {avatar.name}
-                                                </option>
-                                            ))}
-                                        </optgroup>
-                                    )}
-                                </select>
-                            </div>
+                                )}
+                            </select>
                         </div>
-                    </header>
-                    <MindStateHorizontal 
-                        sessionId={sessionId} 
-                        mindState={sessionState?.mindState}
-                        isVisible={mindStateVisible}
-                    />
-                    <div className={`main-content ${!debugVisible ? 'debug-hidden' : ''}`}>
-                        <ChatPanel 
-                            sessionId={sessionId} 
-                            onSessionChange={handleSessionChange}
-                            avatarConfig={avatarConfig}
-                            currentAvatar={currentAvatar}
-                        />
-                        <FlowGraph 
-                            sessionId={sessionId}
-                            flows={flowDefinitions}
-                            activeFlow={sessionState?.activeFlow}
-                            avatarType={currentAvatar}
-                            flowSidebarVisible={flowSidebarVisible}
-                            sessionState={sessionState}
-                        />
-                        <DebugPanel isVisible={debugVisible} />
-                        
-                        {/* Right Sidebar for Flow List */}
-                        <FlowsRightSidebar 
-                            flows={flowDefinitions}
-                            activeFlow={sessionState?.activeFlow}
-                            isVisible={flowSidebarVisible}
-                        />
                     </div>
+                </header>
+                <MindStateHorizontal
+                    sessionId={sessionId}
+                    mindState={sessionState?.mindState}
+                    isVisible={mindStateVisible}
+                />
+                <div className={`main-content ${!debugVisible ? 'debug-hidden' : ''}`}>
+                    <ChatPanel
+                        sessionId={sessionId}
+                        onSessionChange={handleSessionChange}
+                        avatarConfig={avatarConfig}
+                        currentAvatar={currentAvatar}
+                    />
+                    <FlowGraph
+                        sessionId={sessionId}
+                        flows={flowDefinitions}
+                        activeFlow={sessionState?.activeFlow}
+                        avatarType={currentAvatar}
+                        flowSidebarVisible={flowSidebarVisible}
+                        sessionState={sessionState}
+                    />
+                    <DebugPanel isVisible={debugVisible}/>
+
+                    {/* Right Sidebar for Flow List */}
+                    <FlowsRightSidebar
+                        flows={flowDefinitions}
+                        activeFlow={sessionState?.activeFlow}
+                        isVisible={flowSidebarVisible}
+                    />
                 </div>
-            );
-        };
-        
-        // Render the app
-        ReactDOM.render(<Dashboard />, document.getElementById('root'));
-    </script>
+            </div>
+        );
+    };
+
+    // Render the app
+    ReactDOM.render(<Dashboard/>, document.getElementById('root'));
+</script>
 </body>
 </html> 

@@ -1,7 +1,7 @@
-import { Request, Response } from 'express';
+import {Request, Response} from 'express';
 import ExtendedDatabaseService from '../services/extended-database.service';
-import { ExecutionTimerService } from '../services/execution-timer.service';
-import { SimulationScene, SceneParticipant } from '../models/auth-types';
+import {ExecutionTimerService} from '../services/execution-timer.service';
+import {SimulationScene, SceneParticipant} from '../models/auth-types';
 
 export class SceneBuilderController {
     private databaseService: ExtendedDatabaseService;
@@ -20,7 +20,7 @@ export class SceneBuilderController {
 
         try {
             const sceneData = req.body;
-            
+
             // Validation
             if (!sceneData.name || !sceneData.category) {
                 res.status(400).json({
@@ -93,11 +93,11 @@ export class SceneBuilderController {
             // For now, use default user - later get from auth
             const userId = req.query.user_id as string || 'default_user';
             const category = req.query.category as string;
-            
+
             console.log('📥 Getting simulation scenes for user:', userId, category ? `category: ${category}` : '');
 
             let scenes: SimulationScene[];
-            
+
             if (category) {
                 scenes = await this.databaseService.getScenesByCategory(category);
             } else {
@@ -132,8 +132,8 @@ export class SceneBuilderController {
         timer.start();
 
         try {
-            const { sceneId } = req.params;
-            
+            const {sceneId} = req.params;
+
             console.log('📥 Getting simulation scene:', sceneId);
 
             const scene = await this.databaseService.getSimulationSceneById(sceneId);
@@ -174,9 +174,9 @@ export class SceneBuilderController {
         timer.start();
 
         try {
-            const { sceneId } = req.params;
+            const {sceneId} = req.params;
             const updateData = req.body;
-            
+
             console.log('✏️ Updating simulation scene:', sceneId);
 
             const updatedScene = await this.databaseService.updateSimulationScene(sceneId, updateData);
@@ -218,8 +218,8 @@ export class SceneBuilderController {
         timer.start();
 
         try {
-            const { sceneId } = req.params;
-            
+            const {sceneId} = req.params;
+
             console.log('🗑️ Deleting simulation scene:', sceneId);
 
             const deleted = await this.databaseService.deleteSimulationScene(sceneId);
@@ -292,9 +292,9 @@ export class SceneBuilderController {
         timer.start();
 
         try {
-            const { sceneId } = req.params;
-            const { name } = req.body;
-            
+            const {sceneId} = req.params;
+            const {name} = req.body;
+
             console.log('📋 Duplicating simulation scene:', sceneId);
 
             const originalScene = await this.databaseService.getSimulationSceneById(sceneId);

@@ -11,7 +11,7 @@ class HomepageApp {
         this.currentAvatars = [];
         this.currentCategory = 'all';
         this.searchQuery = '';
-        
+
         // Wait for auth manager to be ready
         this.waitForAuthManager().then(() => {
             this.init();
@@ -31,10 +31,10 @@ class HomepageApp {
         this.loadCustomAvatars();
         this.setupRouting();
         this.startAnimations();
-        
+
         // Check initial screen size
         this.handleResize();
-        
+
         console.log('🎯 Homepage App initialized');
     }
 
@@ -107,7 +107,7 @@ class HomepageApp {
     toggleSidebar() {
         const sidebar = document.querySelector('.sidebar');
         this.sidebarCollapsed = !this.sidebarCollapsed;
-        
+
         if (this.isMobile) {
             sidebar.classList.toggle('open');
         } else {
@@ -116,19 +116,19 @@ class HomepageApp {
 
         // Save state
         localStorage.setItem('sidebarCollapsed', this.sidebarCollapsed);
-        
+
         console.log(`🎯 Sidebar ${this.sidebarCollapsed ? 'collapsed' : 'expanded'}`);
     }
 
     navigateToPage(pageName) {
         console.log(`🎯 Navigating to page: ${pageName}`);
-        
+
         // Show loading
         this.showLoading();
-        
+
         // Update navigation active state
         this.updateNavigation(pageName);
-        
+
         // Hide welcome screen
         const welcomeScreen = document.getElementById('welcomeScreen');
         if (welcomeScreen) {
@@ -152,9 +152,9 @@ class HomepageApp {
 
         // Update current page
         this.currentPage = pageName;
-        
+
         // Update URL (basic routing)
-        window.history.pushState({ page: pageName }, '', `#${pageName}`);
+        window.history.pushState({page: pageName}, '', `#${pageName}`);
     }
 
     updateNavigation(pageName) {
@@ -278,7 +278,7 @@ class HomepageApp {
                 </button>
             </div>
         `;
-        
+
         contentArea.innerHTML = placeholderHTML;
     }
 
@@ -317,17 +317,17 @@ class HomepageApp {
         // Update navigation
         this.updateNavigation('welcome');
         this.updatePageHeader('welcome');
-        
+
         this.currentPage = 'welcome';
     }
 
     async loadCustomAvatars() {
         try {
             console.log('🎯 Loading custom avatars...');
-            
+
             const response = await fetch('/api/avatars');
             const data = await response.json();
-            
+
             if (data.success && Array.isArray(data.data)) {
                 this.updateAvatarDropdown(data.data);
                 console.log(`✅ Loaded ${data.data.length} custom avatars`);
@@ -343,7 +343,7 @@ class HomepageApp {
 
         // Keep existing standard avatars
         const standardOptions = Array.from(dropdown.querySelectorAll('option'));
-        
+
         // Add custom avatars
         if (customAvatars.length > 0) {
             // Create optgroup for custom avatars if it doesn't exist
@@ -369,10 +369,10 @@ class HomepageApp {
 
     handleAvatarChange(avatarId) {
         console.log(`🎯 Avatar changed to: ${avatarId}`);
-        
+
         // Save selection
         localStorage.setItem('selectedAvatar', avatarId);
-        
+
         // Show success notification
         this.showNotification('Avatar został zmieniony', 'success');
     }
@@ -463,7 +463,7 @@ class HomepageApp {
                     const menu = document.querySelector('.fab-menu');
                     if (menu) menu.remove();
                 }
-            }, { once: true });
+            }, {once: true});
         }, 100);
     }
 
@@ -533,15 +533,15 @@ class HomepageApp {
                 </div>
             </div>
         `;
-        
+
         document.body.insertAdjacentHTML('beforeend', searchOverlay);
     }
 
     showNotifications() {
         const notifications = [
-            { id: 1, title: 'Nowy avatar został utworzony', time: '2 min temu', type: 'success' },
-            { id: 2, title: 'Przetwarzanie pliku wiedzy', time: '15 min temu', type: 'info' },
-            { id: 3, title: 'Flow zaktualizowany', time: '1h temu', type: 'warning' }
+            {id: 1, title: 'Nowy avatar został utworzony', time: '2 min temu', type: 'success'},
+            {id: 2, title: 'Przetwarzanie pliku wiedzy', time: '15 min temu', type: 'info'},
+            {id: 3, title: 'Flow zaktualizowany', time: '1h temu', type: 'warning'}
         ];
 
         const notificationOverlay = `
@@ -616,7 +616,7 @@ class HomepageApp {
     handleResize() {
         const wasMobile = this.isMobile;
         this.isMobile = window.innerWidth <= 768;
-        
+
         if (wasMobile !== this.isMobile) {
             const sidebar = document.querySelector('.sidebar');
             if (this.isMobile) {
@@ -643,7 +643,7 @@ class HomepageApp {
     animateStats() {
         const statNumbers = document.querySelectorAll('.stat-number');
         const targets = ['12', '1.2K', '98%'];
-        
+
         statNumbers.forEach((stat, index) => {
             const target = targets[index];
             if (target.includes('K')) {
@@ -750,15 +750,15 @@ class HomepageApp {
         // Use AuthManager for authentication check
         this.isLoggedIn = window.authManager.isAuthenticated();
         this.currentUser = window.authManager.getUser();
-        
+
         console.log('🔍 Authentication check:', {
             isLoggedIn: this.isLoggedIn,
             user: this.currentUser
         });
-        
+
         // Setup auth event listeners
         this.setupAuthEventListeners();
-        
+
         if (this.isLoggedIn) {
             this.updateUIForLoggedInUser();
             console.log('✅ User is logged in:', this.currentUser);
@@ -798,11 +798,11 @@ class HomepageApp {
         // Update user profile in sidebar
         const userName = document.querySelector('.user-name');
         const userStatus = document.querySelector('.user-status');
-        
+
         if (userName && this.currentUser) {
             userName.textContent = `${this.currentUser.first_name} ${this.currentUser.last_name}`;
         }
-        
+
         if (userStatus) {
             userStatus.textContent = this.currentUser?.role === 'admin' ? 'Administrator' : 'Użytkownik';
         }
@@ -823,7 +823,7 @@ class HomepageApp {
         if (!this.currentUser) return;
 
         const isAdmin = this.currentUser.role === 'admin';
-        
+
         // Show admin-only sections
         const adminSections = document.querySelectorAll('[data-admin-only]');
         adminSections.forEach(section => {
@@ -838,7 +838,7 @@ class HomepageApp {
 
     addAdminNavigation() {
         const navSections = document.querySelector('.sidebar-nav');
-        
+
         // Check if admin section already exists
         if (document.querySelector('.admin-nav-section')) return;
 
@@ -974,7 +974,7 @@ class HomepageApp {
     enableDemoMode() {
         localStorage.setItem('demoMode', 'true');
         this.showNotification('Tryb demo włączony', 'info');
-        
+
         // Hide auth prompt
         const authPrompt = document.querySelector('.auth-prompt');
         if (authPrompt) {
@@ -1094,7 +1094,7 @@ class HomepageApp {
                     const menu = document.querySelector('.user-menu');
                     if (menu) menu.remove();
                 }
-            }, { once: true });
+            }, {once: true});
         }, 100);
     }
 
@@ -1104,7 +1104,7 @@ class HomepageApp {
                 // Use AuthManager for logout
                 await window.authManager.logout();
                 this.showNotification('Wylogowano pomyślnie', 'success');
-                
+
                 // Redirect to login page after short delay
                 setTimeout(() => {
                     window.location.href = '/login.html';
@@ -1136,10 +1136,10 @@ class HomepageApp {
         if (avatarManagerScreen) {
             avatarManagerScreen.style.display = 'block';
             avatarManagerScreen.style.animation = 'fadeInUp 0.5s ease forwards';
-            
+
             // Initialize Avatar Manager
             this.initializeAvatarManager();
-            
+
             // Load avatars
             this.loadAvatars();
         }
@@ -1242,7 +1242,7 @@ class HomepageApp {
                 console.error('Failed to load demo avatars, using fallback:', error);
                 demoAvatars = this.getDemoAvatars();
             }
-            
+
             // Load user avatars if logged in
             let userAvatars = [];
             if (this.isLoggedIn) {
@@ -1282,7 +1282,7 @@ class HomepageApp {
                 description: 'Doświadczony prezes firmy technologicznej, ekspert od AI i automatyzacji',
                 personality: 'Charyzmatyczny, wizjonerski, analityczny',
                 specialization: 'Zarządzanie projektami AI, rozwój algorytmów uczenia maszynowego',
-                stats: { conversations: 45, flows: 3, accuracy: 94 },
+                stats: {conversations: 45, flows: 3, accuracy: 94},
                 status: 'active',
                 category: 'business'
             },
@@ -1293,7 +1293,7 @@ class HomepageApp {
                 description: 'Ekspert od networkingu i budowania relacji biznesowych',
                 personality: 'Towarzyski, empatyczny, perswazyjny',
                 specialization: 'Budowanie sieci kontaktów, sprzedaż B2B',
-                stats: { conversations: 67, flows: 4, accuracy: 91 },
+                stats: {conversations: 67, flows: 4, accuracy: 91},
                 status: 'active',
                 category: 'sales'
             },
@@ -1304,7 +1304,7 @@ class HomepageApp {
                 description: 'Profesjonalny trener biznesowy i coach rozwoju osobistego',
                 personality: 'Motywujący, cierpliwy, analityczny',
                 specialization: 'Szkolenia biznesowe, coaching, rozwój umiejętności',
-                stats: { conversations: 89, flows: 5, accuracy: 96 },
+                stats: {conversations: 89, flows: 5, accuracy: 96},
                 status: 'active',
                 category: 'training'
             },
@@ -1315,7 +1315,7 @@ class HomepageApp {
                 description: 'Ciekawy świata student gotowy do nauki i zadawania pytań',
                 personality: 'Ciekawski, entuzjastyczny, otwarty na wiedzę',
                 specialization: 'Uczenie się, zadawanie pytań, przyswajanie wiedzy',
-                stats: { conversations: 23, flows: 2, accuracy: 87 },
+                stats: {conversations: 23, flows: 2, accuracy: 87},
                 status: 'active',
                 category: 'education'
             },
@@ -1326,7 +1326,7 @@ class HomepageApp {
                 description: 'Doświadczony pracownik biurowy, ekspert od codziennych zadań',
                 personality: 'Praktyczny, zorganizowany, pomocny',
                 specialization: 'Zarządzanie zadaniami, organizacja pracy, efektywność',
-                stats: { conversations: 56, flows: 3, accuracy: 92 },
+                stats: {conversations: 56, flows: 3, accuracy: 92},
                 status: 'active',
                 category: 'workplace'
             },
@@ -1337,7 +1337,7 @@ class HomepageApp {
                 description: 'Reprezentuje perspektywę klienta w różnych scenariuszach biznesowych',
                 personality: 'Wymagający, dociekliwy, zorientowany na wartość',
                 specialization: 'Ocena produktów/usług, negocjacje, podejmowanie decyzji',
-                stats: { conversations: 34, flows: 2, accuracy: 89 },
+                stats: {conversations: 34, flows: 2, accuracy: 89},
                 status: 'active',
                 category: 'customer'
             }
@@ -1347,7 +1347,7 @@ class HomepageApp {
     updateAvatarCounts() {
         const counts = {
             all: this.allAvatars.length,
-            'with-flows': this.allAvatars.filter(a => 
+            'with-flows': this.allAvatars.filter(a =>
                 (a.flows && a.flows.length > 0) || (a.stats && a.stats.flows > 0)
             ).length,
             reactive: this.allAvatars.filter(a => a.type === 'reactive').length,
@@ -1376,7 +1376,7 @@ class HomepageApp {
                 this.currentAvatars = this.allAvatars;
                 break;
             case 'with-flows':
-                this.currentAvatars = this.allAvatars.filter(a => 
+                this.currentAvatars = this.allAvatars.filter(a =>
                     (a.flows && a.flows.length > 0) || (a.stats && a.stats.flows > 0)
                 );
                 break;
@@ -1445,13 +1445,13 @@ class HomepageApp {
 
     createAvatarCard(avatar) {
         const initial = avatar.name.charAt(0);
-        
+
         // Handle both old format (stats) and new format (usage_stats + flows array)
         const hasFlows = (avatar.flows && avatar.flows.length > 0) || (avatar.stats && avatar.stats.flows > 0);
         const conversations = avatar.usage_stats?.total_conversations || avatar.stats?.conversations || 0;
         const flows = (avatar.flows && avatar.flows.length) || avatar.stats?.flows || 0;
         const accuracy = avatar.usage_stats?.success_rate || avatar.stats?.accuracy || 0;
-        
+
         const badgeClass = avatar.type === 'demo' ? 'demo' : (avatar.status === 'active' ? '' : 'inactive');
         const badgeText = avatar.type === 'demo' ? 'DEMO' : (avatar.status === 'active' ? 'AKTYWNY' : 'NIEAKTYWNY');
 
@@ -1487,12 +1487,12 @@ class HomepageApp {
                 </div>
 
                 <div class="avatar-actions">
-                    ${avatar.type === 'demo' 
-                        ? `<button class="avatar-btn avatar-btn-primary" data-action="copy" data-avatar-id="${avatar.id}">Kopiuj</button>
+                    ${avatar.type === 'demo'
+            ? `<button class="avatar-btn avatar-btn-primary" data-action="copy" data-avatar-id="${avatar.id}">Kopiuj</button>
                            <button class="avatar-btn avatar-btn-secondary" data-action="chat" data-avatar-id="${avatar.id}">Testuj</button>`
-                        : `<button class="avatar-btn avatar-btn-primary" data-action="edit" data-avatar-id="${avatar.id}">Edytuj</button>
+            : `<button class="avatar-btn avatar-btn-primary" data-action="edit" data-avatar-id="${avatar.id}">Edytuj</button>
                            <button class="avatar-btn avatar-btn-secondary" data-action="chat" data-avatar-id="${avatar.id}">Chat</button>`
-                    }
+        }
                 </div>
             </div>
         `;

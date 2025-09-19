@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
+import {Request, Response} from 'express';
 import CustomAvatarService from '../services/custom-avatar.service';
-import { ExecutionTimerService } from '../services/execution-timer.service';
+import {ExecutionTimerService} from '../services/execution-timer.service';
 
 /**
  * CustomAvatarController - API endpoints dla zarządzania custom avatarami
@@ -68,7 +68,7 @@ export class CustomAvatarController {
         } catch (error) {
             timer.stop();
             console.error('❌ Error saving custom avatar:', error);
-            
+
             res.status(500).json({
                 success: false,
                 error: 'Internal server error while saving custom avatar'
@@ -105,7 +105,7 @@ export class CustomAvatarController {
      */
     public async getAvatarById(req: Request, res: Response): Promise<void> {
         try {
-            const { id } = req.params;
+            const {id} = req.params;
             const avatar = await this.customAvatarService.getCustomAvatarById(id);
 
             if (!avatar) {
@@ -136,7 +136,7 @@ export class CustomAvatarController {
      */
     public async updateAvatar(req: Request, res: Response): Promise<void> {
         try {
-            const { id } = req.params;
+            const {id} = req.params;
             const updates = req.body;
 
             const updatedAvatar = await this.customAvatarService.updateCustomAvatar(id, updates);
@@ -173,7 +173,7 @@ export class CustomAvatarController {
         timer.start();
 
         try {
-            const { id } = req.params;
+            const {id} = req.params;
 
             if (!id) {
                 res.status(400).json({
@@ -234,7 +234,7 @@ export class CustomAvatarController {
      */
     public async activateAvatar(req: Request, res: Response): Promise<void> {
         try {
-            const { id } = req.params;
+            const {id} = req.params;
             const activatedAvatar = await this.customAvatarService.activateCustomAvatar(id);
 
             if (!activatedAvatar) {
@@ -266,7 +266,7 @@ export class CustomAvatarController {
      */
     public async getAvatarFlows(req: Request, res: Response): Promise<void> {
         try {
-            const { id } = req.params;
+            const {id} = req.params;
             const flows = await this.customAvatarService.getAvatarFlows(id);
 
             res.json({
@@ -292,7 +292,7 @@ export class CustomAvatarController {
      */
     public async getAvatarIntents(req: Request, res: Response): Promise<void> {
         try {
-            const { id } = req.params;
+            const {id} = req.params;
             const intents = await this.customAvatarService.getAvatarIntents(id);
 
             res.json({
@@ -350,10 +350,10 @@ export class CustomAvatarController {
      */
     public async processKnowledgeFiles(req: Request, res: Response): Promise<void> {
         try {
-            const { avatarId } = req.params;
-            
+            const {avatarId} = req.params;
+
             const result = await this.customAvatarService.processKnowledgeFiles(avatarId);
-            
+
             if (result.success) {
                 res.status(200).json({
                     success: true,
@@ -385,9 +385,9 @@ export class CustomAvatarController {
      */
     public async uploadKnowledgeFile(req: Request, res: Response): Promise<void> {
         try {
-            const { avatarId } = req.params;
-            const { fileName, fileType, fileSize, fileContent } = req.body;
-            
+            const {avatarId} = req.params;
+            const {fileName, fileType, fileSize, fileContent} = req.body;
+
             if (!fileName || !fileType || !fileContent) {
                 res.status(400).json({
                     success: false,
@@ -414,8 +414,8 @@ export class CustomAvatarController {
             const fileBuffer = Buffer.from(fileContent, 'base64');
 
             const result = await this.customAvatarService.addKnowledgeFileToAvatar(
-                avatarId, 
-                knowledgeFile, 
+                avatarId,
+                knowledgeFile,
                 fileBuffer
             );
 

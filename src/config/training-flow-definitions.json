@@ -4,7 +4,9 @@
       "id": "greeting_flow",
       "name": "Powitanie i nawiązanie kontaktu",
       "description": "Proces powitania i zbudowania pierwszego kontaktu z użytkownikiem",
-      "entry_intents": ["greeting"],
+      "entry_intents": [
+        "greeting"
+      ],
       "priority": 10,
       "steps": [
         {
@@ -12,99 +14,140 @@
           "name": "Powitanie",
           "description": "Ciepłe powitanie użytkownika",
           "required": true,
-          "next_steps": ["conversation_opener"]
+          "next_steps": [
+            "conversation_opener"
+          ]
         },
         {
           "id": "conversation_opener",
           "name": "Otwarcie rozmowy",
           "description": "Zaproszenie do rozmowy o potrzebach",
           "required": true,
-          "next_steps": ["completed"]
+          "next_steps": [
+            "completed"
+          ]
         }
       ],
-      "success_criteria": ["initial_greeting", "conversation_opener"],
+      "success_criteria": [
+        "initial_greeting",
+        "conversation_opener"
+      ],
       "max_duration": 300,
       "repeatable": false
     },
     {
-      "id": "theory_introduction_flow", 
+      "id": "theory_introduction_flow",
       "name": "Wprowadzenie teorii",
       "description": "Systematyczne przedstawienie teoretycznych podstaw tematu z definicjami i wyjaśnieniami",
-      "entry_intents": ["theory_request", "explain_concept", "what_is"],
+      "entry_intents": [
+        "theory_request",
+        "explain_concept",
+        "what_is"
+      ],
       "priority": 10,
       "pedagogical_type": "THEORY",
       "steps": [
         {
           "id": "concept_introduction",
-          "name": "Wprowadzenie koncepcji", 
+          "name": "Wprowadzenie koncepcji",
           "description": "Przedstawienie głównej koncepcji i jej znaczenia",
           "required": true,
-          "next_steps": ["detailed_explanation"]
+          "next_steps": [
+            "detailed_explanation"
+          ]
         },
         {
           "id": "detailed_explanation",
           "name": "Szczegółowe wyjaśnienie",
           "description": "Dogłębne omówienie teorii z przykładami",
-          "required": true, 
-          "next_steps": ["key_principles"]
+          "required": true,
+          "next_steps": [
+            "key_principles"
+          ]
         },
         {
           "id": "key_principles",
           "name": "Kluczowe zasady",
           "description": "Przedstawienie głównych zasad i reguł",
           "required": true,
-          "next_steps": ["theory_summary"]
+          "next_steps": [
+            "theory_summary"
+          ]
         },
         {
           "id": "theory_summary",
           "name": "Podsumowanie teorii",
           "description": "Syntetyczne podsumowanie najważniejszych punktów",
           "required": true,
-          "next_steps": ["completed"]
+          "next_steps": [
+            "completed"
+          ]
         }
       ],
-      "success_criteria": ["concept_introduction", "detailed_explanation", "key_principles", "theory_summary"],
+      "success_criteria": [
+        "concept_introduction",
+        "detailed_explanation",
+        "key_principles",
+        "theory_summary"
+      ],
       "max_duration": 600,
       "repeatable": true
     },
     {
       "id": "guided_practice_flow",
-      "name": "Praktyka z przewodnikiem", 
+      "name": "Praktyka z przewodnikiem",
       "description": "Wspólne ćwiczenie z trenerem krok po kroku z bezpośrednim wsparciem",
-      "entry_intents": ["show_me_how", "practice_together", "guide_me"],
+      "entry_intents": [
+        "show_me_how",
+        "practice_together",
+        "guide_me"
+      ],
       "priority": 9,
-      "pedagogical_type": "EXAMPLE", 
+      "pedagogical_type": "EXAMPLE",
       "steps": [
         {
           "id": "practice_setup",
           "name": "Przygotowanie do ćwiczenia",
           "description": "Ustalenie celów i warunków ćwiczenia",
           "required": true,
-          "next_steps": ["step_by_step_guidance"]
+          "next_steps": [
+            "step_by_step_guidance"
+          ]
         },
         {
-          "id": "step_by_step_guidance", 
+          "id": "step_by_step_guidance",
           "name": "Przewodnictwo krok po kroku",
           "description": "Prowadzenie uczącego przez kolejne etapy",
           "required": true,
-          "next_steps": ["feedback_loop"]
+          "next_steps": [
+            "feedback_loop"
+          ]
         },
         {
           "id": "feedback_loop",
           "name": "Pętla zwrotna",
-          "description": "Korekta błędów i pozytywne wzmocnienia", 
+          "description": "Korekta błędów i pozytywne wzmocnienia",
           "required": true,
-          "next_steps": ["practice_completion"]
+          "next_steps": [
+            "practice_completion"
+          ]
         },
         {
           "id": "practice_completion",
           "name": "Zakończenie ćwiczenia",
           "description": "Podsumowanie postępów i następne kroki",
           "required": true,
-          "next_steps": ["completed"]
+          "next_steps": [
+            "completed"
+          ]
         }
       ],
-      "success_criteria": ["practice_setup", "step_by_step_guidance", "feedback_loop", "practice_completion"],
+      "success_criteria": [
+        "practice_setup",
+        "step_by_step_guidance",
+        "feedback_loop",
+        "practice_completion"
+      ],
       "max_duration": 900,
       "repeatable": true
     },
@@ -112,7 +155,11 @@
       "id": "question_answer_flow",
       "name": "Sesja pytań i odpowiedzi",
       "description": "Interaktywna sesja sprawdzająca zrozumienie i rozwijająca wiedzę",
-      "entry_intents": ["ask_question", "check_understanding", "clarify"],
+      "entry_intents": [
+        "ask_question",
+        "check_understanding",
+        "clarify"
+      ],
       "priority": 8,
       "pedagogical_type": "QUESTION",
       "steps": [
@@ -121,31 +168,44 @@
           "name": "Identyfikacja pytania",
           "description": "Dokładne zrozumienie pytania uczącego",
           "required": true,
-          "next_steps": ["knowledge_retrieval"]
+          "next_steps": [
+            "knowledge_retrieval"
+          ]
         },
         {
           "id": "knowledge_retrieval",
           "name": "Wyszukiwanie wiedzy",
           "description": "Odnalezienie odpowiednich informacji z bazy",
           "required": true,
-          "next_steps": ["answer_formulation"]
+          "next_steps": [
+            "answer_formulation"
+          ]
         },
         {
           "id": "answer_formulation",
           "name": "Formułowanie odpowiedzi",
           "description": "Przygotowanie jasnej i zrozumiałej odpowiedzi",
           "required": true,
-          "next_steps": ["comprehension_check"]
+          "next_steps": [
+            "comprehension_check"
+          ]
         },
         {
           "id": "comprehension_check",
           "name": "Sprawdzenie zrozumienia",
           "description": "Weryfikacja czy odpowiedź została zrozumiana",
           "required": true,
-          "next_steps": ["completed"]
+          "next_steps": [
+            "completed"
+          ]
         }
       ],
-      "success_criteria": ["question_identification", "knowledge_retrieval", "answer_formulation", "comprehension_check"],
+      "success_criteria": [
+        "question_identification",
+        "knowledge_retrieval",
+        "answer_formulation",
+        "comprehension_check"
+      ],
       "max_duration": 300,
       "repeatable": true
     },
@@ -153,7 +213,11 @@
       "id": "independent_practice_flow",
       "name": "Samodzielna praktyka",
       "description": "Ćwiczenie pozwalające na samodzielne zastosowanie wiedzy",
-      "entry_intents": ["practice_alone", "try_myself", "exercise"],
+      "entry_intents": [
+        "practice_alone",
+        "try_myself",
+        "exercise"
+      ],
       "priority": 7,
       "pedagogical_type": "PRACTICE",
       "steps": [
@@ -162,31 +226,44 @@
           "name": "Przydzielenie zadania",
           "description": "Jasne określenie zadania do samodzielnego wykonania",
           "required": true,
-          "next_steps": ["resource_provision"]
+          "next_steps": [
+            "resource_provision"
+          ]
         },
         {
           "id": "resource_provision",
           "name": "Udostępnienie zasobów",
           "description": "Przekazanie niezbędnych materiałów i wskazówek",
           "required": true,
-          "next_steps": ["progress_monitoring"]
+          "next_steps": [
+            "progress_monitoring"
+          ]
         },
         {
           "id": "progress_monitoring",
           "name": "Monitorowanie postępów",
           "description": "Obserwacja i wsparcie w razie potrzeby",
           "required": true,
-          "next_steps": ["result_evaluation"]
+          "next_steps": [
+            "result_evaluation"
+          ]
         },
         {
           "id": "result_evaluation",
           "name": "Ocena rezultatów",
           "description": "Analiza wykonanego zadania i feedback",
           "required": true,
-          "next_steps": ["completed"]
+          "next_steps": [
+            "completed"
+          ]
         }
       ],
-      "success_criteria": ["task_assignment", "resource_provision", "progress_monitoring", "result_evaluation"],
+      "success_criteria": [
+        "task_assignment",
+        "resource_provision",
+        "progress_monitoring",
+        "result_evaluation"
+      ],
       "max_duration": 1200,
       "repeatable": true
     },
@@ -194,40 +271,57 @@
       "id": "assessment_flow",
       "name": "Ocena i sprawdzenie",
       "description": "Formalna ocena poziomu opanowania materiału",
-      "entry_intents": ["test_me", "check_knowledge", "assessment"],
+      "entry_intents": [
+        "test_me",
+        "check_knowledge",
+        "assessment"
+      ],
       "priority": 6,
       "pedagogical_type": "ASSESSMENT",
       "steps": [
         {
-          "id": "assessment_preparation", 
+          "id": "assessment_preparation",
           "name": "Przygotowanie oceny",
           "description": "Wybór odpowiednich pytań i kryteriów oceny",
           "required": true,
-          "next_steps": ["knowledge_testing"]
+          "next_steps": [
+            "knowledge_testing"
+          ]
         },
         {
           "id": "knowledge_testing",
           "name": "Testowanie wiedzy",
           "description": "Przeprowadzenie testu lub sprawdzianu",
           "required": true,
-          "next_steps": ["result_analysis"]
+          "next_steps": [
+            "result_analysis"
+          ]
         },
         {
           "id": "result_analysis",
           "name": "Analiza wyników",
           "description": "Ocena poprawności odpowiedzi i poziomu zrozumienia",
           "required": true,
-          "next_steps": ["feedback_delivery"]
+          "next_steps": [
+            "feedback_delivery"
+          ]
         },
         {
           "id": "feedback_delivery",
           "name": "Przekazanie feedbacku",
           "description": "Omówienie wyników z sugestiami rozwoju",
           "required": true,
-          "next_steps": ["completed"]
+          "next_steps": [
+            "completed"
+          ]
         }
       ],
-      "success_criteria": ["assessment_preparation", "knowledge_testing", "result_analysis", "feedback_delivery"],
+      "success_criteria": [
+        "assessment_preparation",
+        "knowledge_testing",
+        "result_analysis",
+        "feedback_delivery"
+      ],
       "max_duration": 600,
       "repeatable": true
     },
@@ -235,7 +329,11 @@
       "id": "summary_reflection_flow",
       "name": "Podsumowanie i refleksja",
       "description": "Proces podsumowania materiału i refleksji nad nauką",
-      "entry_intents": ["summarize", "reflect", "what_learned"],
+      "entry_intents": [
+        "summarize",
+        "reflect",
+        "what_learned"
+      ],
       "priority": 5,
       "pedagogical_type": "SUMMARY",
       "steps": [
@@ -244,31 +342,44 @@
           "name": "Powtórka treści",
           "description": "Przegląd najważniejszych punktów z sesji",
           "required": true,
-          "next_steps": ["key_insights"]
+          "next_steps": [
+            "key_insights"
+          ]
         },
         {
           "id": "key_insights",
           "name": "Kluczowe wnioski",
           "description": "Identyfikacja głównych wniosków i odkryć",
           "required": true,
-          "next_steps": ["reflection_questions"]
+          "next_steps": [
+            "reflection_questions"
+          ]
         },
         {
           "id": "reflection_questions",
           "name": "Pytania refleksyjne",
           "description": "Zadawanie pytań pomagających w refleksji",
           "required": true,
-          "next_steps": ["next_steps_planning"]
+          "next_steps": [
+            "next_steps_planning"
+          ]
         },
         {
           "id": "next_steps_planning",
           "name": "Planowanie kolejnych kroków",
           "description": "Określenie dalszego kierunku nauki",
           "required": true,
-          "next_steps": ["completed"]
+          "next_steps": [
+            "completed"
+          ]
         }
       ],
-      "success_criteria": ["content_recap", "key_insights", "reflection_questions", "next_steps_planning"],
+      "success_criteria": [
+        "content_recap",
+        "key_insights",
+        "reflection_questions",
+        "next_steps_planning"
+      ],
       "max_duration": 400,
       "repeatable": true
     },
@@ -276,7 +387,11 @@
       "id": "next_steps_flow",
       "name": "Planowanie kolejnych kroków",
       "description": "Określenie dalszych działań i ścieżki rozwoju",
-      "entry_intents": ["what_next", "continue_learning", "next_topic"],
+      "entry_intents": [
+        "what_next",
+        "continue_learning",
+        "next_topic"
+      ],
       "priority": 4,
       "pedagogical_type": "PLANNING",
       "steps": [
@@ -285,43 +400,78 @@
           "name": "Ocena postępów",
           "description": "Przegląd dotychczasowych osiągnięć",
           "required": true,
-          "next_steps": ["gap_analysis"]
+          "next_steps": [
+            "gap_analysis"
+          ]
         },
         {
           "id": "gap_analysis",
           "name": "Analiza braków",
           "description": "Identyfikacja obszarów do dalszego rozwoju",
           "required": true,
-          "next_steps": ["path_recommendation"]
+          "next_steps": [
+            "path_recommendation"
+          ]
         },
         {
           "id": "path_recommendation",
           "name": "Rekomendacja ścieżki",
           "description": "Sugestie co do dalszych kroków nauki",
           "required": true,
-          "next_steps": ["resource_recommendation"]
+          "next_steps": [
+            "resource_recommendation"
+          ]
         },
         {
           "id": "resource_recommendation",
           "name": "Rekomendacja zasobów",
           "description": "Wskazanie odpowiednich materiałów i narzędzi",
           "required": true,
-          "next_steps": ["completed"]
+          "next_steps": [
+            "completed"
+          ]
         }
       ],
-      "success_criteria": ["progress_assessment", "gap_analysis", "path_recommendation", "resource_recommendation"],
+      "success_criteria": [
+        "progress_assessment",
+        "gap_analysis",
+        "path_recommendation",
+        "resource_recommendation"
+      ],
       "max_duration": 300,
       "repeatable": true
     }
   ],
   "flow_transitions": {
-    "theory_introduction_flow": ["guided_practice_flow", "question_answer_flow"],
-    "guided_practice_flow": ["independent_practice_flow", "question_answer_flow"],
-    "question_answer_flow": ["theory_introduction_flow", "guided_practice_flow", "summary_reflection_flow"],
-    "independent_practice_flow": ["assessment_flow", "question_answer_flow"],
-    "assessment_flow": ["summary_reflection_flow", "theory_introduction_flow"],
-    "summary_reflection_flow": ["next_steps_flow", "theory_introduction_flow"],
-    "next_steps_flow": ["theory_introduction_flow", "guided_practice_flow"]
+    "theory_introduction_flow": [
+      "guided_practice_flow",
+      "question_answer_flow"
+    ],
+    "guided_practice_flow": [
+      "independent_practice_flow",
+      "question_answer_flow"
+    ],
+    "question_answer_flow": [
+      "theory_introduction_flow",
+      "guided_practice_flow",
+      "summary_reflection_flow"
+    ],
+    "independent_practice_flow": [
+      "assessment_flow",
+      "question_answer_flow"
+    ],
+    "assessment_flow": [
+      "summary_reflection_flow",
+      "theory_introduction_flow"
+    ],
+    "summary_reflection_flow": [
+      "next_steps_flow",
+      "theory_introduction_flow"
+    ],
+    "next_steps_flow": [
+      "theory_introduction_flow",
+      "guided_practice_flow"
+    ]
   },
   "metadata": {
     "version": "1.0.0",
@@ -329,6 +479,13 @@
     "description": "Metodyczne przepływy szkoleniowe dla avatara-szkoleniowca",
     "pedagogical_framework": "Constructivist Learning Theory",
     "target_audience": "Adult learners",
-    "supported_content_types": ["theory", "examples", "questions", "practice", "assessment", "summary"]
+    "supported_content_types": [
+      "theory",
+      "examples",
+      "questions",
+      "practice",
+      "assessment",
+      "summary"
+    ]
   }
 }

@@ -1,8 +1,8 @@
 // ============ EXTENDED AVATAR CONTROLLER ============
 
-import { Request, Response } from 'express';
+import {Request, Response} from 'express';
 import ExtendedDatabaseService from '../services/extended-database.service';
-import { ExtendedAvatar } from '../models/auth-types';
+import {ExtendedAvatar} from '../models/auth-types';
 
 export class ExtendedAvatarController {
     private extendedDb: ExtendedDatabaseService;
@@ -16,12 +16,12 @@ export class ExtendedAvatarController {
         try {
             const userId = (req as any).user?.userId;
             if (!userId) {
-                res.status(401).json({ error: 'User not authenticated' });
+                res.status(401).json({error: 'User not authenticated'});
                 return;
             }
 
             const avatars = await this.extendedDb.getAvatarsByUserId(userId);
-            
+
             res.json({
                 success: true,
                 avatars,
@@ -29,7 +29,7 @@ export class ExtendedAvatarController {
             });
         } catch (error) {
             console.error('Error fetching user avatars:', error);
-            res.status(500).json({ 
+            res.status(500).json({
                 error: 'Failed to fetch avatars',
                 details: error instanceof Error ? error.message : 'Unknown error'
             });
@@ -40,7 +40,7 @@ export class ExtendedAvatarController {
     public getDemoAvatars = async (req: Request, res: Response): Promise<void> => {
         try {
             const demoAvatars = await this.extendedDb.getDemoAvatars();
-            
+
             res.json({
                 success: true,
                 avatars: demoAvatars,
@@ -48,7 +48,7 @@ export class ExtendedAvatarController {
             });
         } catch (error) {
             console.error('Error fetching demo avatars:', error);
-            res.status(500).json({ 
+            res.status(500).json({
                 error: 'Failed to fetch demo avatars',
                 details: error instanceof Error ? error.message : 'Unknown error'
             });
@@ -58,18 +58,18 @@ export class ExtendedAvatarController {
     // Get specific avatar by ID
     public getAvatarById = async (req: Request, res: Response): Promise<void> => {
         try {
-            const { id } = req.params;
+            const {id} = req.params;
             const userId = (req as any).user?.userId;
 
             const avatar = await this.extendedDb.getAvatarById(id);
             if (!avatar) {
-                res.status(404).json({ error: 'Avatar not found' });
+                res.status(404).json({error: 'Avatar not found'});
                 return;
             }
 
             // Check ownership for non-demo avatars
             if (avatar.type !== 'demo' && avatar.user_id !== userId) {
-                res.status(403).json({ error: 'Access denied' });
+                res.status(403).json({error: 'Access denied'});
                 return;
             }
 
@@ -79,7 +79,7 @@ export class ExtendedAvatarController {
             });
         } catch (error) {
             console.error('Error fetching avatar:', error);
-            res.status(500).json({ 
+            res.status(500).json({
                 error: 'Failed to fetch avatar',
                 details: error instanceof Error ? error.message : 'Unknown error'
             });
@@ -91,7 +91,7 @@ export class ExtendedAvatarController {
         try {
             const userId = (req as any).user?.userId;
             if (!userId) {
-                res.status(401).json({ error: 'User not authenticated' });
+                res.status(401).json({error: 'User not authenticated'});
                 return;
             }
 
@@ -109,8 +109,8 @@ export class ExtendedAvatarController {
 
             // Validate required fields
             if (!name || !description || !personality) {
-                res.status(400).json({ 
-                    error: 'Missing required fields: name, description, personality' 
+                res.status(400).json({
+                    error: 'Missing required fields: name, description, personality'
                 });
                 return;
             }
@@ -160,7 +160,7 @@ export class ExtendedAvatarController {
 
         } catch (error) {
             console.error('Error creating avatar:', error);
-            res.status(500).json({ 
+            res.status(500).json({
                 error: 'Failed to create avatar',
                 details: error instanceof Error ? error.message : 'Unknown error'
             });
@@ -172,21 +172,21 @@ export class ExtendedAvatarController {
         try {
             const userId = (req as any).user?.userId;
             if (!userId) {
-                res.status(401).json({ error: 'User not authenticated' });
+                res.status(401).json({error: 'User not authenticated'});
                 return;
             }
 
-            const { sourceAvatarId, name, customizations = {} } = req.body;
+            const {sourceAvatarId, name, customizations = {}} = req.body;
 
             if (!sourceAvatarId) {
-                res.status(400).json({ error: 'Source avatar ID is required' });
+                res.status(400).json({error: 'Source avatar ID is required'});
                 return;
             }
 
             // Verify source is a demo avatar
             const sourceAvatar = await this.extendedDb.getAvatarById(sourceAvatarId);
             if (!sourceAvatar || sourceAvatar.type !== 'demo') {
-                res.status(400).json({ error: 'Source must be a demo avatar' });
+                res.status(400).json({error: 'Source must be a demo avatar'});
                 return;
             }
 
@@ -208,7 +208,7 @@ export class ExtendedAvatarController {
 
         } catch (error) {
             console.error('Error copying demo avatar:', error);
-            res.status(500).json({ 
+            res.status(500).json({
                 error: 'Failed to copy demo avatar',
                 details: error instanceof Error ? error.message : 'Unknown error'
             });
@@ -218,23 +218,23 @@ export class ExtendedAvatarController {
     // Update avatar
     public updateAvatar = async (req: Request, res: Response): Promise<void> => {
         try {
-            const { id } = req.params;
+            const {id} = req.params;
             const userId = (req as any).user?.userId;
 
             if (!userId) {
-                res.status(401).json({ error: 'User not authenticated' });
+                res.status(401).json({error: 'User not authenticated'});
                 return;
             }
 
             // Check if avatar exists and user owns it
             const existingAvatar = await this.extendedDb.getAvatarById(id);
             if (!existingAvatar) {
-                res.status(404).json({ error: 'Avatar not found' });
+                res.status(404).json({error: 'Avatar not found'});
                 return;
             }
 
             if (existingAvatar.user_id !== userId) {
-                res.status(403).json({ error: 'Access denied' });
+                res.status(403).json({error: 'Access denied'});
                 return;
             }
 
@@ -252,7 +252,7 @@ export class ExtendedAvatarController {
 
             const result = await this.extendedDb.updateAvatar(id, updateData);
             if (!result) {
-                res.status(500).json({ error: 'Failed to update avatar' });
+                res.status(500).json({error: 'Failed to update avatar'});
                 return;
             }
 
@@ -266,7 +266,7 @@ export class ExtendedAvatarController {
 
         } catch (error) {
             console.error('Error updating avatar:', error);
-            res.status(500).json({ 
+            res.status(500).json({
                 error: 'Failed to update avatar',
                 details: error instanceof Error ? error.message : 'Unknown error'
             });
@@ -276,35 +276,35 @@ export class ExtendedAvatarController {
     // Delete avatar
     public deleteAvatar = async (req: Request, res: Response): Promise<void> => {
         try {
-            const { id } = req.params;
+            const {id} = req.params;
             const userId = (req as any).user?.userId;
 
             if (!userId) {
-                res.status(401).json({ error: 'User not authenticated' });
+                res.status(401).json({error: 'User not authenticated'});
                 return;
             }
 
             // Check if avatar exists and user owns it
             const existingAvatar = await this.extendedDb.getAvatarById(id);
             if (!existingAvatar) {
-                res.status(404).json({ error: 'Avatar not found' });
+                res.status(404).json({error: 'Avatar not found'});
                 return;
             }
 
             if (existingAvatar.user_id !== userId) {
-                res.status(403).json({ error: 'Access denied' });
+                res.status(403).json({error: 'Access denied'});
                 return;
             }
 
             // Don't allow deleting demo avatars
             if (existingAvatar.type === 'demo') {
-                res.status(400).json({ error: 'Cannot delete demo avatars' });
+                res.status(400).json({error: 'Cannot delete demo avatars'});
                 return;
             }
 
             const result = await this.extendedDb.deleteAvatar(id);
             if (!result) {
-                res.status(500).json({ error: 'Failed to delete avatar' });
+                res.status(500).json({error: 'Failed to delete avatar'});
                 return;
             }
 
@@ -315,7 +315,7 @@ export class ExtendedAvatarController {
 
         } catch (error) {
             console.error('Error deleting avatar:', error);
-            res.status(500).json({ 
+            res.status(500).json({
                 error: 'Failed to delete avatar',
                 details: error instanceof Error ? error.message : 'Unknown error'
             });
@@ -327,12 +327,12 @@ export class ExtendedAvatarController {
         try {
             const userId = (req as any).user?.userId;
             if (!userId) {
-                res.status(401).json({ error: 'User not authenticated' });
+                res.status(401).json({error: 'User not authenticated'});
                 return;
             }
 
             const avatars = await this.extendedDb.getAvatarsByUserId(userId);
-            
+
             const stats = {
                 total_avatars: avatars.length,
                 active_avatars: avatars.filter((a: ExtendedAvatar) => a.status === 'active').length,
@@ -346,7 +346,11 @@ export class ExtendedAvatarController {
                 most_used: avatars
                     .sort((a: ExtendedAvatar, b: ExtendedAvatar) => (b.usage_stats?.total_conversations || 0) - (a.usage_stats?.total_conversations || 0))
                     .slice(0, 5)
-                    .map((a: ExtendedAvatar) => ({ id: a.id, name: a.name, conversations: a.usage_stats?.total_conversations || 0 }))
+                    .map((a: ExtendedAvatar) => ({
+                        id: a.id,
+                        name: a.name,
+                        conversations: a.usage_stats?.total_conversations || 0
+                    }))
             };
 
             res.json({
@@ -356,7 +360,7 @@ export class ExtendedAvatarController {
 
         } catch (error) {
             console.error('Error fetching avatar stats:', error);
-            res.status(500).json({ 
+            res.status(500).json({
                 error: 'Failed to fetch avatar statistics',
                 details: error instanceof Error ? error.message : 'Unknown error'
             });

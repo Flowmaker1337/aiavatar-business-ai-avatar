@@ -1,7 +1,7 @@
-import { VectorDatabaseService, VectorData, VectorDatabaseHealth } from '../models/types';
-import { getVectorDatabaseName } from '../config/env';
-import { BaseVectorUploadService } from './base-vector-upload.service';
-import { BaseVectorClearService, ClearCommand } from './base-vector-clear.service';
+import {VectorDatabaseService, VectorData, VectorDatabaseHealth} from '../models/types';
+import {getVectorDatabaseName} from '../config/env';
+import {BaseVectorUploadService} from './base-vector-upload.service';
+import {BaseVectorClearService, ClearCommand} from './base-vector-clear.service';
 
 /**
  * Vector Database Adapter Service
@@ -28,19 +28,19 @@ class VectorDatabaseAdapterService implements VectorDatabaseService {
         switch (databaseName) {
             case 'pinecone':
                 // Dynamic import to avoid loading Pinecone when using Qdrant
-                const { default: pineconeService } = await import('./pinecone.service');
+                const {default: pineconeService} = await import('./pinecone.service');
                 this.vectorDbService = pineconeService;
                 console.log('[VECTOR-DB] Using Pinecone as vector database');
                 break;
             case 'qdrant':
                 // Dynamic import to avoid loading Qdrant when using Pinecone
-                const { default: qdrantService } = await import('./qdrant.service');
+                const {default: qdrantService} = await import('./qdrant.service');
                 this.vectorDbService = qdrantService;
                 console.log('[VECTOR-DB] Using Qdrant as vector database');
                 break;
             default:
                 console.warn(`[VECTOR-DB] Unknown vector database type: ${databaseName}, defaulting to Qdrant`);
-                const { default: defaultQdrantService } = await import('./qdrant.service');
+                const {default: defaultQdrantService} = await import('./qdrant.service');
                 this.vectorDbService = defaultQdrantService;
         }
 

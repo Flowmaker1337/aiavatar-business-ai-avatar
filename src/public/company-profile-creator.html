@@ -389,19 +389,25 @@
         }
 
         @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
         @media (max-width: 768px) {
             .creator-form {
                 grid-template-columns: 1fr;
             }
-            
+
             .brand-voice-section {
                 grid-template-columns: 1fr;
             }
-            
+
             .action-buttons {
                 flex-direction: column;
             }
@@ -409,214 +415,214 @@
     </style>
 </head>
 <body>
-    <div class="company-creator-container">
-        <div class="creator-header">
-            <h1><i class="fas fa-building"></i> Company Profile Creator</h1>
-            <p>Stwórz szczegółowy profil firmy dla symulacji biznesowych i szkoleń</p>
-        </div>
-
-        <form id="companyProfileForm" class="creator-form">
-            <!-- Basic Information -->
-            <div class="form-section">
-                <h3 class="section-title">
-                    <i class="fas fa-info-circle"></i>
-                    Podstawowe informacje
-                </h3>
-                
-                <div class="form-group">
-                    <label for="companyName">Nazwa firmy *</label>
-                    <input type="text" id="companyName" required placeholder="np. TechFlow Solutions">
-                    <div class="input-hint">Oficjalna nazwa Twojej firmy</div>
-                </div>
-
-                <div class="form-group">
-                    <label for="companyDescription">Opis firmy</label>
-                    <textarea id="companyDescription" placeholder="Krótki opis działalności firmy..."></textarea>
-                    <button type="button" class="ai-generate-btn" onclick="companyCreator.generateWithAI('description')">
-                        <i class="fas fa-magic"></i> Generuj z AI
-                    </button>
-                </div>
-
-                <div class="form-group">
-                    <label for="industry">Branża *</label>
-                    <select id="industry" required>
-                        <option value="">Wybierz branżę</option>
-                        <option value="technology">Technologia</option>
-                        <option value="finance">Finanse</option>
-                        <option value="healthcare">Ochrona zdrowia</option>
-                        <option value="education">Edukacja</option>
-                        <option value="retail">Handel detaliczny</option>
-                        <option value="manufacturing">Produkcja</option>
-                        <option value="consulting">Konsulting</option>
-                        <option value="logistics">Logistyka</option>
-                        <option value="other">Inna</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="companySize">Wielkość firmy</label>
-                    <select id="companySize">
-                        <option value="startup">Startup (1-10 osób)</option>
-                        <option value="small">Mała (11-50 osób)</option>
-                        <option value="medium">Średnia (51-250 osób)</option>
-                        <option value="large">Duża (251-1000 osób)</option>
-                        <option value="enterprise">Korporacja (1000+ osób)</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="location">Lokalizacja</label>
-                    <input type="text" id="location" placeholder="np. Warszawa, Polska">
-                </div>
-            </div>
-
-            <!-- Business Details -->
-            <div class="form-section">
-                <h3 class="section-title">
-                    <i class="fas fa-bullseye"></i>
-                    Szczegóły biznesowe
-                </h3>
-                
-                <div class="form-group">
-                    <label for="mission">Misja firmy</label>
-                    <textarea id="mission" placeholder="Jaka jest misja Twojej firmy?"></textarea>
-                    <button type="button" class="ai-generate-btn" onclick="companyCreator.generateWithAI('mission')">
-                        <i class="fas fa-magic"></i> Generuj z AI
-                    </button>
-                </div>
-
-                <div class="form-group">
-                    <label for="values">Wartości firmy</label>
-                    <input type="text" id="valuesInput" placeholder="Dodaj wartość i naciśnij Enter">
-                    <div class="input-hint">Naciśnij Enter aby dodać wartość</div>
-                    <div id="valuesDisplay" class="tags-display">
-                        <div class="add-tag-btn" onclick="companyCreator.addTag('values')">
-                            <i class="fas fa-plus"></i> Dodaj wartość
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="products">Produkty/Usługi</label>
-                    <input type="text" id="productsInput" placeholder="Dodaj produkt/usługę i naciśnij Enter">
-                    <div class="input-hint">Naciśnij Enter aby dodać produkt/usługę</div>
-                    <div id="productsDisplay" class="tags-display">
-                        <div class="add-tag-btn" onclick="companyCreator.addTag('products')">
-                            <i class="fas fa-plus"></i> Dodaj produkt/usługę
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="targetAudience">Grupa docelowa</label>
-                    <input type="text" id="targetAudienceInput" placeholder="Dodaj grupę docelową i naciśnij Enter">
-                    <div class="input-hint">Naciśnij Enter aby dodać grupę docelową</div>
-                    <div id="targetAudienceDisplay" class="tags-display">
-                        <div class="add-tag-btn" onclick="companyCreator.addTag('targetAudience')">
-                            <i class="fas fa-plus"></i> Dodaj grupę docelową
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Brand Voice -->
-            <div class="form-section full-width">
-                <h3 class="section-title">
-                    <i class="fas fa-microphone"></i>
-                    Brand Voice & Komunikacja
-                </h3>
-                
-                <div class="brand-voice-section">
-                    <div class="form-group">
-                        <label for="brandTone">Ton komunikacji</label>
-                        <select id="brandTone">
-                            <option value="professional">Profesjonalny</option>
-                            <option value="friendly">Przyjazny</option>
-                            <option value="casual">Swobodny</option>
-                            <option value="authoritative">Autorytatywny</option>
-                            <option value="innovative">Innowacyjny</option>
-                            <option value="trustworthy">Godny zaufania</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="brandStyle">Styl komunikacji</label>
-                        <select id="brandStyle">
-                            <option value="formal">Formalny</option>
-                            <option value="conversational">Konwersacyjny</option>
-                            <option value="technical">Techniczny</option>
-                            <option value="storytelling">Narracyjny</option>
-                            <option value="direct">Bezpośredni</option>
-                            <option value="educational">Edukacyjny</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="keyMessages">Kluczowe komunikaty</label>
-                    <input type="text" id="keyMessagesInput" placeholder="Dodaj kluczowy komunikat i naciśnij Enter">
-                    <div class="input-hint">Naciśnij Enter aby dodać komunikat</div>
-                    <div id="keyMessagesDisplay" class="tags-display">
-                        <div class="add-tag-btn" onclick="companyCreator.addTag('keyMessages')">
-                            <i class="fas fa-plus"></i> Dodaj komunikat
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="doNotUse">Czego nie używać w komunikacji</label>
-                    <input type="text" id="doNotUseInput" placeholder="Dodaj słowo/frazę której unikać i naciśnij Enter">
-                    <div class="input-hint">Słowa i frazy, których należy unikać w komunikacji</div>
-                    <div id="doNotUseDisplay" class="tags-display">
-                        <div class="add-tag-btn" onclick="companyCreator.addTag('doNotUse')">
-                            <i class="fas fa-plus"></i> Dodaj ograniczenie
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Team Structure -->
-            <div class="form-section full-width">
-                <h3 class="section-title">
-                    <i class="fas fa-users"></i>
-                    Struktura zespołu
-                </h3>
-                
-                <div class="team-roles-section">
-                    <div id="teamRolesList">
-                        <!-- Team roles will be added dynamically -->
-                    </div>
-                    <div class="add-role-btn" onclick="companyCreator.addTeamRole()">
-                        <i class="fas fa-plus"></i> Dodaj rolę w zespole
-                    </div>
-                </div>
-            </div>
-        </form>
-
-        <div class="action-buttons">
-            <button type="button" class="btn-secondary" onclick="companyCreator.previewProfile()">
-                <i class="fas fa-eye"></i> Podgląd
-            </button>
-            <button type="button" class="btn-primary" onclick="companyCreator.saveProfile()">
-                <i class="fas fa-save"></i> Zapisz profil
-            </button>
-            <button type="button" class="btn-secondary" onclick="companyCreator.loadTemplates()">
-                <i class="fas fa-download"></i> Załaduj szablon
-            </button>
-        </div>
-
-        <!-- Existing Profiles -->
-        <div class="profiles-list">
-            <h3 class="section-title">
-                <i class="fas fa-folder-open"></i>
-                Istniejące profile firm
-            </h3>
-            <div id="existingProfiles">
-                <p style="text-align: center; color: #a0aec0;">Ładowanie profili...</p>
-            </div>
-        </div>
+<div class="company-creator-container">
+    <div class="creator-header">
+        <h1><i class="fas fa-building"></i> Company Profile Creator</h1>
+        <p>Stwórz szczegółowy profil firmy dla symulacji biznesowych i szkoleń</p>
     </div>
 
-    <script src="company-profile-creator-script.js"></script>
+    <form id="companyProfileForm" class="creator-form">
+        <!-- Basic Information -->
+        <div class="form-section">
+            <h3 class="section-title">
+                <i class="fas fa-info-circle"></i>
+                Podstawowe informacje
+            </h3>
+
+            <div class="form-group">
+                <label for="companyName">Nazwa firmy *</label>
+                <input type="text" id="companyName" required placeholder="np. TechFlow Solutions">
+                <div class="input-hint">Oficjalna nazwa Twojej firmy</div>
+            </div>
+
+            <div class="form-group">
+                <label for="companyDescription">Opis firmy</label>
+                <textarea id="companyDescription" placeholder="Krótki opis działalności firmy..."></textarea>
+                <button type="button" class="ai-generate-btn" onclick="companyCreator.generateWithAI('description')">
+                    <i class="fas fa-magic"></i> Generuj z AI
+                </button>
+            </div>
+
+            <div class="form-group">
+                <label for="industry">Branża *</label>
+                <select id="industry" required>
+                    <option value="">Wybierz branżę</option>
+                    <option value="technology">Technologia</option>
+                    <option value="finance">Finanse</option>
+                    <option value="healthcare">Ochrona zdrowia</option>
+                    <option value="education">Edukacja</option>
+                    <option value="retail">Handel detaliczny</option>
+                    <option value="manufacturing">Produkcja</option>
+                    <option value="consulting">Konsulting</option>
+                    <option value="logistics">Logistyka</option>
+                    <option value="other">Inna</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="companySize">Wielkość firmy</label>
+                <select id="companySize">
+                    <option value="startup">Startup (1-10 osób)</option>
+                    <option value="small">Mała (11-50 osób)</option>
+                    <option value="medium">Średnia (51-250 osób)</option>
+                    <option value="large">Duża (251-1000 osób)</option>
+                    <option value="enterprise">Korporacja (1000+ osób)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="location">Lokalizacja</label>
+                <input type="text" id="location" placeholder="np. Warszawa, Polska">
+            </div>
+        </div>
+
+        <!-- Business Details -->
+        <div class="form-section">
+            <h3 class="section-title">
+                <i class="fas fa-bullseye"></i>
+                Szczegóły biznesowe
+            </h3>
+
+            <div class="form-group">
+                <label for="mission">Misja firmy</label>
+                <textarea id="mission" placeholder="Jaka jest misja Twojej firmy?"></textarea>
+                <button type="button" class="ai-generate-btn" onclick="companyCreator.generateWithAI('mission')">
+                    <i class="fas fa-magic"></i> Generuj z AI
+                </button>
+            </div>
+
+            <div class="form-group">
+                <label for="values">Wartości firmy</label>
+                <input type="text" id="valuesInput" placeholder="Dodaj wartość i naciśnij Enter">
+                <div class="input-hint">Naciśnij Enter aby dodać wartość</div>
+                <div id="valuesDisplay" class="tags-display">
+                    <div class="add-tag-btn" onclick="companyCreator.addTag('values')">
+                        <i class="fas fa-plus"></i> Dodaj wartość
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="products">Produkty/Usługi</label>
+                <input type="text" id="productsInput" placeholder="Dodaj produkt/usługę i naciśnij Enter">
+                <div class="input-hint">Naciśnij Enter aby dodać produkt/usługę</div>
+                <div id="productsDisplay" class="tags-display">
+                    <div class="add-tag-btn" onclick="companyCreator.addTag('products')">
+                        <i class="fas fa-plus"></i> Dodaj produkt/usługę
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="targetAudience">Grupa docelowa</label>
+                <input type="text" id="targetAudienceInput" placeholder="Dodaj grupę docelową i naciśnij Enter">
+                <div class="input-hint">Naciśnij Enter aby dodać grupę docelową</div>
+                <div id="targetAudienceDisplay" class="tags-display">
+                    <div class="add-tag-btn" onclick="companyCreator.addTag('targetAudience')">
+                        <i class="fas fa-plus"></i> Dodaj grupę docelową
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Brand Voice -->
+        <div class="form-section full-width">
+            <h3 class="section-title">
+                <i class="fas fa-microphone"></i>
+                Brand Voice & Komunikacja
+            </h3>
+
+            <div class="brand-voice-section">
+                <div class="form-group">
+                    <label for="brandTone">Ton komunikacji</label>
+                    <select id="brandTone">
+                        <option value="professional">Profesjonalny</option>
+                        <option value="friendly">Przyjazny</option>
+                        <option value="casual">Swobodny</option>
+                        <option value="authoritative">Autorytatywny</option>
+                        <option value="innovative">Innowacyjny</option>
+                        <option value="trustworthy">Godny zaufania</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="brandStyle">Styl komunikacji</label>
+                    <select id="brandStyle">
+                        <option value="formal">Formalny</option>
+                        <option value="conversational">Konwersacyjny</option>
+                        <option value="technical">Techniczny</option>
+                        <option value="storytelling">Narracyjny</option>
+                        <option value="direct">Bezpośredni</option>
+                        <option value="educational">Edukacyjny</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="keyMessages">Kluczowe komunikaty</label>
+                <input type="text" id="keyMessagesInput" placeholder="Dodaj kluczowy komunikat i naciśnij Enter">
+                <div class="input-hint">Naciśnij Enter aby dodać komunikat</div>
+                <div id="keyMessagesDisplay" class="tags-display">
+                    <div class="add-tag-btn" onclick="companyCreator.addTag('keyMessages')">
+                        <i class="fas fa-plus"></i> Dodaj komunikat
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="doNotUse">Czego nie używać w komunikacji</label>
+                <input type="text" id="doNotUseInput" placeholder="Dodaj słowo/frazę której unikać i naciśnij Enter">
+                <div class="input-hint">Słowa i frazy, których należy unikać w komunikacji</div>
+                <div id="doNotUseDisplay" class="tags-display">
+                    <div class="add-tag-btn" onclick="companyCreator.addTag('doNotUse')">
+                        <i class="fas fa-plus"></i> Dodaj ograniczenie
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Structure -->
+        <div class="form-section full-width">
+            <h3 class="section-title">
+                <i class="fas fa-users"></i>
+                Struktura zespołu
+            </h3>
+
+            <div class="team-roles-section">
+                <div id="teamRolesList">
+                    <!-- Team roles will be added dynamically -->
+                </div>
+                <div class="add-role-btn" onclick="companyCreator.addTeamRole()">
+                    <i class="fas fa-plus"></i> Dodaj rolę w zespole
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="action-buttons">
+        <button type="button" class="btn-secondary" onclick="companyCreator.previewProfile()">
+            <i class="fas fa-eye"></i> Podgląd
+        </button>
+        <button type="button" class="btn-primary" onclick="companyCreator.saveProfile()">
+            <i class="fas fa-save"></i> Zapisz profil
+        </button>
+        <button type="button" class="btn-secondary" onclick="companyCreator.loadTemplates()">
+            <i class="fas fa-download"></i> Załaduj szablon
+        </button>
+    </div>
+
+    <!-- Existing Profiles -->
+    <div class="profiles-list">
+        <h3 class="section-title">
+            <i class="fas fa-folder-open"></i>
+            Istniejące profile firm
+        </h3>
+        <div id="existingProfiles">
+            <p style="text-align: center; color: #a0aec0;">Ładowanie profili...</p>
+        </div>
+    </div>
+</div>
+
+<script src="company-profile-creator-script.js"></script>
 </body>
 </html>

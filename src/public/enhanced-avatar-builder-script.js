@@ -18,7 +18,7 @@ class EnhancedAvatarBuilder {
             manual_knowledge: ''
         };
         this.uploadedFiles = [];
-        
+
         this.init();
     }
 
@@ -26,7 +26,7 @@ class EnhancedAvatarBuilder {
         this.bindEvents();
         this.updatePreview();
         this.loadSuggestedTags();
-        
+
         console.log('🎨 Enhanced Avatar Builder initialized');
     }
 
@@ -35,11 +35,11 @@ class EnhancedAvatarBuilder {
         document.getElementById('backBtn')?.addEventListener('click', () => this.goBack());
         document.getElementById('nextStepBtn')?.addEventListener('click', () => this.nextStep());
         document.getElementById('prevStepBtn')?.addEventListener('click', () => this.prevStep());
-        
+
         // Header actions
         document.getElementById('saveAsDraftBtn')?.addEventListener('click', () => this.saveAsDraft());
         document.getElementById('createAvatarBtn')?.addEventListener('click', () => this.createAvatar());
-        
+
         // Step navigation
         document.querySelectorAll('.step').forEach(step => {
             step.addEventListener('click', () => {
@@ -157,7 +157,7 @@ class EnhancedAvatarBuilder {
 
         // Test functionality
         document.getElementById('testBtn')?.addEventListener('click', () => this.testAvatar());
-        
+
         // Preview refresh
         document.getElementById('refreshPreviewBtn')?.addEventListener('click', () => this.updatePreview());
 
@@ -228,7 +228,7 @@ class EnhancedAvatarBuilder {
         }
 
         if (nextBtn) {
-            nextBtn.innerHTML = stepNumber === this.totalSteps 
+            nextBtn.innerHTML = stepNumber === this.totalSteps
                 ? '<i class="fas fa-magic"></i> Stwórz Avatara'
                 : 'Następny krok <i class="fas fa-arrow-right"></i>';
         }
@@ -289,7 +289,7 @@ class EnhancedAvatarBuilder {
         // Update preview tags
         const previewTags = document.getElementById('previewTags');
         if (previewTags) {
-            previewTags.innerHTML = this.avatarData.tags.map(tag => 
+            previewTags.innerHTML = this.avatarData.tags.map(tag =>
                 `<div class="preview-tag">${tag}</div>`
             ).join('');
         }
@@ -299,12 +299,12 @@ class EnhancedAvatarBuilder {
         if (previewTypeValue) {
             previewTypeValue.textContent = this.avatarData.type === 'custom' ? 'Custom' : 'Reaktywny';
         }
-        
+
         const previewCategoryValue = document.getElementById('previewCategoryValue');
         if (previewCategoryValue) {
             previewCategoryValue.textContent = this.getCategoryDisplayName(this.avatarData.category);
         }
-        
+
         const previewFilesValue = document.getElementById('previewFilesValue');
         if (previewFilesValue) {
             previewFilesValue.textContent = this.uploadedFiles.length.toString();
@@ -332,11 +332,11 @@ class EnhancedAvatarBuilder {
         if (!sampleResponse) return;
 
         let response = `Cześć! Jestem ${this.avatarData.name || 'nowym avatarem'}`;
-        
+
         if (this.avatarData.specialization) {
             response += ` i specjalizuję się w ${this.avatarData.specialization.toLowerCase()}`;
         }
-        
+
         response += '. Jak mogę Ci dziś pomóc?';
 
         sampleResponse.textContent = response;
@@ -357,15 +357,15 @@ class EnhancedAvatarBuilder {
         };
 
         const tags = tagsByCategory[this.avatarData.category] || tagsByCategory.general;
-        
-        suggestedTags.innerHTML = tags.map(tag => 
+
+        suggestedTags.innerHTML = tags.map(tag =>
             `<button class="suggested-tag" onclick="window.avatarBuilder.addTag('${tag}')">${tag}</button>`
         ).join('');
     }
 
     addTag(tagText) {
         if (!tagText || this.avatarData.tags.includes(tagText)) return;
-        
+
         this.avatarData.tags.push(tagText);
         this.updateTagsList();
         this.updatePreview();
@@ -381,7 +381,7 @@ class EnhancedAvatarBuilder {
         const tagsList = document.getElementById('tagsList');
         if (!tagsList) return;
 
-        tagsList.innerHTML = this.avatarData.tags.map(tag => 
+        tagsList.innerHTML = this.avatarData.tags.map(tag =>
             `<div class="tag-item">
                 ${tag}
                 <span class="tag-remove" onclick="window.avatarBuilder.removeTag('${tag}')">&times;</span>
@@ -400,7 +400,7 @@ class EnhancedAvatarBuilder {
                 });
             }
         });
-        
+
         this.updateFilesList();
         this.updatePreview();
     }
@@ -425,7 +425,7 @@ class EnhancedAvatarBuilder {
             return;
         }
 
-        uploadedFiles.innerHTML = this.uploadedFiles.map((file, index) => 
+        uploadedFiles.innerHTML = this.uploadedFiles.map((file, index) =>
             `<div class="file-item">
                 <div class="file-info">
                     <div class="file-icon">
@@ -467,19 +467,19 @@ class EnhancedAvatarBuilder {
     updateSummary() {
         // Update summary values
         document.getElementById('summaryName').textContent = this.avatarData.name || '-';
-        document.getElementById('summaryType').textContent = 
+        document.getElementById('summaryType').textContent =
             this.avatarData.type === 'custom' ? 'Custom Avatar' : 'Reaktywny Avatar';
-        document.getElementById('summaryCategory').textContent = 
+        document.getElementById('summaryCategory').textContent =
             this.getCategoryDisplayName(this.avatarData.category);
-        document.getElementById('summaryPersonality').textContent = 
+        document.getElementById('summaryPersonality').textContent =
             this.avatarData.personality || '-';
-        document.getElementById('summaryStyle').textContent = 
+        document.getElementById('summaryStyle').textContent =
             this.avatarData.communication_style || '-';
-        document.getElementById('summarySpecialization').textContent = 
+        document.getElementById('summarySpecialization').textContent =
             this.avatarData.specialization || '-';
-        document.getElementById('summaryTags').textContent = 
+        document.getElementById('summaryTags').textContent =
             this.avatarData.tags.join(', ') || '-';
-        document.getElementById('summaryFiles').textContent = 
+        document.getElementById('summaryFiles').textContent =
             `${this.uploadedFiles.length} plików`;
     }
 
@@ -487,9 +487,9 @@ class EnhancedAvatarBuilder {
         const testQuestion = document.getElementById('testQuestion');
         const testResponse = document.getElementById('testResponse');
         const testBtn = document.getElementById('testBtn');
-        
+
         if (!testQuestion || !testResponse || !testBtn) return;
-        
+
         const question = testQuestion.value.trim();
         if (!question) {
             this.showNotification('Wpisz pytanie do przetestowania', 'warning');
@@ -503,10 +503,10 @@ class EnhancedAvatarBuilder {
         try {
             // Simulate API call for testing
             await new Promise(resolve => setTimeout(resolve, 2000));
-            
+
             const mockResponse = this.generateMockResponse(question);
             testResponse.innerHTML = `<p>${mockResponse}</p>`;
-            
+
         } catch (error) {
             console.error('Test error:', error);
             testResponse.innerHTML = '<p style="color: #ff6b6b;">Błąd podczas testowania avatara</p>';
@@ -574,7 +574,7 @@ class EnhancedAvatarBuilder {
             }
 
             const result = await response.json();
-            
+
             if (result.success) {
                 // Apply generated content
                 this.applyGeneratedContent(fieldType, result.data);
@@ -585,11 +585,11 @@ class EnhancedAvatarBuilder {
 
         } catch (error) {
             console.error('AI Generation error:', error);
-            
+
             // Fallback to mock generation for demo purposes
             this.generateMockContent(fieldType);
             this.showNotification(`🤖 Wygenerowano ${this.getFieldDisplayName(fieldType)} (demo)`, 'info');
-            
+
         } finally {
             // Restore button
             generateBtn.disabled = false;
@@ -642,7 +642,7 @@ class EnhancedAvatarBuilder {
 
     getMockContentForField(fieldType) {
         const category = this.avatarData.category || 'business';
-        
+
         const mockData = {
             business: {
                 name: 'Ekspert Strategii Biznesowej',
@@ -692,7 +692,7 @@ class EnhancedAvatarBuilder {
 
     async saveAsDraft() {
         this.showLoading('Zapisywanie szkicu...');
-        
+
         try {
             const draftData = {
                 ...this.avatarData,
@@ -702,10 +702,10 @@ class EnhancedAvatarBuilder {
 
             // Save to localStorage as fallback
             localStorage.setItem('avatarDraft', JSON.stringify(draftData));
-            
+
             this.hideLoading();
             this.showNotification('Szkic zapisany pomyślnie!', 'success');
-            
+
         } catch (error) {
             console.error('Save draft error:', error);
             this.hideLoading();
@@ -745,13 +745,13 @@ class EnhancedAvatarBuilder {
             }
 
             const result = await response.json();
-            
+
             // Clear draft
             localStorage.removeItem('avatarDraft');
-            
+
             this.hideLoading();
             this.showNotification('Avatar utworzony pomyślnie!', 'success');
-            
+
             // Redirect to avatar manager after short delay
             setTimeout(() => {
                 if (window.homepageApp) {
@@ -764,7 +764,7 @@ class EnhancedAvatarBuilder {
         } catch (error) {
             console.error('Create avatar error:', error);
             this.hideLoading();
-            
+
             if (error.message.includes('Authentication')) {
                 this.showNotification('Zaloguj się aby utworzyć avatara', 'warning');
                 // Redirect to login
@@ -780,7 +780,7 @@ class EnhancedAvatarBuilder {
     showLoading(text = 'Ładowanie...') {
         const loadingOverlay = document.getElementById('loadingOverlay');
         const loadingText = document.querySelector('.loading-text');
-        
+
         if (loadingText) loadingText.textContent = text;
         if (loadingOverlay) loadingOverlay.classList.add('active');
     }
@@ -900,13 +900,13 @@ let avatarBuilder;
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     avatarBuilder = new EnhancedAvatarBuilder();
-    
+
     // Export to window immediately
     window.avatarBuilder = avatarBuilder;
-    
+
     // Load draft if exists
     avatarBuilder.loadDraft();
-    
+
     // Add CSS animations
     const style = document.createElement('style');
     style.textContent = `

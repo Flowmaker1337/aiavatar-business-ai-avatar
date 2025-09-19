@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
+import {Request, Response} from 'express';
 import DatabaseService from '../services/database.service';
-import { ExecutionTimerService } from '../services/execution-timer.service';
+import {ExecutionTimerService} from '../services/execution-timer.service';
 
 interface ReactiveAvatarPrompts {
     avatar_id: 'client' | 'student';
@@ -27,7 +27,7 @@ export class ReactiveAvatarController {
 
         try {
             const avatarId = req.params.avatarId as 'client' | 'student';
-            const { system_prompt, user_prompt_template } = req.body;
+            const {system_prompt, user_prompt_template} = req.body;
 
             // Walidacja
             if (!['client', 'student'].includes(avatarId)) {
@@ -58,11 +58,11 @@ export class ReactiveAvatarController {
 
             // Upsert do bazy danych  
             const collectionName = 'reactive_avatar_prompts';
-            
+
             // Try to find existing
             const existing = await this.databaseService.findAll(collectionName);
             const existingPrompt = existing.find((p: any) => p.avatar_id === avatarId);
-            
+
             if (existingPrompt) {
                 // Update existing
                 await this.databaseService.update(collectionName, existingPrompt.id || existingPrompt._id, promptData);
@@ -83,7 +83,7 @@ export class ReactiveAvatarController {
         } catch (error) {
             timer.stop();
             console.error('❌ Error saving reactive avatar prompts:', error);
-            
+
             res.status(500).json({
                 success: false,
                 error: 'Internal server error while saving prompts'
@@ -127,7 +127,7 @@ export class ReactiveAvatarController {
         } catch (error) {
             timer.stop();
             console.error('❌ Error getting reactive avatar prompts:', error);
-            
+
             res.status(500).json({
                 success: false,
                 error: 'Internal server error while getting prompts'
@@ -159,7 +159,7 @@ export class ReactiveAvatarController {
         } catch (error) {
             timer.stop();
             console.error('❌ Error getting all reactive avatar prompts:', error);
-            
+
             res.status(500).json({
                 success: false,
                 error: 'Internal server error while getting all prompts'
@@ -176,7 +176,7 @@ export class ReactiveAvatarController {
         timer.start();
 
         try {
-            const { description, avatarType } = req.body;
+            const {description, avatarType} = req.body;
 
             // Walidacja
             if (!description || !description.trim()) {
@@ -200,13 +200,13 @@ export class ReactiveAvatarController {
             console.log(`🤖 Generating reactive avatar: ${avatarType} with description: ${description}`);
 
             // Importuj FlowWizardService dynamicznie aby uniknąć circular dependencies
-            const { default: FlowWizardService } = await import('../services/flow-wizard.service');
+            const {default: FlowWizardService} = await import('../services/flow-wizard.service');
             const flowWizard = FlowWizardService.getInstance();
 
             // Wygeneruj kompletny reactive avatar
             const generatedAvatar = await this.generateCompleteReactiveAvatar(
-                description, 
-                avatarType, 
+                description,
+                avatarType,
                 flowWizard
             );
 
@@ -223,7 +223,7 @@ export class ReactiveAvatarController {
         } catch (error) {
             timer.stop();
             console.error('❌ Error generating reactive avatar:', error);
-            
+
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';
             res.status(500).json({
                 success: false,
@@ -237,7 +237,7 @@ export class ReactiveAvatarController {
      * Generuje kompletny reactive avatar z wszystkimi polami
      */
     private async generateCompleteReactiveAvatar(
-        description: string, 
+        description: string,
         avatarType: 'client' | 'student' | 'employee',
         flowWizard: any
     ): Promise<any> {
@@ -257,10 +257,10 @@ export class ReactiveAvatarController {
         const companyName = await flowWizard.generateAvatarField('companyName', `${description}. Typ: ${avatarType}. Polska firma.`);
         const industry = await flowWizard.generateAvatarField('industry', `${description}. Typ: ${avatarType}. Branża firmy.`);
         const personality = await flowWizard.generateAvatarField('personality', `${description}. Typ: ${avatarType}. ${businessContext}`);
-        
+
         // Generuj specjalizacje na podstawie typu
         const specializations = await this.generateSpecializationsForType(avatarType, description, flowWizard);
-        
+
         // Generuj company details
         const companyDetails = await this.generateCompanyDetails(avatarType, description, companyName, industry, flowWizard);
 
@@ -287,8 +287,8 @@ export class ReactiveAvatarController {
      * Generuje specjalizacje dla danego typu avatara
      */
     private async generateSpecializationsForType(
-        avatarType: string, 
-        description: string, 
+        avatarType: string,
+        description: string,
         flowWizard: any
     ): Promise<string[]> {
         const prompt = `Na podstawie opisu: "${description}" i typu avatara: "${avatarType}"
@@ -413,7 +413,7 @@ Odpowiedz tylko JSON bez komentarzy.`;
             const fallbacks = {
                 client: {
                     style: "Praktyczny i ostrożny",
-                    tone: "Bezpośredni i konkretny", 
+                    tone: "Bezpośredni i konkretny",
                     business_motivation: "Stabilny rozwój firmy z kontrolą nad kosztami i ryzykiem",
                     communication_style: "Skeptyczny, pyta o dowody, potrzebuje konkretów",
                     emotional_traits: ["Praktyczny", "Ostrożny", "Zorientowany na ROI", "Analityczny"],
@@ -423,7 +423,7 @@ Odpowiedz tylko JSON bez komentarzy.`;
                 student: {
                     style: "Ambitny ale niepewny",
                     tone: "Pytający i chętny do nauki",
-                    business_motivation: "Rozwój umiejętności i budowanie skutecznego zespołu", 
+                    business_motivation: "Rozwój umiejętności i budowanie skutecznego zespołu",
                     communication_style: "Chłonny, zadaje dużo pytań, szuka konkretnych rozwiązań",
                     emotional_traits: ["Ambitny", "Niepewny siebie", "Chce się uczyć", "Analityczny"],
                     strengths: ["Eagerness to learn", "Analytical thinking", "Team-oriented", "Adaptable"],
@@ -476,7 +476,7 @@ Odpowiedz tylko JSON bez komentarzy.`;
         timer.start();
 
         try {
-            const { avatarData } = req.body;
+            const {avatarData} = req.body;
 
             if (!avatarData || !avatarData.firstName || !avatarData.lastName) {
                 res.status(400).json({
@@ -495,7 +495,7 @@ Odpowiedz tylko JSON bez komentarzy.`;
 
             // Ścieżka do simulation-avatars.json
             const configPath = path.resolve(__dirname, '../config/simulation-avatars.json');
-            
+
             // Wczytaj istniejące avatary
             let simulationAvatars: any = {};
             try {
@@ -503,7 +503,7 @@ Odpowiedz tylko JSON bez komentarzy.`;
                 simulationAvatars = JSON.parse(configData);
             } catch (error) {
                 console.error('Error reading simulation-avatars.json:', error);
-                simulationAvatars = { simulation_avatars: {} };
+                simulationAvatars = {simulation_avatars: {}};
             }
 
             // Upewnij się, że struktura istnieje
@@ -513,7 +513,7 @@ Odpowiedz tylko JSON bez komentarzy.`;
 
             // Wygeneruj unikalny klucz dla avatara
             const avatarKey = `generated_${avatarData._id.replace('sim_generated_', '').replace('_' + Date.now(), '')}`;
-            
+
             // Dodaj avatar do konfiguracji
             simulationAvatars.simulation_avatars[avatarKey] = avatarData;
 
@@ -536,7 +536,7 @@ Odpowiedz tylko JSON bez komentarzy.`;
         } catch (error) {
             timer.stop();
             console.error('❌ Error saving generated avatar:', error);
-            
+
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';
             res.status(500).json({
                 success: false,

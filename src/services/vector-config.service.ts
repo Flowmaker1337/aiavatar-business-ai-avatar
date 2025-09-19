@@ -1,4 +1,4 @@
-import { VectorDatabaseConfig } from '../models/types';
+import {VectorDatabaseConfig} from '../models/types';
 
 /**
  * Vector Database Configuration Service

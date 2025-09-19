@@ -1,7 +1,7 @@
-import { QdrantClient } from '@qdrant/js-client-rest';
+import {QdrantClient} from '@qdrant/js-client-rest';
 import {QDRANT_URL, QDRANT_COLLECTION_NAME, QDRANT_API_KEY, getVectorDatabaseName} from '../config/env';
-import { VectorData } from '../models/types';
-import { BaseVectorDatabaseService } from './base-vector-database.service';
+import {VectorData} from '../models/types';
+import {BaseVectorDatabaseService} from './base-vector-database.service';
 import vectorConfigService from './vector-config.service';
 
 /**
@@ -14,12 +14,12 @@ class QdrantService extends BaseVectorDatabaseService {
 
     constructor() {
         super();
-        
+
         // Initialize official Qdrant client
         this.client = new QdrantClient({
             url: QDRANT_URL,
-            ...(QDRANT_API_KEY && { apiKey: QDRANT_API_KEY })
-        });        
+            ...(QDRANT_API_KEY && {apiKey: QDRANT_API_KEY})
+        });
     }
 
     /**
@@ -115,7 +115,7 @@ class QdrantService extends BaseVectorDatabaseService {
                 text: vector.metadata.text,
                 text_length: vector.metadata.text_length,
                 token_count: vector.metadata.token_count,
-                ...(vector.metadata.avatar_id && { avatar_id: vector.metadata.avatar_id })
+                ...(vector.metadata.avatar_id && {avatar_id: vector.metadata.avatar_id})
             }
         }));
 
@@ -124,8 +124,8 @@ class QdrantService extends BaseVectorDatabaseService {
         let totalAdded = 0;
 
         for (let i = 0; i < qdrantPoints.length; i += batchSize) {
-            const batch = qdrantPoints.slice(i, i + batchSize);            
-            
+            const batch = qdrantPoints.slice(i, i + batchSize);
+
             try {
                 await this.client.upsert(QDRANT_COLLECTION_NAME, {
                     points: batch

@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import FlowWizardService, { GeneratedFlowPackage } from '../services/flow-wizard.service';
-import { ExecutionTimerService } from '../services/execution-timer.service';
+import {Request, Response} from 'express';
+import FlowWizardService, {GeneratedFlowPackage} from '../services/flow-wizard.service';
+import {ExecutionTimerService} from '../services/execution-timer.service';
 
 /**
  * FlowWizardController - API endpoints dla AI-powered generatora flows
@@ -22,10 +22,10 @@ export class FlowWizardController {
         timer.start();
 
         try {
-            const { 
-                businessContext, 
-                flowPurpose, 
-                avatarType = 'networker', 
+            const {
+                businessContext,
+                flowPurpose,
+                avatarType = 'networker',
                 useRAG = true,
                 saveToFiles = false
             } = req.body;
@@ -81,7 +81,7 @@ export class FlowWizardController {
         } catch (error) {
             timer.stop();
             console.error('❌ Error generating flow:', error);
-            
+
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';
             res.status(500).json({
                 success: false,
@@ -100,7 +100,7 @@ export class FlowWizardController {
         timer.start();
 
         try {
-            const { template, customization = {} } = req.body;
+            const {template, customization = {}} = req.body;
 
             if (!template) {
                 res.status(400).json({
@@ -125,7 +125,7 @@ export class FlowWizardController {
             }
 
             // Zastosuj customization
-            const finalConfig = { ...selectedTemplate, ...customization };
+            const finalConfig = {...selectedTemplate, ...customization};
 
             // Wygeneruj flow
             const flowPackage = await this.flowWizard.generateCompleteFlow(
@@ -149,7 +149,7 @@ export class FlowWizardController {
         } catch (error) {
             timer.stop();
             console.error('❌ Error generating quick flow:', error);
-            
+
             res.status(500).json({
                 success: false,
                 error: 'Internal server error while generating quick flow'
@@ -164,7 +164,7 @@ export class FlowWizardController {
     public async getTemplates(req: Request, res: Response): Promise<void> {
         try {
             const templates = this.getQuickTemplates();
-            
+
             res.json({
                 success: true,
                 data: {
@@ -188,7 +188,7 @@ export class FlowWizardController {
      */
     public async saveFlowPackage(req: Request, res: Response): Promise<void> {
         try {
-            const { flowPackage } = req.body;
+            const {flowPackage} = req.body;
 
             if (!flowPackage || !flowPackage.id) {
                 res.status(400).json({
@@ -227,7 +227,7 @@ export class FlowWizardController {
      */
     public async validateFlowPackage(req: Request, res: Response): Promise<void> {
         try {
-            const { flowPackage } = req.body;
+            const {flowPackage} = req.body;
 
             if (!flowPackage) {
                 res.status(400).json({
@@ -296,7 +296,7 @@ export class FlowWizardController {
                         true
                     );
                     generatedExamples.push(flowPackage);
-                    
+
                     // Krótka przerwa między generowaniem
                     await new Promise(resolve => setTimeout(resolve, 1000));
                 } catch (error) {
@@ -331,7 +331,7 @@ export class FlowWizardController {
      */
     public async generateAvatarField(req: Request, res: Response): Promise<void> {
         try {
-            const { fieldName, description } = req.body;
+            const {fieldName, description} = req.body;
 
             if (!fieldName || !description) {
                 res.status(400).json({
@@ -433,7 +433,7 @@ export class FlowWizardController {
             if (!Array.isArray(intents) || intents.length === 0) {
                 errors.push('Must have at least one intent definition');
             }
-            
+
             intents.forEach((intent: any, index: number) => {
                 if (!intent.name) errors.push(`Intent ${index} missing name`);
                 if (!intent.examples || intent.examples.length === 0) {
@@ -463,7 +463,7 @@ export class FlowWizardController {
         if (flowPackage.knowledge_base) {
             suggestions.push('Consider testing RAG integration with the provided knowledge base');
         }
-        
+
         suggestions.push('Test the generated flow with real user inputs');
         suggestions.push('Monitor flow completion rates after deployment');
 

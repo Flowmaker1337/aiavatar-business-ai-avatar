@@ -1,5 +1,5 @@
-import { ELEVEN_LABS_API_KEY } from '../config/env';
-import { ExecutionTimerService } from './execution-timer.service';
+import {ELEVEN_LABS_API_KEY} from '../config/env';
+import {ExecutionTimerService} from './execution-timer.service';
 import fs from 'fs';
 import path from 'path';
 
@@ -88,10 +88,10 @@ class ElevenLabsService {
             }
 
             const audioBuffer = Buffer.from(await response.arrayBuffer());
-            
+
             timer.stop();
             console.log(`✅ Speech generated successfully (${audioBuffer.length} bytes)`);
-            
+
             return audioBuffer;
         } catch (error) {
             timer.stop();
@@ -116,7 +116,7 @@ class ElevenLabsService {
         }
     ): Promise<string | null> {
         const audioBuffer = await this.generateSpeech(text, voiceId, options);
-        
+
         if (!audioBuffer) {
             return null;
         }
@@ -125,12 +125,12 @@ class ElevenLabsService {
             // Upewnij się, że katalog istnieje
             const dir = path.dirname(outputPath);
             if (!fs.existsSync(dir)) {
-                fs.mkdirSync(dir, { recursive: true });
+                fs.mkdirSync(dir, {recursive: true});
             }
 
             // Zapisz plik
             fs.writeFileSync(outputPath, audioBuffer);
-            
+
             console.log(`✅ Speech file saved to: ${outputPath}`);
             return outputPath;
         } catch (error) {
@@ -192,7 +192,7 @@ class ElevenLabsService {
 
             timer.stop();
             console.log(`✅ Speech streaming started`);
-            
+
             return response.body;
         } catch (error) {
             timer.stop();

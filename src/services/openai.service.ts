@@ -117,7 +117,7 @@ class OpenAIService {
 
         let messages: Prompt[] = [userPrompt];
         if (systemPrompt) {
-          messages.push(systemPrompt);
+            messages.push(systemPrompt);
         }
         // const messages = this.generatePrompts(userPrompt);
         try {

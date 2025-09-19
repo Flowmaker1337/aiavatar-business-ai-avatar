@@ -89,7 +89,9 @@
           "emotion_change": "JOY",
           "say_verbatim": "Z przyjemnością umówię Cię na konsultację z dedykowanym doradcą leasingowym. Czy preferujesz kontakt telefoniczny, czy może spotkanie osobiste w jednym z naszych oddziałów?",
           "character_changes": {
-            "disable_goals": ["offer_consultation"]
+            "disable_goals": [
+              "offer_consultation"
+            ]
           }
         }
       ],

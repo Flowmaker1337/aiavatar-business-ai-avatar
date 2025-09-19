@@ -1,6 +1,6 @@
 import openAIService from './openai.service';
-import { SimulationPersona } from '../models/types';
-import { ExecutionTimerService } from './execution-timer.service';
+import {SimulationPersona} from '../models/types';
+import {ExecutionTimerService} from './execution-timer.service';
 
 /**
  * PersonaGeneratorService - generuje rozbudowane persony na podstawie ogólnego opisu
@@ -43,7 +43,7 @@ export class PersonaGeneratorService {
 
             timer.stop();
             console.log(`✅ Generated persona: ${generatedPersona.name}`);
-            
+
             return generatedPersona;
         } catch (error) {
             timer.stop();
@@ -61,27 +61,27 @@ export class PersonaGeneratorService {
         industry?: string,
         companySize?: string
     ): Promise<SimulationPersona> {
-        
+
         const prompt = this.buildPersonaPrompt(basicDescription, role, industry, companySize);
-        
+
         const userPrompt = {
             role: 'user' as const,
             content: prompt
         };
 
         const response = await this.openAIService.generateResponse(userPrompt);
-        
+
         try {
             // Parsuj odpowiedź JSON od AI
             const parsedPersona = JSON.parse(response);
-            
+
             // Waliduj i uzupełnij brakujące pola
             return this.validateAndCompletePersona(parsedPersona);
-            
+
         } catch (parseError) {
             console.error('❌ Error parsing AI response:', parseError);
             console.log('Raw AI response:', response);
-            
+
             // Fallback - stwórz podstawową personę
             return this.createFallbackPersona(basicDescription, role, industry);
         }
@@ -154,7 +154,7 @@ Odpowiedz TYLKO poprawnym JSON-em, bez dodatkowych komentarzy.`;
     private validateAndCompletePersona(parsedPersona: any): SimulationPersona {
         // Sprawdź czy wszystkie wymagane pola są obecne
         const requiredFields = [
-            'name', 'background', 'goals', 'challenges', 
+            'name', 'background', 'goals', 'challenges',
             'personality_traits', 'communication_style', 'expertise_level',
             'industry', 'company_size', 'decision_making_style'
         ];
@@ -208,7 +208,7 @@ Odpowiedz TYLKO poprawnym JSON-em, bez dodatkowych komentarzy.`;
         industry?: string
     ): SimulationPersona {
         const name = this.generateFallbackName(basicDescription);
-        
+
         return {
             name,
             background: `${basicDescription}. Doświadczony profesjonalista w swojej dziedzinie.`,
@@ -242,22 +242,22 @@ Odpowiedz TYLKO poprawnym JSON-em, bez dodatkowych komentarzy.`;
     private generateFallbackName(description: string): string {
         // Prosta heurystyka do generowania nazwy
         const names = [
-            'Jan Kowalski', 'Anna Nowak', 'Piotr Wiśniewski', 
+            'Jan Kowalski', 'Anna Nowak', 'Piotr Wiśniewski',
             'Katarzyna Woźniak', 'Tomasz Dąbrowski', 'Magdalena Lewandowska'
         ];
-        
+
         const randomName = names[Math.floor(Math.random() * names.length)];
-        
+
         // Spróbuj wyciągnąć pozycję z opisu
         const lowerDesc = description.toLowerCase();
         let position = 'Specjalista';
-        
+
         if (lowerDesc.includes('dyrektor')) position = 'Dyrektor';
         else if (lowerDesc.includes('manager') || lowerDesc.includes('menedżer')) position = 'Manager';
         else if (lowerDesc.includes('właściciel')) position = 'Właściciel';
         else if (lowerDesc.includes('konsultant')) position = 'Konsultant';
         else if (lowerDesc.includes('ekspert')) position = 'Ekspert';
-        
+
         return `${randomName} - ${position}`;
     }
 
@@ -287,7 +287,7 @@ Odpowiedz TYLKO poprawnym JSON-em, bez dodatkowych komentarzy.`;
         ];
 
         const personas: SimulationPersona[] = [];
-        
+
         for (const example of examples) {
             try {
                 const persona = await this.generatePersona(
@@ -297,7 +297,7 @@ Odpowiedz TYLKO poprawnym JSON-em, bez dodatkowych komentarzy.`;
                     example.companySize
                 );
                 personas.push(persona);
-                
+
                 // Dodaj małą przerwę między wywołaniami API
                 await new Promise(resolve => setTimeout(resolve, 1000));
             } catch (error) {

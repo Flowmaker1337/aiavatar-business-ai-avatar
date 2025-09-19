@@ -10,7 +10,7 @@ class PageSecurity {
         this.protectedPages = [
             '/', // Homepage requires authentication
             '/enhanced-avatar-builder.html',
-            '/flow-studio.html', 
+            '/flow-studio.html',
             '/avatar-chat-dashboard.html',
             '/react-dashboard.html',
             '/dashboard',
@@ -21,15 +21,15 @@ class PageSecurity {
             '/simulation-dashboard.html',
             '/visual-flow-designer.html'
         ];
-        
+
         this.adminPages = [
             '/admin-dashboard.html',
             '/user-management.html'
         ];
-        
+
         this.currentPage = window.location.pathname;
         this.initialized = false;
-        
+
         this.init();
     }
 
@@ -41,23 +41,23 @@ class PageSecurity {
             console.log(' Public page, skipping security checks.');
             // Still initialize AuthManager for login/register forms
             if (typeof window.authManager === 'undefined') {
-                 setTimeout(() => this.init(), 100);
-                 return;
+                setTimeout(() => this.init(), 100);
+                return;
             }
             return;
         }
-        
+
         // Wait for auth manager to be ready
         if (typeof window.authManager === 'undefined') {
             setTimeout(() => this.init(), 100);
             return;
         }
-        
+
         this.initialized = true;
         this.checkPageAccess();
         this.setupEventListeners();
         this.addSecurityHeaders();
-        
+
         console.log('🛡️ PageSecurity initialized for:', this.currentPage);
     }
 
@@ -125,13 +125,13 @@ class PageSecurity {
 
     onPageAccessGranted() {
         console.log('✅ Page access granted');
-        
+
         // Initialize page-specific security
         this.initializePageSecurity();
-        
+
         // Show user info if available
         this.displayUserInfo();
-        
+
         // Setup session monitoring
         this.setupSessionMonitoring();
     }
@@ -141,13 +141,13 @@ class PageSecurity {
     initializePageSecurity() {
         // Add CSRF protection
         this.addCSRFProtection();
-        
+
         // Setup secure form handling
         this.setupSecureFormHandling();
-        
+
         // Add XSS protection
         this.addXSSProtection();
-        
+
         // Setup content security
         this.setupContentSecurity();
     }
@@ -171,16 +171,16 @@ class PageSecurity {
         document.addEventListener('submit', async (e) => {
             const form = e.target;
             if (!form.tagName || form.tagName.toLowerCase() !== 'form') return;
-            
+
             // Skip if form has data-no-auth attribute
             if (form.hasAttribute('data-no-auth')) return;
-            
+
             e.preventDefault();
-            
+
             try {
                 const formData = new FormData(form);
                 const data = Object.fromEntries(formData.entries());
-                
+
                 const response = await window.authManager.makeAuthenticatedRequest(
                     form.action || window.location.pathname,
                     {
@@ -188,7 +188,7 @@ class PageSecurity {
                         body: JSON.stringify(data)
                     }
                 );
-                
+
                 if (response.ok) {
                     const result = await response.json();
                     this.handleFormSuccess(form, result);
@@ -198,7 +198,7 @@ class PageSecurity {
                 }
             } catch (error) {
                 console.error('Form submission error:', error);
-                this.handleFormError(form, { error: error.message });
+                this.handleFormError(form, {error: error.message});
             }
         });
     }
@@ -267,7 +267,7 @@ class PageSecurity {
 
         // Setup idle timeout
         this.setupIdleTimeout();
-        
+
         // Setup session heartbeat
         this.setupSessionHeartbeat();
     }
@@ -285,7 +285,7 @@ class PageSecurity {
 
         // Reset timer on user activity
         ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'].forEach(event => {
-            document.addEventListener(event, resetIdleTimer, { passive: true });
+            document.addEventListener(event, resetIdleTimer, {passive: true});
         });
 
         resetIdleTimer();
@@ -306,21 +306,21 @@ class PageSecurity {
 
     handleIdleTimeout() {
         console.log('⏰ User idle timeout');
-        
+
         if (typeof showNotification === 'function') {
             showNotification('Session expired due to inactivity', 'warning');
         }
-        
+
         window.authManager.logout();
         this.redirectToLogin('Session expired due to inactivity');
     }
 
     handleSessionExpired() {
         console.log('🚫 Session expired');
-        
+
         // Clear sensitive data from page
         this.clearSensitiveData();
-        
+
         // Show session expired message
         this.showSessionExpiredModal();
     }
@@ -379,7 +379,7 @@ class PageSecurity {
             `;
             document.body.appendChild(modal);
         }
-        
+
         modal.style.display = 'flex';
     }
 
@@ -432,24 +432,24 @@ class PageSecurity {
 
     handleFormSuccess(form, result) {
         console.log('✅ Form submitted successfully:', result);
-        
+
         if (typeof showNotification === 'function') {
             showNotification(result.message || 'Operation completed successfully', 'success');
         }
-        
+
         // Trigger custom event
-        form.dispatchEvent(new CustomEvent('form:success', { detail: result }));
+        form.dispatchEvent(new CustomEvent('form:success', {detail: result}));
     }
 
     handleFormError(form, error) {
         console.error('❌ Form submission failed:', error);
-        
+
         if (typeof showNotification === 'function') {
             showNotification(error.error || 'Operation failed', 'error');
         }
-        
+
         // Trigger custom event
-        form.dispatchEvent(new CustomEvent('form:error', { detail: error }));
+        form.dispatchEvent(new CustomEvent('form:error', {detail: error}));
     }
 }
 

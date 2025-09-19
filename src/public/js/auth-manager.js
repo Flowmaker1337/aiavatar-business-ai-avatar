@@ -7,13 +7,13 @@ class AuthManager {
         this.user = null;
         this.tokenExpiresAt = null;
         this.refreshTimer = null;
-        
+
         // Initialize from localStorage
         this.loadFromStorage();
-        
+
         // Setup automatic token refresh
         this.setupTokenRefresh();
-        
+
         // Setup event listeners
         this.setupEventListeners();
     }
@@ -24,15 +24,15 @@ class AuthManager {
         this.token = accessToken;
         this.refreshToken = refreshToken;
         this.tokenExpiresAt = new Date(expiresAt);
-        
+
         // Save to localStorage
         localStorage.setItem('auth_token', accessToken);
         localStorage.setItem('refresh_token', refreshToken);
         localStorage.setItem('token_expires_at', expiresAt);
-        
+
         // Setup refresh timer
         this.setupTokenRefresh();
-        
+
         console.log('✅ Tokens set successfully, expires at:', this.tokenExpiresAt);
     }
 
@@ -41,19 +41,19 @@ class AuthManager {
         this.refreshToken = null;
         this.user = null;
         this.tokenExpiresAt = null;
-        
+
         // Clear localStorage
         localStorage.removeItem('auth_token');
         localStorage.removeItem('refresh_token');
         localStorage.removeItem('token_expires_at');
         localStorage.removeItem('user_data');
-        
+
         // Clear refresh timer
         if (this.refreshTimer) {
             clearTimeout(this.refreshTimer);
             this.refreshTimer = null;
         }
-        
+
         console.log('🧹 Tokens cleared');
         this.dispatchEvent('auth:logout');
     }
@@ -63,11 +63,11 @@ class AuthManager {
         this.refreshToken = localStorage.getItem('refresh_token');
         const expiresAt = localStorage.getItem('token_expires_at');
         const userData = localStorage.getItem('user_data');
-        
+
         if (expiresAt) {
             this.tokenExpiresAt = new Date(expiresAt);
         }
-        
+
         if (userData) {
             try {
                 this.user = JSON.parse(userData);
@@ -76,7 +76,7 @@ class AuthManager {
                 localStorage.removeItem('user_data');
             }
         }
-        
+
         // Check if token is expired
         if (this.token && this.tokenExpiresAt && new Date() >= this.tokenExpiresAt) {
             console.log('⏰ Token expired, attempting refresh');
@@ -88,17 +88,17 @@ class AuthManager {
         if (this.refreshTimer) {
             clearTimeout(this.refreshTimer);
         }
-        
+
         if (!this.tokenExpiresAt) return;
-        
+
         // Refresh token 5 minutes before expiry
         const refreshTime = this.tokenExpiresAt.getTime() - Date.now() - (5 * 60 * 1000);
-        
+
         if (refreshTime > 0) {
             this.refreshTimer = setTimeout(() => {
                 this.refreshTokens();
             }, refreshTime);
-            
+
             console.log(`🔄 Token refresh scheduled in ${Math.round(refreshTime / 1000 / 60)} minutes`);
         } else {
             // Token expires soon, refresh now
@@ -115,7 +115,7 @@ class AuthManager {
 
         try {
             console.log('🔄 Refreshing tokens...');
-            
+
             const response = await fetch('/api/auth/refresh', {
                 method: 'POST',
                 headers: {
@@ -134,7 +134,7 @@ class AuthManager {
                     data.data.refresh_token,
                     data.data.expires_at
                 );
-                
+
                 console.log('✅ Tokens refreshed successfully');
                 this.dispatchEvent('auth:token-refreshed');
                 return true;
@@ -159,7 +159,7 @@ class AuthManager {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({email, password})
             });
 
             const data = await response.json();
@@ -171,22 +171,22 @@ class AuthManager {
                     data.data.refresh_token,
                     data.data.expires_at
                 );
-                
+
                 // Set user data
                 this.user = data.data.user;
                 localStorage.setItem('user_data', JSON.stringify(this.user));
-                
+
                 console.log('✅ Login successful:', this.user.email);
-                this.dispatchEvent('auth:login', { user: this.user });
-                
-                return { success: true, user: this.user };
+                this.dispatchEvent('auth:login', {user: this.user});
+
+                return {success: true, user: this.user};
             } else {
                 console.error('❌ Login failed:', data.error);
-                return { success: false, error: data.error };
+                return {success: false, error: data.error};
             }
         } catch (error) {
             console.error('❌ Login error:', error);
-            return { success: false, error: 'Network error' };
+            return {success: false, error: 'Network error'};
         }
     }
 
@@ -209,21 +209,21 @@ class AuthManager {
                     data.data.refresh_token,
                     data.data.expires_at
                 );
-                
+
                 this.user = data.data.user;
                 localStorage.setItem('user_data', JSON.stringify(this.user));
-                
+
                 console.log('✅ Registration successful:', this.user.email);
-                this.dispatchEvent('auth:register', { user: this.user });
-                
-                return { success: true, user: this.user };
+                this.dispatchEvent('auth:register', {user: this.user});
+
+                return {success: true, user: this.user};
             } else {
                 console.error('❌ Registration failed:', data.error);
-                return { success: false, error: data.error };
+                return {success: false, error: data.error};
             }
         } catch (error) {
             console.error('❌ Registration error:', error);
-            return { success: false, error: 'Network error' };
+            return {success: false, error: 'Network error'};
         }
     }
 
@@ -242,7 +242,7 @@ class AuthManager {
         } catch (error) {
             console.error('Logout API call failed:', error);
         }
-        
+
         this.clearTokens();
         console.log('👋 Logged out');
     }
@@ -282,17 +282,17 @@ class AuthManager {
         // Handle authentication errors
         if (response.status === 401) {
             const data = await response.json();
-            
+
             if (data.code === 'TOKEN_EXPIRED') {
                 console.log('🔄 Token expired during request, refreshing...');
                 const refreshed = await this.refreshTokens();
                 if (refreshed) {
                     // Retry the request with new token
                     headers['Authorization'] = `Bearer ${this.token}`;
-                    return fetch(url, { ...options, headers });
+                    return fetch(url, {...options, headers});
                 }
             }
-            
+
             console.log('🚫 Authentication failed, logging out');
             await this.logout();
             throw new Error('Authentication failed');
@@ -354,7 +354,7 @@ class AuthManager {
     }
 
     dispatchEvent(eventName, detail = {}) {
-        window.dispatchEvent(new CustomEvent(eventName, { detail }));
+        window.dispatchEvent(new CustomEvent(eventName, {detail}));
     }
 
     async validateToken() {
@@ -373,7 +373,7 @@ class AuthManager {
                     return true;
                 }
             }
-            
+
             console.log('🚫 Token validation failed');
             this.logout();
             return false;

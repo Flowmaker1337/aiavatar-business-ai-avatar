@@ -6,7 +6,7 @@ class AdminDashboard {
         this.users = [];
         this.auditLogs = [];
         this.systemStats = {};
-        
+
         // Wait for auth manager to be ready
         this.waitForAuthManager().then(() => {
             this.init();
@@ -29,7 +29,7 @@ class AdminDashboard {
 
         this.bindEvents();
         this.loadInitialData();
-        
+
         console.log('🛡️ Admin Dashboard initialized');
     }
 
@@ -38,9 +38,9 @@ class AdminDashboard {
     checkAdminAccess() {
         const user = window.authManager.getUser();
         const isAdmin = window.authManager.isAdmin();
-        
-        console.log('🔍 Admin access check:', { user, isAdmin });
-        
+
+        console.log('🔍 Admin access check:', {user, isAdmin});
+
         return isAdmin;
     }
 
@@ -136,7 +136,7 @@ class AdminDashboard {
         try {
             // Load basic system statistics
             const response = await window.authManager.makeAuthenticatedRequest('/api/admin/stats');
-            
+
             if (response.ok) {
                 const data = await response.json();
                 this.systemStats = data.data || {};
@@ -228,7 +228,7 @@ class AdminDashboard {
             `;
 
             const response = await window.authManager.makeAuthenticatedRequest('/api/auth/users');
-            
+
             if (response.ok) {
                 const data = await response.json();
                 this.users = data.data || [];
@@ -249,7 +249,7 @@ class AdminDashboard {
 
     renderUsersTable() {
         const usersContainer = document.getElementById('usersTable');
-        
+
         if (this.users.length === 0) {
             usersContainer.innerHTML = `
                 <div class="alert alert-info">
@@ -328,7 +328,7 @@ class AdminDashboard {
     async loadRolesData() {
         try {
             const rolesContainer = document.getElementById('rolesContent');
-            
+
             // Show loading
             rolesContainer.innerHTML = `
                 <div class="loading">
@@ -339,7 +339,7 @@ class AdminDashboard {
 
             // Try to get permission analytics
             const response = await window.authManager.makeAuthenticatedRequest('/api/admin/permissions/analytics');
-            
+
             let permissionsData;
             if (response.ok) {
                 const data = await response.json();
@@ -358,8 +358,8 @@ class AdminDashboard {
                         ]
                     },
                     user_distribution: {
-                        by_role: { admin: 2, user: 40 },
-                        by_status: { active: 38, inactive: 3, suspended: 1 }
+                        by_role: {admin: 2, user: 40},
+                        by_status: {active: 38, inactive: 3, suspended: 1}
                     }
                 };
             }
@@ -379,7 +379,7 @@ class AdminDashboard {
 
     renderRolesContent(permissionsData) {
         const rolesContainer = document.getElementById('rolesContent');
-        
+
         rolesContainer.innerHTML = `
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
                 <div class="data-table">
@@ -461,7 +461,7 @@ class AdminDashboard {
 
     async loadAuditData() {
         const auditContainer = document.getElementById('auditLogs');
-        
+
         auditContainer.innerHTML = `
             <div class="alert alert-info">
                 <i class="fas fa-info-circle"></i>
@@ -531,14 +531,14 @@ class AdminDashboard {
         document.getElementById('userEmail').value = user.email;
         document.getElementById('userRole').value = user.role;
         document.getElementById('userStatus').value = user.status;
-        
+
         document.getElementById('userForm').dataset.userId = userId;
         document.getElementById('userModal').classList.add('show');
     }
 
     async handleUserFormSubmit(e) {
         e.preventDefault();
-        
+
         const formData = {
             first_name: document.getElementById('userFirstName').value,
             last_name: document.getElementById('userLastName').value,
@@ -548,7 +548,7 @@ class AdminDashboard {
         };
 
         const userId = document.getElementById('userForm').dataset.userId;
-        
+
         try {
             let response;
             if (userId) {
@@ -584,11 +584,11 @@ class AdminDashboard {
         if (!user) return;
 
         const newStatus = user.status === 'active' ? 'inactive' : 'active';
-        
+
         try {
             const response = await window.authManager.makeAuthenticatedRequest(`/api/auth/users/${userId}/status`, {
                 method: 'PUT',
-                body: JSON.stringify({ status: newStatus })
+                body: JSON.stringify({status: newStatus})
             });
 
             if (response.ok) {
@@ -653,11 +653,11 @@ class AdminDashboard {
             <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-triangle' : 'info-circle'}"></i>
             ${message}
         `;
-        
+
         // Insert at top of content
         const content = document.querySelector('.admin-content');
         content.insertBefore(notification, content.firstChild);
-        
+
         // Remove after 5 seconds
         setTimeout(() => {
             if (notification.parentNode) {

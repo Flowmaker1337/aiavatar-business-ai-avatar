@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import {Request, Response} from 'express';
 import fs from 'fs';
 import path from 'path';
 import {
@@ -10,7 +10,7 @@ import {
     BusinessAvatar
 } from '../models/types';
 import SimulationManager from '../services/simulation-manager.service';
-import { ExecutionTimerService } from '../services/execution-timer.service';
+import {ExecutionTimerService} from '../services/execution-timer.service';
 
 /**
  * SimulationController - API endpoints dla modułu symulacji konwersacji
@@ -33,7 +33,7 @@ export class SimulationController {
         timer.start();
 
         try {
-            const { scenario, config } = req.body;
+            const {scenario, config} = req.body;
 
             // Walidacja danych wejściowych
             if (!scenario || !config) {
@@ -129,7 +129,7 @@ export class SimulationController {
     public async getSimulationMessages(req: Request, res: Response): Promise<void> {
         try {
             const simulationId = req.params.id;
-            const { limit = 50, offset = 0 } = req.query;
+            const {limit = 50, offset = 0} = req.query;
 
             const simulation = this.simulationManager.getSimulation(simulationId);
             if (!simulation) {
@@ -253,7 +253,7 @@ export class SimulationController {
     public async resumeSimulation(req: Request, res: Response): Promise<void> {
         try {
             const simulationId = req.params.id;
-            const { config } = req.body;
+            const {config} = req.body;
 
             const defaultConfig: SimulationConfig = {
                 auto_start: true,
@@ -266,7 +266,7 @@ export class SimulationController {
             };
 
             const success = await this.simulationManager.resumeSimulation(
-                simulationId, 
+                simulationId,
                 config || defaultConfig
             );
 
@@ -387,7 +387,7 @@ export class SimulationController {
     public async exportSimulation(req: Request, res: Response): Promise<void> {
         try {
             const simulationId = req.params.id;
-            const { format = 'json' } = req.body;
+            const {format = 'json'} = req.body;
 
             const simulation = this.simulationManager.getSimulation(simulationId);
             if (!simulation) {
@@ -501,7 +501,7 @@ export class SimulationController {
     private async loadFullScenarioTemplates(): Promise<SimulationScenario[]> {
         try {
             const scenariosPath = path.resolve(__dirname, '../config/simulation-scenarios.json');
-            
+
             if (!fs.existsSync(scenariosPath)) {
                 console.warn('⚠️ Scenarios file not found, using default templates');
                 return this.getDefaultScenarioTemplates() as SimulationScenario[];
@@ -509,7 +509,7 @@ export class SimulationController {
 
             const rawData = fs.readFileSync(scenariosPath, 'utf8');
             const scenariosData = JSON.parse(rawData);
-            
+
             if (scenariosData.scenarios && Array.isArray(scenariosData.scenarios)) {
                 console.log(`📋 Loaded ${scenariosData.scenarios.length} full scenarios from file`);
                 return scenariosData.scenarios;
@@ -517,7 +517,7 @@ export class SimulationController {
                 console.warn('⚠️ Invalid scenarios file format, using default templates');
                 return this.getDefaultScenarioTemplates() as SimulationScenario[];
             }
-            
+
         } catch (error) {
             console.error('❌ Error loading scenarios from file:', error);
             return this.getDefaultScenarioTemplates() as SimulationScenario[];
@@ -638,7 +638,7 @@ export class SimulationController {
         timer.start();
 
         try {
-            const { avatar_id, user_role, user_company } = req.body;
+            const {avatar_id, user_role, user_company} = req.body;
 
             if (!avatar_id || !user_role) {
                 res.status(400).json({
@@ -715,7 +715,7 @@ export class SimulationController {
         timer.start();
 
         try {
-            const { session_id, message } = req.body;
+            const {session_id, message} = req.body;
 
             if (!session_id || !message) {
                 res.status(400).json({
@@ -798,8 +798,8 @@ export class SimulationController {
         timer.start();
 
         try {
-            const { sessionId } = req.params;
-            
+            const {sessionId} = req.params;
+
             const sessionData = this.chatSessions.get(sessionId);
             if (!sessionData) {
                 res.status(404).json({

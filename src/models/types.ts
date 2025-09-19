@@ -1,130 +1,130 @@
 // Types for communication between modules
 export interface UserQuery {
-  user_message: string;
-  session_id?: string;
-  avatar_type?: string;
+    user_message: string;
+    session_id?: string;
+    avatar_type?: string;
 }
 
 export interface UserStreamingQuery extends UserQuery {
-  request_id: string;
+    request_id: string;
 }
 
 export interface NPCState {
-  emotions: {
-    joy: number;
-    anger: number;
-    sadness: number;
-    fear: number;
-    neutral: number;
-  };
-  activeGoals: string[];
-  disabledGoals: string[];
+    emotions: {
+        joy: number;
+        anger: number;
+        sadness: number;
+        fear: number;
+        neutral: number;
+    };
+    activeGoals: string[];
+    disabledGoals: string[];
 }
 
 export interface AnalysisResult {
-  is_question: boolean;
-  tone: 'angry' | 'nice' | 'neutral';
-  topic_relevant: boolean;
-  intent: 'question' | 'greeting' | 'criticism' | 'other';
-  detected_goal?: DetectedGoal;
+    is_question: boolean;
+    tone: 'angry' | 'nice' | 'neutral';
+    topic_relevant: boolean;
+    intent: 'question' | 'greeting' | 'criticism' | 'other';
+    detected_goal?: DetectedGoal;
 }
 
 export interface DetectedGoal {
-  name: string;
-  confidence: number;
-  entities?: Record<string, string>;
+    name: string;
+    confidence: number;
+    entities?: Record<string, string>;
 }
 
 export interface Goal {
-  name: string;
-  repeatable: boolean;
-  enabled_by_default: boolean;
-  activation: {
-    trigger?: string;
-    intent?: string;
-  };
-  actions: GoalAction;
-  extracted_entities?: {
     name: string;
-  }[];
-  activation_condition?: {
-    logical_expression: string;
-  };
+    repeatable: boolean;
+    enabled_by_default: boolean;
+    activation: {
+        trigger?: string;
+        intent?: string;
+    };
+    actions: GoalAction;
+    extracted_entities?: {
+        name: string;
+    }[];
+    activation_condition?: {
+        logical_expression: string;
+    };
 }
 
 export interface GoalAction {
-  instruction?: string;
-  emotion_change?: 'JOY' | 'ANGER' | 'SADNESS' | 'FEAR' | 'NEUTRAL';
-  character_changes?: {
-    enable_goals?: string[];
-    disable_goals?: string[];
-  };
-  say_verbatim?: string;
-  send_trigger?: string;
-  trigger_params?: {
-    name: string;
-    value: string;
-  }[];
+    instruction?: string;
+    emotion_change?: 'JOY' | 'ANGER' | 'SADNESS' | 'FEAR' | 'NEUTRAL';
+    character_changes?: {
+        enable_goals?: string[];
+        disable_goals?: string[];
+    };
+    say_verbatim?: string;
+    send_trigger?: string;
+    trigger_params?: {
+        name: string;
+        value: string;
+    }[];
 }
 
 export interface ExecuteDetectedGoal {
-  executedGoalName: string;
-  responseText: string;
-  isSayVerbatim: boolean;
+    executedGoalName: string;
+    responseText: string;
+    isSayVerbatim: boolean;
 }
 
 export interface ResponseData {
-  message: string;
-  audio_url?: string;
-  state?: NPCState;
+    message: string;
+    audio_url?: string;
+    state?: NPCState;
 }
 
 export interface KnowledgeChunk {
-  id: string;
-  text: string;
-  metadata: {
-    source: string;
-    category: string;
-    relevance_score?: number;
-  };
+    id: string;
+    text: string;
+    metadata: {
+        source: string;
+        category: string;
+        relevance_score?: number;
+    };
 }
 
 // Message format for API
 export interface MessagePayload {
-  user_message: string;
-  is_question: boolean;
-  history: string;
-  context_knowledge: string;
-  tone: 'angry' | 'nice' | 'neutral';
+    user_message: string;
+    is_question: boolean;
+    history: string;
+    context_knowledge: string;
+    tone: 'angry' | 'nice' | 'neutral';
 }
 
 // Configuration for speech synthesizer (Eleven Labs)
 export interface SpeechConfig {
-  text: string;
-  voice_id: string;
-  model_id: string;
-  voice_settings?: {
-    stability: number;
-    similarity_boost: number;
-    style: number;
-    use_speaker_boost: boolean;
-  };
+    text: string;
+    voice_id: string;
+    model_id: string;
+    voice_settings?: {
+        stability: number;
+        similarity_boost: number;
+        style: number;
+        use_speaker_boost: boolean;
+    };
 }
 
 // MongoDB interfaces for managing users, avatars, sessions and chat history
-import { ObjectId } from 'mongodb';
+import {ObjectId} from 'mongodb';
 
 export interface User {
-  _id: ObjectId; // MongoDB ObjectId
-  email: string; // Unique user identifier
-  firstName: string;
-  lastName: string;  
+    _id: ObjectId; // MongoDB ObjectId
+    email: string; // Unique user identifier
+    firstName: string;
+    lastName: string;
 }
 
 export interface Avatar {
-  _id: ObjectId; // MongoDB ObjectId   
-  firstName: string;
-  lastName: string;  
+    _id: ObjectId; // MongoDB ObjectId
+    firstName: string;
+    lastName: string;
 }
 
 // Default IDs for default user and avatar
@@ -132,33 +132,33 @@ export const DEFAULT_USER_ID = '6818757b228dbc374ab60abb';
 export const DEFAULT_AVATAR_ID = '681876c1228dbc374ab60abc';
 
 export interface Session {
-  _id: string; // UUID as string
-  userId: ObjectId;
-  avatarId: ObjectId;
-  startedAt: Date;
+    _id: string; // UUID as string
+    userId: ObjectId;
+    avatarId: ObjectId;
+    startedAt: Date;
 }
 
 export interface ChatHistory {
-  _id: ObjectId; // MongoDB ObjectId
-  sessionId: string;
-  isUser: boolean;
-  content: string;
-  timestamp: Date;
-  goalName: string | null;
-  isSayVerbatim: boolean;
+    _id: ObjectId; // MongoDB ObjectId
+    sessionId: string;
+    isUser: boolean;
+    content: string;
+    timestamp: Date;
+    goalName: string | null;
+    isSayVerbatim: boolean;
 }
 
 export interface Prompt {
-  role: 'system' | 'user' | 'assistant';
-  content: string;
+    role: 'system' | 'user' | 'assistant';
+    content: string;
 }
 
 export interface UserPrompt extends Prompt {
-  role: 'user';
+    role: 'user';
 }
 
 export interface SystemPrompt extends Prompt {
-  role: 'system';
+    role: 'system';
 }
 
 /**
@@ -166,67 +166,67 @@ export interface SystemPrompt extends Prompt {
  * This allows easy switching between different vector databases (Pinecone, Qdrant, etc.)
  */
 export interface VectorDatabaseService {
-  /**
-   * Query knowledge base for similar vectors
-   * @param query User query text
-   * @returns Array of matching text chunks
-   */
-  queryKnowledgeBase(query: string): Promise<string[]>;
-  
-  /**
-   * Add or update vectors in the database
-   * @param vectors Array of vectors to upsert
-   * @returns Number of successfully added vectors
-   */
-  upsertVectors(vectors: VectorData[]): Promise<number>;
-  
-  /**
-   * Delete all vectors from the database
-   * @returns Success status
-   */
-  deleteAllVectors(): Promise<boolean>;
-  
-  /**
-   * Delete specific vectors by IDs
-   * @param ids Array of vector IDs to delete
-   * @returns Success status
-   */
-  deleteVectorsByIds(ids: string[]): Promise<boolean>;
-  
-  /**
-   * Get database health status
-   * @returns Health status
-   */
-  getHealthStatus(): Promise<boolean>;
-  
-  /**
-   * Get detailed health information
-   * @returns Detailed health status with database type, message and timestamp
-   */
-  getDetailedHealthStatus(): Promise<VectorDatabaseHealth>;
+    /**
+     * Query knowledge base for similar vectors
+     * @param query User query text
+     * @returns Array of matching text chunks
+     */
+    queryKnowledgeBase(query: string): Promise<string[]>;
+
+    /**
+     * Add or update vectors in the database
+     * @param vectors Array of vectors to upsert
+     * @returns Number of successfully added vectors
+     */
+    upsertVectors(vectors: VectorData[]): Promise<number>;
+
+    /**
+     * Delete all vectors from the database
+     * @returns Success status
+     */
+    deleteAllVectors(): Promise<boolean>;
+
+    /**
+     * Delete specific vectors by IDs
+     * @param ids Array of vector IDs to delete
+     * @returns Success status
+     */
+    deleteVectorsByIds(ids: string[]): Promise<boolean>;
+
+    /**
+     * Get database health status
+     * @returns Health status
+     */
+    getHealthStatus(): Promise<boolean>;
+
+    /**
+     * Get detailed health information
+     * @returns Detailed health status with database type, message and timestamp
+     */
+    getDetailedHealthStatus(): Promise<VectorDatabaseHealth>;
 }
 
 export interface VectorData {
-  id: string; // UUID format for all vector databases
-  values: number[];
-  metadata: {
-    category: string;
-    topic: string;
-    text: string;
-    text_length: number;
-    token_count: number;
-    avatar_id?: string; // For multi-avatar support
-    content_hash?: string; // For deduplication
-    created_at?: string; // ISO timestamp
-    [key: string]: any; // Allow additional metadata fields
-  };
+    id: string; // UUID format for all vector databases
+    values: number[];
+    metadata: {
+        category: string;
+        topic: string;
+        text: string;
+        text_length: number;
+        token_count: number;
+        avatar_id?: string; // For multi-avatar support
+        content_hash?: string; // For deduplication
+        created_at?: string; // ISO timestamp
+        [key: string]: any; // Allow additional metadata fields
+    };
 }
 
 export interface VectorDatabaseHealth {
-  isHealthy: boolean;
-  databaseType: string;
-  message?: string;
-  timestamp: Date;
+    isHealthy: boolean;
+    databaseType: string;
+    message?: string;
+    timestamp: Date;
 }
 
 export interface VectorDatabaseConfig {
@@ -350,14 +350,14 @@ export interface CustomAvatar {
     created_at: number;
     updated_at: number;
     status: 'draft' | 'active' | 'archived';
-    
+
     // Knowledge files
     knowledge_files: KnowledgeFile[];
-    
+
     // Associated flows and intents
     flows: CustomFlow[];
     intents: CustomIntent[];
-    
+
     // Metadata
     creator_id?: string;
     usage_stats?: AvatarUsageStats;

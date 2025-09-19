@@ -462,10 +462,9 @@ body {
     flex: 1;
     padding: 32px;
     overflow-y: auto;
-    background: 
-        radial-gradient(circle at 20% 50%, rgba(57, 229, 117, 0.03) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(57, 229, 117, 0.02) 0%, transparent 50%),
-        #0a0a0a;
+    background: radial-gradient(circle at 20% 50%, rgba(57, 229, 117, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(57, 229, 117, 0.02) 0%, transparent 50%),
+    #0a0a0a;
 }
 
 /* Welcome Screen */
@@ -507,8 +506,12 @@ body {
 }
 
 @keyframes gradientShift {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
 }
 
 .hero-subtitle {
@@ -604,8 +607,12 @@ body {
 }
 
 @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); }
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
 }
 
 /* Quick Actions */
@@ -893,8 +900,12 @@ body {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .loading-text {
@@ -905,8 +916,14 @@ body {
 
 /* Animations */
 @keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.1); opacity: 0.8; }
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
 }
 
 /* ============ RESPONSIVE DESIGN ============ */
@@ -917,11 +934,11 @@ body {
         gap: 40px;
         text-align: center;
     }
-    
+
     .hero-title {
         font-size: 40px;
     }
-    
+
     .actions-grid {
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     }
@@ -933,47 +950,47 @@ body {
         transform: translateX(-100%);
         position: fixed;
     }
-    
+
     .sidebar.open {
         transform: translateX(0);
     }
-    
+
     .main-content {
         margin-left: 0;
     }
-    
+
     .top-header {
         padding: 16px 20px;
         flex-wrap: wrap;
         gap: 16px;
     }
-    
+
     .page-title {
         font-size: 20px;
     }
-    
+
     .header-actions {
         gap: 8px;
     }
-    
+
     .content-area {
         padding: 20px;
     }
-    
+
     .hero-title {
         font-size: 32px;
     }
-    
+
     .hero-stats {
         justify-content: center;
         gap: 24px;
     }
-    
+
     .actions-grid {
         grid-template-columns: 1fr;
         gap: 20px;
     }
-    
+
     .fab {
         bottom: 20px;
         right: 20px;
@@ -987,19 +1004,19 @@ body {
     .hero-title {
         font-size: 28px;
     }
-    
+
     .hero-subtitle {
         font-size: 16px;
     }
-    
+
     .section-title {
         font-size: 24px;
     }
-    
+
     .action-card {
         padding: 24px 20px;
     }
-    
+
     .content-area {
         padding: 16px;
     }
@@ -1482,35 +1499,35 @@ body {
     .avatar-manager-screen {
         padding: 20px;
     }
-    
+
     .screen-header {
         flex-direction: column;
         gap: 20px;
         align-items: stretch;
     }
-    
+
     .screen-actions {
         justify-content: stretch;
     }
-    
+
     .category-filters {
         flex-direction: column;
         gap: 12px;
     }
-    
+
     .search-box {
         max-width: none;
     }
-    
+
     .avatars-grid {
         grid-template-columns: 1fr;
         gap: 16px;
     }
-    
+
     .category-tabs {
         gap: 8px;
     }
-    
+
     .category-tab {
         padding: 10px 16px;
         font-size: 13px;

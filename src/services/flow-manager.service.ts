@@ -1,17 +1,17 @@
 import fs from 'fs';
 import path from 'path';
-import { 
-    FlowDefinition, 
-    FlowStep, 
-    FlowExecution, 
-    FlowStepExecution, 
-    MindStateStack, 
+import {
+    FlowDefinition,
+    FlowStep,
+    FlowExecution,
+    FlowStepExecution,
+    MindStateStack,
     BusinessAvatar,
     CustomAvatar,
     CustomFlow
 } from '../models/types';
 import MemoryManager from './memory-manager.service';
-import { ExecutionTimerService } from './execution-timer.service';
+import {ExecutionTimerService} from './execution-timer.service';
 import CustomAvatarService from './custom-avatar.service';
 
 /**
@@ -59,7 +59,7 @@ class FlowManager {
 
             this.flowDefinitions = data.flows;
             this.initialized = true;
-            
+
             console.log(`✅ FlowManager initialized with ${this.flowDefinitions.length} flow definitions`);
         } catch (error) {
             console.error('❌ Failed to initialize FlowManager:', error);
@@ -73,18 +73,18 @@ class FlowManager {
     public async loadFlowDefinitionsForAvatar(avatarType: string): Promise<void> {
         try {
             let fileName = 'flow-definitions.json'; // Default networker
-            
+
             if (avatarType === 'trainer') {
                 fileName = 'training-flow-definitions.json';
             }
-            
+
             const filePath = path.resolve(__dirname, `../config/${fileName}`);
             const rawData = fs.readFileSync(filePath, 'utf-8');
             const data = JSON.parse(rawData);
 
             this.flowDefinitions = data.flows;
             this.initialized = true; // Mark as initialized after loading avatar-specific definitions
-            
+
             console.log(`✅ FlowManager loaded ${this.flowDefinitions.length} flow definitions for avatar type: ${avatarType}`);
         } catch (error) {
             console.error(`❌ Failed to load flow definitions for avatar type ${avatarType}:`, error);
@@ -134,7 +134,7 @@ class FlowManager {
             const existingFlow = this.activeFlows.get(sessionId);
             if (existingFlow && existingFlow.flow_id === flowDef.id) {
                 console.log(`Flow ${flowDef.id} already active for session ${sessionId}`);
-                
+
                 // Znajdź krok odpowiadający intentowi i przejdź do niego
                 const targetStep = flowDef.steps.find(step => step.id === intentName);
                 if (targetStep && targetStep.id !== existingFlow.current_step) {
@@ -143,7 +143,7 @@ class FlowManager {
                     existingFlow.last_activity = Date.now();
                     await this.executeStep(sessionId, targetStep);
                 }
-                
+
                 timer.stop();
                 return existingFlow;
             }
@@ -179,7 +179,7 @@ class FlowManager {
 
             timer.stop();
             console.log(`✅ Started flow ${flowDef.id} for session ${sessionId}`);
-            
+
             return flowExecution;
         } catch (error) {
             timer.stop();
@@ -361,7 +361,7 @@ class FlowManager {
         }
 
         const totalSteps = flowDef.success_criteria.length;
-        const completedSteps = flow.completed_steps.filter(stepId => 
+        const completedSteps = flow.completed_steps.filter(stepId =>
             flowDef.success_criteria.includes(stepId)
         ).length;
 
@@ -383,16 +383,16 @@ class FlowManager {
     private findFlowForIntent(intentName: string, avatarId?: string): FlowDefinition | null {
         // Pobierz wszystkie flows (standard + custom dla tego avatara)
         const allFlows = this.getFlowDefinitionsForAvatar(avatarId);
-        
+
         // Sortuj flows według priorytetu (wyższy = ważniejszy)
         const sortedFlows = allFlows.sort((a, b) => b.priority - a.priority);
-        
+
         for (const flow of sortedFlows) {
             if (flow.entry_intents.includes(intentName)) {
                 return flow;
             }
         }
-        
+
         return null;
     }
 
@@ -413,11 +413,11 @@ class FlowManager {
         };
 
         flow.step_executions.push(stepExecution);
-        
+
         // Aktualizuj MindState z aktualnym krokiem flow
         const memoryManager = MemoryManager.getInstance();
         await memoryManager.updateCurrentFlow(sessionId, flow.flow_id, step.id);
-        
+
         console.log(`🚀 Executing step ${step.id} (${step.name}) for flow ${flow.flow_id}`);
     }
 
@@ -488,13 +488,13 @@ class FlowManager {
             }
 
             // Konwertuj CustomFlow[] na FlowDefinition[]
-            const customFlowDefinitions: FlowDefinition[] = customAvatar.flows.map(customFlow => 
+            const customFlowDefinitions: FlowDefinition[] = customAvatar.flows.map(customFlow =>
                 this.convertCustomFlowToDefinition(customFlow)
             );
 
             // Zapisz custom flows dla tego avatara
             this.customFlowDefinitions.set(avatarId, customFlowDefinitions);
-            
+
             console.log(`✅ FlowManager loaded ${customFlowDefinitions.length} custom flows for avatar: ${customAvatar.name} (${avatarId})`);
         } catch (error) {
             console.error(`❌ Failed to load custom flows for avatar ${avatarId}:`, error);
