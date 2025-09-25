@@ -147,15 +147,16 @@ class AvatarChatDashboard {
                 name: 'Networker',
                 description: 'Profesjonalny ambasador biznesowy',
                 icon: '🤝',
-                specialization: 'networking i rozwój biznesu'
+                specialization: 'networkingu i rozwoju biznesu'
             };
         } else if (avatarId === 'trainer') {
             this.currentAvatar = {
                 ...this.currentAvatar,
-                name: 'Trainer',
-                description: 'Ekspert od archetypów osobowości',
+                name: 'Trener',
+                // description: 'Ekspert od archetypów osobowości',
+                description: 'Ekspert od AI',
                 icon: '🎓',
-                specialization: 'szkolenia i edukacja'
+                specialization: 'szkoleniach i edukacji'
             };
         } else if (avatarId.startsWith('custom_')) {
             // Load custom avatar details
@@ -275,7 +276,7 @@ class AvatarChatDashboard {
     addWelcomeMessage() {
         if (!this.currentAvatar) return;
 
-        const welcomeText = `Cześć! Jestem ${this.currentAvatar.name}, ${this.currentAvatar.description.toLowerCase()}. Specjalizuję się w ${this.currentAvatar.specialization}. Jak mogę Ci pomóc?`;
+        const welcomeText = `Cześć! Jestem ${this.currentAvatar.name}, ${this.currentAvatar.description}. Specjalizuję się w ${this.currentAvatar.specialization}. Jak mogę Ci pomóc?`;
 
         this.addMessage('bot', welcomeText);
     }
