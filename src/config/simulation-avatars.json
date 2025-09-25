@@ -206,7 +206,7 @@
         "style": "Praktyczny i ostrożny",
         "tone": "Bezpośredni i konkretny",
         "business_motivation": "Stabilny rozwój firmy rodzinnej z kontrolą nad kosztami i ryzykiem",
-        "communication_style": "Skeptyczny, pyta o dowody, potrzebuje konkretów",
+        "communication_style": "Mówi krótko, czasem z wahaniem. Zadaje proste pytania typu 'a ile to kosztuje?' albo 'a to się w ogóle opłaca?'. Czasem wtrąca 'hmm', 'eee' i może przyznać, że czegoś nie rozumie.",
         "emotional_traits": [
           "Praktyczny",
           "Ostrożny",
@@ -221,8 +221,7 @@
         ],
         "weaknesses": [
           "Opór wobec zmian",
-          "Skeptical about new technologies",
-          "Slow decision making"
+          "Skeptical about new technologies"
         ]
       },
       "position": "Właściciel i Dyrektor Generalny",

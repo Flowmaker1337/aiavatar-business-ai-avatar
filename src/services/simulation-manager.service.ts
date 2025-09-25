@@ -713,6 +713,9 @@ HISTORIA ROZMOWY:`;
                 content: systemPrompt
             });
 
+            console.log(`Simulation system prompt: ${systemPrompt}\n`);
+            console.log(`Simulation user prompt: ${finalUserPrompt}\n`);
+
             timer.stop();
             console.log(`🤖 Generated reactive response for ${avatarId} (${userRole} mode)`);
 
@@ -822,28 +825,10 @@ ${avatarId === 'client' ? `WIELKOŚĆ FIRMY: ${avatarData.company.size}` : `DOŚ
         if (avatarId === 'client') {
             return basePrompt + `
 
-TWOJE CELE W ROZMOWIE:
-- Znaleźć rozwiązanie problemów swojej firmy
-- Upewnić się o wartości dla biznesu
-- Sprawdzić czy to opłacalne rozwiązanie
-- Zminimalizować ryzyko biznesowe
-
-TWOJE WYZWANIA:
-- Ograniczony budżet
-- Potrzeba uzasadnienia decyzji przed kierownictwem
-- Skeptycyzm wobec nowych rozwiązań
-- Presja czasu na podejmowanie decyzji
-
-JAKO BUYER:
-- Zadawaj pytania o produkty/usługi
-- Wyrażaj wątpliwości i obawy
-- Negocjuj warunki
-- Bądź skeptyczny ale konstruktywny
-- Żądaj konkretnych przykładów i dowodów
-
-Odpowiadaj w charakterze dla tej osoby, używając jej stylu komunikacji: ${avatarData.personality.communication_style}
-Zakaz używania: formatowania tekstu, znaków końca linii, znaków wcięć, znaków tabulacji, list wypunktowanych i numerycznych, wyliczeń, akapitów.
-        WAŻNE! Odpowiadaj krótkimi zdaniami w maksymalnej ilości 3 zdań i cała odpowiedź ma mieć maksymalnie 350 znaków.`;
+Twoim celem w rozmowie jest znaleźć rozwiązanie, które pomoże firmie rosnąć i nie rozwali budżetu. Chcesz mieć pewność, że to ma sens, że się opłaca i da się obronić przed szefostwem. Ważne są dla Ciebie koszty, opłacalność i bezpieczeństwo.
+Masz też swoje wyzwania: ograniczony budżet, presję czasu, sceptycyzm wobec nowości i konieczność tłumaczenia decyzji przed kierownictwem. To sprawia, że nie zawsze jesteś pewny i potrzebujesz jasnych przykładów.
+W rozmowie mów prosto i naturalnie. Zadawaj jedno pytanie naraz – krótko, jak zwykły klient: „a ile to kosztuje?", „a co z wdrożeniem?". Poczekaj na odpowiedź zanim zadasz kolejne pytanie.
+Bądź raczej ostrożny, ale konstruktywny. Możesz wyrażać obawy, ale też szukać sensownych rozwiązań. Nigdy nie przekraczaj 3 zdań i 350 znaków w odpowiedzi.`;
         } else {
             return basePrompt + `
 
@@ -892,20 +877,25 @@ KONTEKST ROZMOWY:
 - Wyzwania: ${companyProfile.key_challenges || 'Budżet i czas'}`;
         }
 
+//         return `Rozmówca napisał: "{{user_message}}"
+//
+// Twoje zadanie jako ${avatarId === 'client' ? 'KLIENT (buyer)' : 'UCZEŃ (learner)'}:
+// 1. Odpowiedz w charakterze ${avatarData.firstName} ${avatarData.lastName}
+// 2. ${avatarId === 'client' ? 'Zachowuj się jak potencjalny klient szukający rozwiązań biznesowych' : 'Zachowuj się jak chętny do nauki menedżer z ograniczonym doświadczeniem'}
+// 3. ${avatarId === 'client' ? 'Zadawaj pytania o korzyści, koszty, implementacje' : 'Zadawaj pytania o praktyczne zastosowania i przykłady'}
+// 4. Używaj stylu: ${avatarData.personality.communication_style}
+// 5. Reaguj zgodnie z osobowością: ${avatarData.personality.style}
+// ${additionalContext}
+//
+// HISTORIA KONWERSACJI:
+// {{conversation_history}}
+//
+// PAMIĘTAJ: Jesteś ${avatarId === 'client' ? 'sceptycznym ale zainteresowanym klientem' : 'ambitnym ale niepewnym uczniem'}.`;
+
         return `Rozmówca napisał: "{{user_message}}"
 
-Twoje zadanie jako ${avatarId === 'client' ? 'KLIENT (buyer)' : 'UCZEŃ (learner)'}:
-1. Odpowiedz w charakterze ${avatarData.firstName} ${avatarData.lastName}
-2. ${avatarId === 'client' ? 'Zachowuj się jak potencjalny klient szukający rozwiązań biznesowych' : 'Zachowuj się jak chętny do nauki menedżer z ograniczonym doświadczeniem'}
-3. ${avatarId === 'client' ? 'Zadawaj pytania o korzyści, koszty, implementation' : 'Zadawaj pytania o praktyczne zastosowania i przykłady'}
-4. Używaj stylu: ${avatarData.personality.communication_style}
-5. Reaguj zgodnie z osobowością: ${avatarData.personality.style}
-${additionalContext}
-
 HISTORIA KONWERSACJI:
-{{conversation_history}}
-
-PAMIĘTAJ: Jesteś ${avatarId === 'client' ? 'skeptycznym ale zainteresowanym klientem' : 'ambitnym ale niepewnym uczniem'}.`;
+{{conversation_history}}`;
     }
 
     /**
